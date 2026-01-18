@@ -13,3 +13,5 @@ transformers
 dataclasses
 pydantic
 accelerate
+langchain_openai
+langchain

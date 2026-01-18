@@ -1,0 +1,35 @@
+{
+  "include": [
+    "src",
+    "pages",
+    "*.py"
+  ],
+  "exclude": [
+    "**/__pycache__",
+    "**/node_modules",
+    "venv",
+    "dist",
+    "*.egg-info",
+    "analysis",
+    "preprocessing",
+    "inference_logs",
+    "qa_logs",
+    "results_dialog_bench"
+  ],
+  "extraPaths": [
+    "src"
+  ],
+  "pythonVersion": "3.8",
+  "typeCheckingMode": "basic",
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false,
+  "stubPath": "typings"
+}
+
+
+
+
+
+
+
+
