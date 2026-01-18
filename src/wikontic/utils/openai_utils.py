@@ -21,7 +21,7 @@ import httpx
 logging.basicConfig(stream=sys.stderr, level=logging.WARNING)
 logger = logging.getLogger("OpenAIUtils")
 logger.setLevel(logging.DEBUG)
-logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpx").setLevel(logging.ERROR)
 
 # _ = load_dotenv(find_dotenv())
 # OpenAI
