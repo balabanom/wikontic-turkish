@@ -1,0 +1,53 @@
+[project]
+name = "wikontic"
+version = "0.0.7"
+authors = [
+  { name="Alla Chepurova", email="chepurova.data@gmail.com" },
+]
+description = "Extract a knowledge graph with LLM from texts and perform QA over the resulted KG"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+dependencies = [
+    "streamlit",
+    "numpy",
+    "pyvis",
+    "python-dotenv",
+    "pymongo",
+    "openai",
+    "tenacity",
+    "pathlib",
+    "typing",
+    "unidecode",
+    "torch>=2.4.0",
+    "transformers",
+    "dataclasses",
+    "pydantic",
+    "accelerate",
+    "langchain",
+    "langchain_openai",
+]
+
+[project.urls]
+Homepage = "https://github.com/screemix/Wikontic"
+Issues = "https://github.com/screemix/Wikontic/issues"
+
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = ["wikontic", "wikontic.utils"]
+
+[tool.setuptools.package-data]
+wikontic = [
+    "utils/ontology_mappings/*.json",
+    "utils/prompts/**/*.txt",
+]

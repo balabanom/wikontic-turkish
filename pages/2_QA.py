@@ -4,11 +4,12 @@ import networkx as nx
 import tempfile
 import os
 from dotenv import load_dotenv, find_dotenv
+
 # from neo4j import GraphDatabase
 from pymongo import MongoClient
-from utils.structured_dynamic_index_utils_with_db import Aligner
-from utils.openai_utils import LLMTripletExtractor
-from utils.structured_inference_with_db import StructuredInferenceWithDB
+from src.wikontic.utils.structured_aligner import Aligner
+from src.wikontic.utils.openai_utils import LLMTripletExtractor
+from src.wikontic.utils.structured_inference_with_db import StructuredInferenceWithDB
 import uuid
 import logging
 import sys
@@ -16,7 +17,7 @@ import base64
 
 # Configure logging
 logging.basicConfig(stream=sys.stderr)
-logger = logging.getLogger('QA')
+logger = logging.getLogger("QA")
 logger.setLevel(logging.ERROR)
 
 
@@ -33,28 +34,38 @@ _ = load_dotenv(find_dotenv())
 WIKIDATA_ONTOLOGY_DB_NAME = "wikidata_ontology"
 TRIPLETS_DB_NAME = "demo"
 mongo_client = MongoClient(os.getenv("MONGO_URI"))
+api_key = os.getenv("KEY")
+proxy_url = os.getenv("PROXY_URL")
 triplets_db = mongo_client.get_database(TRIPLETS_DB_NAME)
 ontology_db = mongo_client.get_database(WIKIDATA_ONTOLOGY_DB_NAME)
 aligner = Aligner(ontology_db=ontology_db, triplets_db=triplets_db)
 
 st.set_page_config(
-    page_title="Wikontic",
-    page_icon="media/wikotic-wo-text.png",
-    layout="wide"
+    page_title="Wikontic", page_icon="media/wikotic-wo-text.png", layout="wide"
 )
+
 
 # --- Visualize ---
 def visualize_knowledge_graph(triplets, highlight_entities=None):
-    net = Network(height="600px", width="100%", bgcolor="#ffffff", font_color="black", directed=True)
+    net = Network(
+        height="600px",
+        width="100%",
+        bgcolor="#ffffff",
+        font_color="black",
+        directed=True,
+    )
     highlight_entities = highlight_entities or set()
     added_nodes = set()
 
     for t in triplets:
-        s, r, o =  t['subject'], t['relation'], t['object']
+        s, r, o = t["subject"], t["relation"], t["object"]
         for node in [s, o]:
             if node not in added_nodes:
-                net.add_node(node, label=node,
-                             color="#B2CD9C" if node in highlight_entities else "#C7C8CC")
+                net.add_node(
+                    node,
+                    label=node,
+                    color="#B2CD9C" if node in highlight_entities else "#C7C8CC",
+                )
                 added_nodes.add(node)
         net.add_edge(s, o, label=r, color="#000000")
 
@@ -65,11 +76,16 @@ def visualize_knowledge_graph(triplets, highlight_entities=None):
         st.components.v1.html(f.read(), height=600, scrolling=True)
     os.remove(html_path)
 
+
 def query_kg(inferer, question_text):
-    identified_entities = inferer.identify_relevant_entities_from_question(question_text, sample_id=user_id)
-    identified_entities_names = [e['entity'] for e in identified_entities]
-    supporting_triplets, ans = inferer.answer_question(question_text, identified_entities, sample_id=user_id)
-    return identified_entities_names, supporting_triplets, ans
+    identified_entities = inferer.identify_relevant_entities_from_question_with_llm(
+        question_text, sample_id=user_id
+    )
+    supporting_triplets, ans = inferer.answer_question_with_llm(
+        question_text, identified_entities, sample_id=user_id
+    )
+    return identified_entities, supporting_triplets, ans
+
 
 with open("media/wikontic.png", "rb") as f:
     img_bytes = f.read()
@@ -99,30 +115,50 @@ if trigger:
     elif not selected_model:
         st.warning("Please select a model.")
     else:
-        extractor = LLMTripletExtractor(model=selected_model)
-        inferer = StructuredInferenceWithDB(extractor=extractor, aligner=aligner, triplets_db=triplets_db)
-        
+        extractor = LLMTripletExtractor(
+            model=selected_model, api_key=api_key, proxy=proxy_url
+        )
+        inferer = StructuredInferenceWithDB(
+            extractor=extractor, aligner=aligner, triplets_db=triplets_db
+        )
+
         st.markdown(f"#### Results for: *{question}*")
-        identified_entities_names, supporting_triplets, ans = query_kg(inferer, question)
+        identified_entities_names, supporting_triplets, ans = query_kg(
+            inferer, question
+        )
 
         st.session_state.kg = nx.DiGraph()
         for t in supporting_triplets:
-            s, r, o = t['subject'], t['relation'], t['object']
-            st.session_state.kg.add_edge(s, o, label=r, highlight=s in identified_entities_names or o in identified_entities_names)
+            s, r, o = t["subject"], t["relation"], t["object"]
+            st.session_state.kg.add_edge(
+                s,
+                o,
+                label=r,
+                highlight=s in identified_entities_names
+                or o in identified_entities_names,
+            )
 
         st.success(f"✅ Extracted {len(supporting_triplets)} supporting triplets.")
 
         st.subheader("Relevant Subgraph")
-        st.markdown("""
+        st.markdown(
+            """
         - 🟢 <span style='color:#B2CD9C'>**Highlighted Entity**</span> – relevant node from your query  
         - ⚪ <span style='color:#C7C8CC'>**Regular Entity**</span> – node from KG  connected to one of the nodes from your query
-        """, unsafe_allow_html=True)
-        visualize_knowledge_graph(supporting_triplets, highlight_entities=identified_entities_names)
+        """,
+            unsafe_allow_html=True,
+        )
+        visualize_knowledge_graph(
+            supporting_triplets, highlight_entities=identified_entities_names
+        )
 
         # st.success(f"✅ Answer to the question is {ans}")
         st.subheader("Answer")
-        st.markdown(f"""
+        st.markdown(
+            f"""
         <div style='background-color: #d4edda; padding: 10px; border-radius: 5px; border-left: 5px solid #28a745;'>
         ✅ Answer to the question is <strong>{ans}</strong>
         </div>
-        """, unsafe_allow_html=True)
+        """,
+            unsafe_allow_html=True,
+        )
