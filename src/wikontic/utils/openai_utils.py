@@ -18,9 +18,8 @@ import tenacity
 import httpx
 
 # Configure logging
-logging.basicConfig(stream=sys.stderr, level=logging.WARNING)
 logger = logging.getLogger("OpenAIUtils")
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.ERROR)
 logging.getLogger("httpx").setLevel(logging.ERROR)
 
 # _ = load_dotenv(find_dotenv())
