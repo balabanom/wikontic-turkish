@@ -6,10 +6,59 @@ from langchain.tools import tool
 import logging
 
 from .base_inference_with_db import BaseInferenceWithDB
+from .run_logger import start_run, log_artifact, finish_run
 
 warnings.filterwarnings("ignore")
 logger = logging.getLogger("StructuredInferenceWithDB")
 logger.setLevel(logging.ERROR)
+
+# ── Reason Codes ──────────────────────────────────────────────────────────────
+# filtered_triplets ve ontology_filtered_triplets içindeki her triplet'e
+# reason_code field'ı eklenir. UI'da "Filtered Out" tabında gösterilir.
+
+REASON_INVALID_TRIPLET_FORMAT   = "INVALID_TRIPLET_FORMAT"
+REASON_ENTITY_TYPE_NOT_FOUND    = "ENTITY_TYPE_NOT_FOUND"
+REASON_PROPERTY_NOT_IN_ONTOLOGY = "PROPERTY_NOT_IN_ONTOLOGY"
+REASON_ONTOLOGY_VIOLATION       = "ONTOLOGY_VIOLATION"
+REASON_LLM_REFINE_FAILED        = "LLM_REFINE_FAILED"
+
+# exception mesajından reason code çıkarmak için anahtar kelimeler
+_EXCEPTION_REASON_MAP = [
+    ("format",      REASON_INVALID_TRIPLET_FORMAT),
+    ("parse",       REASON_INVALID_TRIPLET_FORMAT),
+    ("json",        REASON_INVALID_TRIPLET_FORMAT),
+    ("key",         REASON_INVALID_TRIPLET_FORMAT),
+    ("refine",      REASON_LLM_REFINE_FAILED),
+    ("llm",         REASON_LLM_REFINE_FAILED),
+    ("timeout",     REASON_LLM_REFINE_FAILED),
+    ("api",         REASON_LLM_REFINE_FAILED),
+]
+
+
+def _reason_from_exception(exc_text: str) -> str:
+    """Exception mesajından en uygun reason code'u tahmin eder."""
+    lower = exc_text.lower()
+    for keyword, code in _EXCEPTION_REASON_MAP:
+        if keyword in lower:
+            return code
+    return REASON_LLM_REFINE_FAILED
+
+
+def _reason_from_validation_msg(exception_msg: str) -> str:
+    """
+    _validate_backbone'un ürettiği exception_msg'den reason code üretir.
+    Birden fazla sorun varsa en spesifik olanı döner.
+    """
+    lower = exception_msg.lower()
+    if "violates property constraints" in lower:
+        return REASON_ONTOLOGY_VIOLATION
+    if "not in candidate relations" in lower:
+        return REASON_PROPERTY_NOT_IN_ONTOLOGY
+    if "subject type not in candidate" in lower or "object type not in candidate" in lower:
+        return REASON_ENTITY_TYPE_NOT_FOUND
+    if "subject type" in lower or "object type" in lower:
+        return REASON_ENTITY_TYPE_NOT_FOUND
+    return REASON_PROPERTY_NOT_IN_ONTOLOGY
 
 
 class StructuredInferenceWithDB(BaseInferenceWithDB):
@@ -34,12 +83,17 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
             self.get_1_hop_supporting_triplets
         )
         self.answer_question_with_llm_tool = tool(self.answer_question_with_llm)
-        # 1st step extraction without database
+
+    def _get_model_name(self) -> str:
+        """Extractor üzerinden model adını almayı dener, bulamazsa 'unknown' döner."""
+        for attr in ("model_name", "model", "llm_model", "model_id"):
+            val = getattr(self.extractor, attr, None)
+            if val and isinstance(val, str):
+                return val
+        return "unknown"
 
     def _refine_entity_types(self, text, triplet):
-        """
-        Refine entity types using LLM.
-        """
+        """Refine entity types using LLM."""
         candidate_subj_type_ids, candidate_obj_type_ids = (
             self.aligner.retrieve_similar_entity_types(triplet=triplet)
         )
@@ -60,7 +114,6 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
             candidate_entity_type_id_2_label[t] for t in candidate_obj_type_ids
         ]
 
-        # no need to refine if the triplet's types are in the candidate types
         if (
             triplet["subject_type"] in candidate_subject_types
             and triplet["object_type"] in candidate_object_types
@@ -75,14 +128,9 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
             refined_object_type_id = candidate_entity_type_label_2_id[
                 triplet["object_type"]
             ]
-
         else:
-            # if the triplet's subject type is in the candidate types,
-            # then only refine the subject type
             if triplet["subject_type"] in candidate_subject_types:
                 candidate_subject_types = [triplet["subject_type"]]
-            # if the triplet's object type is in the candidate types,
-            # then only refine the object type
             if triplet["object_type"] in candidate_object_types:
                 candidate_object_types = [triplet["object_type"]]
 
@@ -103,7 +151,6 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                 if refined_subject_type in candidate_subject_types
                 else None
             )
-
             refined_object_type_id = (
                 candidate_entity_type_label_2_id[refined_object_type]
                 if refined_object_type in candidate_object_types
@@ -120,10 +167,7 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
     def _get_candidate_entity_properties(
         self, triplet: Dict[str, str], subj_type_ids: List[str], obj_type_ids: List[str]
     ) -> Tuple[List[Tuple[str, str]], Dict[str, dict]]:
-        """
-        Retrieve candidate properties and their labels/constraints.
-        """
-        # Get the list of tuples (<property_id>, <property_direction>)
+        """Retrieve candidate properties and their labels/constraints."""
         properties: List[Tuple[str, str]] = (
             self.aligner.retrieve_properties_for_entity_type(
                 target_relation=triplet["relation"],
@@ -132,10 +176,6 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                 k=10,
             )
         )
-        # Get dict {<prop_id>:
-        #           {"label": <prop_label>,
-        #           "valid_subject_type_ids": <valid_subject_type_ids>,
-        #           "valid_object_type_ids": <valid_object_type_ids>}}
         prop_2_label_and_constraint = (
             self.aligner.retrieve_properties_labels_and_constraints(
                 property_id_list=[p[0] for p in properties]
@@ -146,11 +186,7 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
     def _refine_relation(
         self, text, triplet, refined_subject_type_id, refined_object_type_id
     ):
-        """
-        Refine relation using LLM.
-        """
-        # if refined subject and object types are in the candidate types,
-        # then refine the relation
+        """Refine relation using LLM."""
         if refined_subject_type_id and refined_object_type_id:
             relation_direction_candidate_pairs, prop_2_label_and_constraint = (
                 self._get_candidate_entity_properties(
@@ -163,8 +199,6 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                 prop_2_label_and_constraint[p[0]]["label"]
                 for p in relation_direction_candidate_pairs
             ]
-            # no need to refine
-            # if the triplet's relation is in the candidate relations
             if triplet["relation"] in candidate_relations:
                 refined_relation = triplet["relation"]
             else:
@@ -172,14 +206,10 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                 refined_relation = self.extractor.refine_relation(
                     text=text, triplet=triplet, candidate_relations=candidate_relations
                 )["relation"]
-        # if refined subject and object types are not in the candidate types,
-        # leave relation as it is
         else:
             refined_relation = triplet["relation"]
             candidate_relations = []
 
-        # if refined relation is in the candidate relations,
-        # then identify the relation direction
         if refined_relation in candidate_relations:
             refined_relation_id_candidates = [
                 p_id
@@ -195,7 +225,6 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
             refined_relation_direction = (
                 "direct" if "direct" in refined_relation_directions else "inverse"
             )
-
             prop_subject_type_ids = [
                 prop_2_label_and_constraint[prop]["valid_subject_type_ids"]
                 for prop in prop_2_label_and_constraint
@@ -206,7 +235,6 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                 for prop in prop_2_label_and_constraint
                 if prop_2_label_and_constraint[prop]["label"] == refined_relation
             ][0]
-
         else:
             refined_relation_direction = "direct"
             refined_relation_id = None
@@ -232,10 +260,7 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
         valid_subject_type_ids: List[str],
         valid_object_type_ids: List[str],
     ):
-        """
-        Check if the selected backbone_triplet's types and relation are in the valid sets.
-        """
-
+        """Check if the selected backbone_triplet's types and relation are in the valid sets."""
         exception_msg = ""
         if not refined_relation_id:
             exception_msg += "Refined relation not in candidate relations\n"
@@ -246,9 +271,7 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
 
         if exception_msg != "":
             return False, exception_msg
-
         else:
-
             subject_type_hierarchy = self.aligner.retrieve_entity_type_hierarchy(
                 refined_subject_type
             )
@@ -270,9 +293,7 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                 return False, exception_msg
 
     def _refine_entity_name(self, text, triplet, sample_id, is_object=False):
-        """
-        Refine entity names using type constraints.
-        """
+        """Refine entity names using type constraints."""
         self.extractor.reset_error_state()
         if is_object:
             entity = unidecode(triplet["object"])
@@ -283,35 +304,26 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
             entity_type = triplet["subject_type"]
             entity_hierarchy = []
 
-        # do not change time or quantity entities (of objects!)
         if any([t in ["Q186408", "Q309314"] for t in entity_hierarchy]):
             updated_entity = entity
         else:
-            # if not time or quantity entities -> retrieve similar entities by type and name similarity
             similar_entities = self.aligner.retrieve_entity_by_type(
                 entity_name=entity, entity_type=entity_type, sample_id=sample_id
             )
-            # if there are similar entities -> refine entity name
             if len(similar_entities) > 0:
-                # if exact match found -> return the exact match
                 if entity in similar_entities:
                     updated_entity = similar_entities[entity]
                 else:
-                    # if not exact match -> refine entity name
                     updated_entity = self.extractor.refine_entity(
                         text=text,
                         triplet=triplet,
                         candidates=list(similar_entities.values()),
                         is_object=is_object,
                     )
-                    # unidecode the updated entity
                     updated_entity = unidecode(updated_entity)
-                    # if the updated entity is None (meaning that LLM didn't find any similar entities)
-                    # -> return the original entity
                     if re.sub(r"[^\w\s]", "", updated_entity) == "None":
                         updated_entity = entity
             else:
-                # if no similar entities -> return the original entity
                 updated_entity = entity
 
         self.aligner.add_entity(
@@ -324,26 +336,39 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
         return updated_entity
 
     def extract_triplets_with_ontology_filtering(
-        self, text, sample_id=None, source_text_id=None
+        self, text, sample_id=None, source_text_id=None, run_id=None
     ):
         """
         Extract and refine knowledge graph triplets from text using LLM.
 
         Args:
             text (str): Input text to extract triplets from
-            sample_id (str): Sample ID - used to distinguish graphs resulted
-                in different launches/by different users
-            source_text_id (str): Optional, - used to distinguish texts from
-                different sources (for example, different paragraphs of the same text)
+            sample_id (str): Sample ID
+            source_text_id (str): Optional source text identifier
+            run_id (str): Optional run ID for trace logging
         Returns:
-            tuple:
-                (initial_triplets, final_triplets, filtered_triplets, ontology_filtered_triplets)
+            tuple: (initial_triplets, final_triplets, filtered_triplets, ontology_filtered_triplets)
         """
         self.extractor.reset_tokens()
         self.extractor.reset_messages()
         self.extractor.reset_error_state()
 
         extracted_triplets = self.extractor.extract_triplets_from_text(text)
+
+        # ── Stage: raw_llm_output ──────────────────────────────────────────────
+        if run_id:
+            try:
+                log_artifact(
+                    run_id,
+                    "raw_llm_output",
+                    {
+                        "text": str(extracted_triplets),
+                        "type": type(extracted_triplets).__name__,
+                        "format": "string",
+                    },
+                )
+            except Exception as log_exc:
+                logger.warning("run_logger raw_llm_output failed: %s", log_exc)
 
         initial_triplets = []
         for triplet in extracted_triplets["triplets"]:
@@ -354,16 +379,36 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
             triplet["sample_id"] = sample_id
             initial_triplets.append(triplet.copy())
 
+        # ── Stage: parsed_triplets ─────────────────────────────────────────────
+        if run_id:
+            try:
+                log_artifact(
+                    run_id,
+                    "parsed_triplets",
+                    {
+                        "triplets": [
+                            {
+                                "subject": t.get("subject"),
+                                "relation": t.get("relation"),
+                                "object": t.get("object"),
+                            }
+                            for t in initial_triplets
+                        ],
+                        "count": len(initial_triplets),
+                    },
+                )
+            except Exception as log_exc:
+                logger.warning("run_logger parsed_triplets failed: %s", log_exc)
+
         final_triplets = []
         filtered_triplets = []
         ontology_filtered_triplets = []
+        entity_merge_log = []
 
         for triplet in extracted_triplets["triplets"]:
             self.extractor.reset_tokens()
             try:
                 logger.log(logging.DEBUG, "Triplet: %s\n%s" % (str(triplet), "-" * 100))
-
-                # _____________ Refine entity types  __________
 
                 (
                     refined_subject_type,
@@ -372,7 +417,6 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                     refined_object_type_id,
                 ) = self._refine_entity_types(text=text, triplet=triplet)
 
-                # ________________ Refine relation ________________
                 (
                     refined_relation,
                     refined_relation_id,
@@ -392,7 +436,6 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                         refined_subject_type_id,
                     )
 
-                # __________ Refine entity names ___________
                 backbone_triplet = {
                     "subject": (
                         triplet["subject"]
@@ -418,36 +461,34 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                 }
 
                 backbone_triplet["qualifiers"] = triplet["qualifiers"]
+
+                # ── Entity name refinement + merge log ────────────────────────
+                original_subject = backbone_triplet["subject"]
+                original_object = backbone_triplet["object"]
+
                 if refined_subject_type_id:
                     backbone_triplet["subject"] = self._refine_entity_name(
                         text, backbone_triplet, sample_id, is_object=False
                     )
+                    if backbone_triplet["subject"] != original_subject:
+                        entity_merge_log.append({
+                            "from": original_subject,
+                            "to": backbone_triplet["subject"],
+                            "entity_type": backbone_triplet["subject_type"],
+                            "method": "vectorSearch+LLM",
+                        })
 
                 if refined_object_type_id:
                     backbone_triplet["object"] = self._refine_entity_name(
                         text, backbone_triplet, sample_id, is_object=True
                     )
-
-                logger.log(
-                    logging.DEBUG,
-                    "Original subject name: %s\n%s"
-                    % (str(backbone_triplet["subject"]), "-" * 100),
-                )
-                logger.log(
-                    logging.DEBUG,
-                    "Original object name: %s\n%s"
-                    % (str(backbone_triplet["object"]), "-" * 100),
-                )
-                logger.log(
-                    logging.DEBUG,
-                    "Refined subject name: %s\n%s"
-                    % (str(backbone_triplet["subject"]), "-" * 100),
-                )
-                logger.log(
-                    logging.DEBUG,
-                    "Refined object name: %s\n%s"
-                    % (str(backbone_triplet["object"]), "-" * 100),
-                )
+                    if backbone_triplet["object"] != original_object:
+                        entity_merge_log.append({
+                            "from": original_object,
+                            "to": backbone_triplet["object"],
+                            "entity_type": backbone_triplet["object_type"],
+                            "method": "vectorSearch+LLM",
+                        })
 
                 (
                     backbone_triplet["prompt_token_num"],
@@ -456,7 +497,6 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                 backbone_triplet["source_text_id"] = source_text_id
                 backbone_triplet["sample_id"] = sample_id
 
-                # ___________________________ Validate backbone triplet ___________________________
                 backbone_triplet_valid, backbone_triplet_exception_msg = (
                     self._validate_backbone(
                         backbone_triplet["subject_type"],
@@ -477,31 +517,21 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                         "Final triplet: %s\n%s" % (str(backbone_triplet), "-" * 100),
                     )
                 else:
-                    logger.log(
-                        logging.ERROR,
-                        "Final triplet is ontology filtered: %s\n%s"
-                        % (str(backbone_triplet), "-" * 100),
-                    )
-                    logger.log(
-                        logging.ERROR,
-                        "Exception: %s" % (str(backbone_triplet_exception_msg)),
-                    )
-                    logger.log(
-                        logging.ERROR, "Refined relation: %s" % (str(refined_relation))
-                    )
-                    logger.log(
-                        logging.ERROR,
-                        "Refined subject type: %s" % (str(refined_subject_type)),
-                    )
-                    logger.log(
-                        logging.ERROR,
-                        "Refined object type: %s" % (str(refined_object_type)),
-                    )
-
+                    # ── Reason code ───────────────────────────────────────────
+                    reason_code = _reason_from_validation_msg(backbone_triplet_exception_msg)
                     backbone_triplet["exception_text"] = backbone_triplet_exception_msg
+                    backbone_triplet["reason_code"] = reason_code
+
+                    logger.log(
+                        logging.ERROR,
+                        "Ontology filtered [%s]: %s\n%s"
+                        % (reason_code, str(backbone_triplet), "-" * 100),
+                    )
                     ontology_filtered_triplets.append(backbone_triplet.copy())
 
             except Exception as e:
+                # ── Reason code ───────────────────────────────────────────────
+                reason_code = _reason_from_exception(str(e))
                 backbone_triplet = triplet.copy()
                 (
                     backbone_triplet["prompt_token_num"],
@@ -510,12 +540,87 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                 backbone_triplet["source_text_id"] = source_text_id
                 backbone_triplet["sample_id"] = sample_id
                 backbone_triplet["exception_text"] = str(e)
+                backbone_triplet["reason_code"] = reason_code
+
                 filtered_triplets.append(backbone_triplet.copy())
                 logger.log(
                     logging.INFO,
-                    "Filtered triplet: %s\n%s" % (str(backbone_triplet), "-" * 100),
+                    "Filtered [%s]: %s\n%s" % (reason_code, str(backbone_triplet), "-" * 100),
                 )
-                logger.log(logging.INFO, "Exception: %s" % (str(e)))
+
+        # ── Stage: filtered_out ────────────────────────────────────────────────
+        if run_id:
+            try:
+                all_filtered = []
+                for t in filtered_triplets:
+                    all_filtered.append({
+                        "subject": t.get("subject"),
+                        "relation": t.get("relation"),
+                        "object": t.get("object"),
+                        "reason_code": t.get("reason_code", REASON_LLM_REFINE_FAILED),
+                        "exception_text": t.get("exception_text", ""),
+                        "filter_stage": "pipeline_exception",
+                    })
+                for t in ontology_filtered_triplets:
+                    all_filtered.append({
+                        "subject": t.get("subject"),
+                        "relation": t.get("relation"),
+                        "object": t.get("object"),
+                        "reason_code": t.get("reason_code", REASON_ONTOLOGY_VIOLATION),
+                        "exception_text": t.get("exception_text", ""),
+                        "filter_stage": "ontology_validation",
+                    })
+                log_artifact(
+                    run_id,
+                    "filtered_out",
+                    {
+                        "triplets": all_filtered,
+                        "count": len(all_filtered),
+                        "pipeline_exception_count": len(filtered_triplets),
+                        "ontology_filtered_count": len(ontology_filtered_triplets),
+                    },
+                )
+            except Exception as log_exc:
+                logger.warning("run_logger filtered_out failed: %s", log_exc)
+
+        # ── Stage: merge_map_entities ──────────────────────────────────────────
+        if run_id:
+            try:
+                log_artifact(
+                    run_id,
+                    "merge_map_entities",
+                    {
+                        "merges": entity_merge_log,
+                        "count": len(entity_merge_log),
+                    },
+                )
+            except Exception as log_exc:
+                logger.warning("run_logger merge_map_entities failed: %s", log_exc)
+
+        # ── Stage: final_triplets ──────────────────────────────────────────────
+        if run_id:
+            try:
+                log_artifact(
+                    run_id,
+                    "final_triplets",
+                    {
+                        "triplets": [
+                            {
+                                "subject": t.get("subject"),
+                                "relation": t.get("relation"),
+                                "object": t.get("object"),
+                                "subject_type": t.get("subject_type"),
+                                "object_type": t.get("object_type"),
+                            }
+                            for t in final_triplets
+                        ],
+                        "count": len(final_triplets),
+                        "filtered_count": len(filtered_triplets),
+                        "ontology_filtered_count": len(ontology_filtered_triplets),
+                    },
+                )
+            except Exception as log_exc:
+                logger.warning("run_logger final_triplets failed: %s", log_exc)
 
         return (
             initial_triplets,
@@ -528,35 +633,67 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
         self, text, sample_id=None, source_text_id=None
     ):
         """
-        Extract and refine knowledge graph triplets from text using LLM, then add them to the database.
+        Extract and refine knowledge graph triplets from text using LLM,
+        then add them to the database.
+
         Args:
             text (str): Input text to extract triplets from
-            sample_id (str): Sample ID - used to distinguish graphs resulted in different launches/by different users
-            source_text_id (str): Optional, - used to distinguish text from different sources (e.g., different paragraphs of the same text)
+            sample_id (str): Sample ID
+            source_text_id (str): Optional source text identifier
         Returns:
-            tuple: (initial_triplets, final_triplets, filtered_triplets, ontology_filtered_triplets)
+            tuple: (initial_triplets, final_triplets, filtered_triplets,
+                    ontology_filtered_triplets, run_id)
         """
-        (
-            initial_triplets,
-            final_triplets,
-            filtered_triplets,
-            ontology_filtered_triplets,
-        ) = self.extract_triplets_with_ontology_filtering(
-            text, sample_id=sample_id, source_text_id=source_text_id
+        model_name = self._get_model_name()
+        run_id = start_run(
+            sample_id=str(sample_id) if sample_id is not None else "unknown",
+            model=model_name,
+            extra_config={"source_text_id": source_text_id},
         )
-        if len(initial_triplets) > 0:
-            self.aligner.add_initial_triplets(initial_triplets, sample_id=sample_id)
-        if len(final_triplets) > 0:
-            self.aligner.add_triplets(final_triplets, sample_id=sample_id)
-        if len(filtered_triplets) > 0:
-            self.aligner.add_filtered_triplets(filtered_triplets, sample_id=sample_id)
-        if len(ontology_filtered_triplets) > 0:
-            self.aligner.add_ontology_filtered_triplets(
-                ontology_filtered_triplets, sample_id=sample_id
+
+        try:
+            (
+                initial_triplets,
+                final_triplets,
+                filtered_triplets,
+                ontology_filtered_triplets,
+            ) = self.extract_triplets_with_ontology_filtering(
+                text,
+                sample_id=sample_id,
+                source_text_id=source_text_id,
+                run_id=run_id,
             )
+
+            if len(initial_triplets) > 0:
+                self.aligner.add_initial_triplets(initial_triplets, sample_id=sample_id)
+            if len(final_triplets) > 0:
+                self.aligner.add_triplets(final_triplets, sample_id=sample_id)
+            if len(filtered_triplets) > 0:
+                self.aligner.add_filtered_triplets(filtered_triplets, sample_id=sample_id)
+            if len(ontology_filtered_triplets) > 0:
+                self.aligner.add_ontology_filtered_triplets(
+                    ontology_filtered_triplets, sample_id=sample_id
+                )
+
+            finish_run(
+                run_id=run_id,
+                status="DONE",
+                stats={
+                    "initial_count": len(initial_triplets),
+                    "final_count": len(final_triplets),
+                    "filtered_count": len(filtered_triplets),
+                    "ontology_filtered_count": len(ontology_filtered_triplets),
+                },
+            )
+
+        except Exception as e:
+            finish_run(run_id=run_id, status="FAILED", error=str(e))
+            raise
+
         return (
             initial_triplets,
             final_triplets,
             filtered_triplets,
             ontology_filtered_triplets,
+            run_id,
         )
