@@ -488,6 +488,11 @@ except Exception as e:
 
 last_run_id = st.session_state.get("last_run_id", None)
 
+# Run Viewer'dan gelen seçimi de dikkate al
+if st.session_state.get("selected_run_id"):
+    last_run_id = st.session_state.get("selected_run_id")
+    st.session_state["selected_run_id"] = None  # bir kez kullan
+
 if recent_runs:
     run_labels = [r["label"] for r in recent_runs]
     run_ids = [r["run_id"] for r in recent_runs]

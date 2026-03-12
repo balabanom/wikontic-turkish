@@ -23,6 +23,8 @@ def _ensure_indexes(db):
     runs.create_index([("created_at", DESCENDING)], background=True)
     runs.create_index([("sample_id", ASCENDING)], background=True)
     runs.create_index([("status", ASCENDING)], background=True)
+    runs.create_index([("model", ASCENDING)], background=True)
+    runs.create_index([("parent_run_id", ASCENDING)], background=True)
 
     artifacts = db["extraction_artifacts"]
     artifacts.create_index([("run_id", ASCENDING)], background=True)
@@ -33,10 +35,22 @@ def _ensure_indexes(db):
     )
 
 
-def start_run(sample_id: str, model: str, extra_config: dict | None = None) -> str:
+def start_run(
+    sample_id: str,
+    model: str,
+    input_text: str | None = None,
+    extra_config: dict | None = None,
+    parent_run_id: str | None = None,
+) -> str:
     """
     Yeni bir extraction run başlatır.
-    Döndürdüğü run_id'yi pipeline'a geçirin.
+
+    Args:
+        sample_id:      Streamlit user/session ID
+        model:          Kullanılan model adı
+        input_text:     Ham input metni (export/replay için şart)
+        extra_config:   Ek config parametreleri
+        parent_run_id:  Replay ise orijinal run'ın ID'si
     """
     db = _get_db()
     run_id = str(uuid.uuid4())
@@ -46,10 +60,12 @@ def start_run(sample_id: str, model: str, extra_config: dict | None = None) -> s
         "created_at": datetime.now(timezone.utc),
         "sample_id": sample_id,
         "model": model,
+        "input_text": input_text or "",
         "status": "STARTED",
         "error": None,
         "stats": None,
         "extra_config": extra_config or {},
+        "parent_run_id": parent_run_id,   # None ise normal run, dolu ise replay
     }
 
     db["extraction_runs"].insert_one(doc)
@@ -63,6 +79,8 @@ def log_artifact(run_id: str, stage: str, payload: dict) -> None:
     stage örnekleri:
         "raw_llm_output"
         "parsed_triplets"
+        "merge_map_entities"
+        "filtered_out"
         "final_triplets"
     """
     db = _get_db()
@@ -74,7 +92,6 @@ def log_artifact(run_id: str, stage: str, payload: dict) -> None:
         "created_at": datetime.now(timezone.utc),
     }
 
-    # Aynı run_id + stage varsa üzerine yaz (upsert)
     db["extraction_artifacts"].update_one(
         {"run_id": run_id, "stage": stage},
         {"$set": doc},

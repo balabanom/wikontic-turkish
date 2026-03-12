@@ -20,7 +20,6 @@ def _get_db():
 # ── Normalizasyon ──────────────────────────────────────────────────────────────
 
 def _normalize_raw_llm_output(payload: dict) -> dict:
-    """raw_llm_output payload'ını standart formata getirir."""
     return {
         "text": str(payload.get("text", payload.get("raw", ""))),
         "format": payload.get("format", "string"),
@@ -29,10 +28,7 @@ def _normalize_raw_llm_output(payload: dict) -> dict:
 
 
 def _normalize_triplets_payload(payload: dict) -> dict:
-    """parsed_triplets / final_triplets payload'ını standart formata getirir."""
     triplets = payload.get("triplets", [])
-
-    # Eski format: doğrudan liste geldiyse
     if isinstance(payload, list):
         triplets = payload
 
@@ -43,7 +39,6 @@ def _normalize_triplets_payload(payload: dict) -> dict:
                 "subject": t.get("subject", ""),
                 "relation": t.get("relation", ""),
                 "object": t.get("object", ""),
-                # final_triplets'te varsa tip bilgisini de al
                 "subject_type": t.get("subject_type", ""),
                 "object_type": t.get("object_type", ""),
             }
@@ -57,10 +52,39 @@ def _normalize_triplets_payload(payload: dict) -> dict:
     }
 
 
+def _normalize_filtered_out(payload: dict) -> dict:
+    triplets = payload.get("triplets", [])
+    normalized = []
+    for t in triplets:
+        normalized.append({
+            "subject": t.get("subject", ""),
+            "relation": t.get("relation", ""),
+            "object": t.get("object", ""),
+            "reason_code": t.get("reason_code", ""),
+            "filter_stage": t.get("filter_stage", ""),
+            "exception_text": t.get("exception_text", ""),
+        })
+    return {
+        "triplets": normalized,
+        "count": payload.get("count", len(normalized)),
+        "pipeline_exception_count": payload.get("pipeline_exception_count", 0),
+        "ontology_filtered_count": payload.get("ontology_filtered_count", 0),
+    }
+
+
+def _normalize_merge_map(payload: dict) -> dict:
+    return {
+        "merges": payload.get("merges", []),
+        "count": payload.get("count", len(payload.get("merges", []))),
+    }
+
+
 _NORMALIZERS = {
     "raw_llm_output": _normalize_raw_llm_output,
     "parsed_triplets": _normalize_triplets_payload,
     "final_triplets": _normalize_triplets_payload,
+    "filtered_out": _normalize_filtered_out,
+    "merge_map_entities": _normalize_merge_map,
 }
 
 
@@ -71,17 +95,21 @@ def _normalize(stage: str, payload: dict) -> dict:
     return payload
 
 
+def _fmt_datetime(dt) -> str:
+    if isinstance(dt, datetime):
+        return dt.strftime("%Y-%m-%d %H:%M:%S")
+    return str(dt) if dt else ""
+
+
 # ── Public API ─────────────────────────────────────────────────────────────────
 
 def get_run(run_id: str) -> Optional[dict]:
     """
-    Verilen run_id için metadata döner.
-    Bulunamazsa None döner.
+    Verilen run_id için metadata döner. Bulunamazsa None döner.
     """
     try:
         db = _get_db()
-        doc = db["extraction_runs"].find_one({"_id": run_id})
-        return doc
+        return db["extraction_runs"].find_one({"_id": run_id})
     except Exception:
         return None
 
@@ -93,9 +121,7 @@ def get_artifact(run_id: str, stage: str) -> Optional[dict]:
     """
     try:
         db = _get_db()
-        doc = db["extraction_artifacts"].find_one(
-            {"run_id": run_id, "stage": stage}
-        )
+        doc = db["extraction_artifacts"].find_one({"run_id": run_id, "stage": stage})
         if doc is None:
             return None
         return _normalize(stage, doc.get("payload", {}))
@@ -103,45 +129,167 @@ def get_artifact(run_id: str, stage: str) -> Optional[dict]:
         return None
 
 
-def list_recent_runs(limit: int = 20, sample_id: Optional[str] = None) -> list:
+def get_all_artifacts(run_id: str) -> dict:
     """
-    Son run'ların özetini döner (dropdown için).
-    Her eleman: {run_id, created_at, model, sample_id, status, preview}
+    Verilen run_id için tüm stage artifact'larını dict olarak döner.
+    Export paketi için kullanılır.
+    Format: {"stage_name": payload_dict, ...}
+    """
+    try:
+        db = _get_db()
+        cursor = db["extraction_artifacts"].find({"run_id": run_id})
+        result = {}
+        for doc in cursor:
+            stage = doc.get("stage", "unknown")
+            result[stage] = _normalize(stage, doc.get("payload", {}))
+        return result
+    except Exception:
+        return {}
 
-    preview: run'ın sample_id'si veya created_at string'i — dropdown'da göstermek için.
+
+def list_recent_runs(
+    limit: int = 50,
+    sample_id: Optional[str] = None,
+    status: Optional[str] = None,
+    model: Optional[str] = None,
+    date_from: Optional[datetime] = None,
+    date_to: Optional[datetime] = None,
+) -> list:
+    """
+    Son run'ların özetini döner.
+
+    Her eleman:
+    {
+        run_id, created_at, model, sample_id, status,
+        input_preview, stats, label
+    }
+
+    Filtreler:
+        sample_id: tam eşleşme
+        status:    tam eşleşme ("DONE" | "FAILED" | "STARTED")
+        model:     tam eşleşme
+        date_from: bu tarihten itibaren (inclusive)
+        date_to:   bu tarihe kadar (inclusive)
     """
     try:
         db = _get_db()
         query = {}
+
         if sample_id:
             query["sample_id"] = sample_id
+        if status:
+            query["status"] = status
+        if model:
+            query["model"] = model
+        if date_from or date_to:
+            date_filter = {}
+            if date_from:
+                date_filter["$gte"] = date_from
+            if date_to:
+                date_filter["$lte"] = date_to
+            query["created_at"] = date_filter
 
         cursor = (
             db["extraction_runs"]
-            .find(query, {"_id": 1, "created_at": 1, "model": 1, "sample_id": 1, "status": 1})
+            .find(
+                query,
+                {
+                    "_id": 1, "created_at": 1, "model": 1,
+                    "sample_id": 1, "status": 1,
+                    "input_text": 1, "stats": 1,
+                    "error": 1, "finished_at": 1,
+                    "extra_config": 1,
+                },
+            )
             .sort("created_at", DESCENDING)
             .limit(limit)
         )
 
         results = []
         for doc in cursor:
-            created_at = doc.get("created_at")
-            if isinstance(created_at, datetime):
-                created_str = created_at.strftime("%Y-%m-%d %H:%M:%S")
-            else:
-                created_str = str(created_at)
+            created_str = _fmt_datetime(doc.get("created_at"))
+            raw_input = doc.get("input_text", "") or ""
+            input_preview = raw_input[:150] + ("…" if len(raw_input) > 150 else "")
+            model_name = doc.get("model", "unknown")
+            status_val = doc.get("status", "")
 
             results.append(
                 {
                     "run_id": doc["_id"],
                     "created_at": created_str,
-                    "model": doc.get("model", "unknown"),
+                    "model": model_name,
                     "sample_id": doc.get("sample_id", ""),
-                    "status": doc.get("status", ""),
-                    # Dropdown'da gösterilecek label
-                    "label": f"{created_str}  |  {doc.get('model', 'unknown')}  |  {doc.get('status', '')}",
+                    "status": status_val,
+                    "input_preview": input_preview,
+                    "input_text": raw_input,
+                    "stats": doc.get("stats") or {},
+                    "error": doc.get("error"),
+                    "finished_at": _fmt_datetime(doc.get("finished_at")),
+                    "extra_config": doc.get("extra_config") or {},
+                    # Dropdown label (kısa)
+                    "label": f"{created_str}  |  {model_name}  |  {status_val}",
                 }
             )
         return results
+
     except Exception:
         return []
+
+
+def get_distinct_models() -> list:
+    """Dropdown için mevcut model listesini döner."""
+    try:
+        db = _get_db()
+        return db["extraction_runs"].distinct("model")
+    except Exception:
+        return []
+
+
+def get_child_runs(parent_run_id: str) -> list:
+    """
+    Verilen parent_run_id için child run'ları (replay'leri) döner.
+    Her eleman: {run_id, created_at, model, status, label}
+    """
+    try:
+        db = _get_db()
+        cursor = (
+            db["extraction_runs"]
+            .find(
+                {"parent_run_id": parent_run_id},
+                {"_id": 1, "created_at": 1, "model": 1, "status": 1},
+            )
+            .sort("created_at", DESCENDING)
+        )
+        results = []
+        for doc in cursor:
+            created_str = _fmt_datetime(doc.get("created_at"))
+            results.append({
+                "run_id": doc["_id"],
+                "created_at": created_str,
+                "model": doc.get("model", "unknown"),
+                "status": doc.get("status", ""),
+                "label": f"{created_str}  |  {doc.get('model', 'unknown')}  |  {doc.get('status', '')}",
+            })
+        return results
+    except Exception:
+        return []
+
+
+def delete_run(run_id: str) -> dict:
+    """
+    Verilen run_id için run + tüm artifact'larını siler.
+    Artifacts önce, run sonra (orphan riski yok).
+
+    Returns: {"runs_deleted": int, "artifacts_deleted": int, "ok": bool}
+    """
+    try:
+        db = _get_db()
+        art_res = db["extraction_artifacts"].delete_many({"run_id": run_id})
+        run_res = db["extraction_runs"].delete_one({"_id": run_id})
+        return {
+            "runs_deleted":      run_res.deleted_count,
+            "artifacts_deleted": art_res.deleted_count,
+            "ok": True,
+        }
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
