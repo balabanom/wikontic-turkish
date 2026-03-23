@@ -456,6 +456,7 @@ with right_col:
                 if st.button("↗️ KG Extraction'da aç", key="open_in_extraction"):
                     st.session_state["last_run_id"]    = selected_run_id
                     st.session_state["selected_run_id"] = selected_run_id
+                    st.session_state["_rv_just_navigated"]  = True
                     st.switch_page("pages/1_KG_Extraction.py")
 
             with btn_col2:
