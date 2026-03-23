@@ -168,33 +168,39 @@ class LLMTripletExtractor:
 		return output
 
 	@tenacity.retry(stop=tenacity.stop_after_attempt(MAX_ATTEMPTS), reraise=True)
-	def extract_triplets_from_text(self, text: str) -> dict:
+	def extract_triplets_from_text(self, text: str, sentences: list | None = None) -> dict:
 		"""Extract knowledge graph triplets from text."""
-
 		self._refine_attempt += 1
 		attempt = self._refine_attempt
-		logger.log(
-			logging.DEBUG,
-			"Attempt of a function call extract_triplets_from_text: %s",
-			attempt,
-		)
+		logger.log(logging.DEBUG,
+			"Attempt of a function call extract_triplets_from_text: %s", attempt)
+
 		system_prompt = self.prompts["triplet_extraction"]
 		if attempt > 1:
 			prev_error = self._prev_error
 			system_prompt += f"\n(Previous attempt #{attempt-1} failed with error: {prev_error}. Please adjust your answer!)"
 			logger.log(logging.ERROR, "System prompt: %s", system_prompt)
 
-		try:
-			return self.get_completion(
-				system_prompt=system_prompt, user_prompt=f'Text: "{text}"'
+		# Numaralı cümle listesi varsa prompt'a ekle
+		if sentences:
+			numbered = "\n".join(f"[{s['id']}] {s['text']}" for s in sentences)
+			user_prompt = (
+				f'Text: "{text}"\n\n'
+				f"Sentences (numbered):\n{numbered}\n\n"
+				f"For each triplet, set sentence_id to the index of the sentence "
+				f"it was extracted from (integer). If unsure, set sentence_id to null."
 			)
+		else:
+			user_prompt = f'Text: "{text}"'
+
+		try:
+			return self.get_completion(system_prompt=system_prompt, user_prompt=user_prompt)
 		except Exception as e:
 			self._prev_error = e
-			# if json from output is broken after 3 attempts  - raise an exception
 			logger.log(logging.ERROR, str(e))
 			if attempt > self.MAX_ATTEMPTS:
 				raise e
-
+ 
 	@tenacity.retry(stop=tenacity.stop_after_attempt(MAX_ATTEMPTS), reraise=True)
 	def refine_entity_types(
 		self,

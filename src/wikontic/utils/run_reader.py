@@ -40,32 +40,57 @@ def _normalize_triplets_payload(payload: dict) -> dict:
                 "relation": t.get("relation", ""),
                 "object": t.get("object", ""),
                 "subject_type": t.get("subject_type", ""),
-                "object_type": t.get("object_type", ""),
+                "object_type":  t.get("object_type", ""),
+                "sentence_id":  t.get("sentence_id"),
             }
         )
 
+    # sentences lookup: sentence_id → text
+    sentences    = payload.get("sentences", [])
+    sid_to_text  = {s["id"]: s["text"] for s in sentences} if sentences else {}
+
+    # sentence_preview alanı türet
+    for t in normalized:
+        sid = t.get("sentence_id")
+        if sid is not None and sid in sid_to_text:
+            full = sid_to_text[sid]
+            t["sentence_preview"] = full[:80] + ("…" if len(full) > 80 else "")
+            t["sentence_full"]    = full
+        else:
+            t["sentence_preview"] = None
+            t["sentence_full"]    = None
+
     return {
-        "triplets": normalized,
-        "count": payload.get("count", len(normalized)),
-        "filtered_count": payload.get("filtered_count", None),
+        "triplets":                normalized,
+        "count":                   payload.get("count", len(normalized)),
+        "filtered_count":          payload.get("filtered_count", None),
         "ontology_filtered_count": payload.get("ontology_filtered_count", None),
+        "sentences":               sentences,
     }
 
 
 def _normalize_filtered_out(payload: dict) -> dict:
-    triplets = payload.get("triplets", [])
+    triplets  = payload.get("triplets", [])
+    sentences = payload.get("sentences", [])
+    sid_to_text = {s["id"]: s["text"] for s in sentences} if sentences else {}
+
     normalized = []
     for t in triplets:
+        sid  = t.get("sentence_id")
+        full = sid_to_text.get(sid) if sid is not None else None
         normalized.append({
-            "subject": t.get("subject", ""),
-            "relation": t.get("relation", ""),
-            "object": t.get("object", ""),
-            "reason_code": t.get("reason_code", ""),
-            "filter_stage": t.get("filter_stage", ""),
-            "exception_text": t.get("exception_text", ""),
+            "subject":         t.get("subject", ""),
+            "relation":        t.get("relation", ""),
+            "object":          t.get("object", ""),
+            "reason_code":     t.get("reason_code", ""),
+            "filter_stage":    t.get("filter_stage", ""),
+            "exception_text":  t.get("exception_text", ""),
+            "sentence_id":     sid,
+            "sentence_preview": (full[:80] + "…" if full and len(full) > 80 else full),
+            "sentence_full":   full,
         })
     return {
-        "triplets": normalized,
+        "triplets":  normalized,
         "count": payload.get("count", len(normalized)),
         "pipeline_exception_count": payload.get("pipeline_exception_count", 0),
         "ontology_filtered_count": payload.get("ontology_filtered_count", 0),

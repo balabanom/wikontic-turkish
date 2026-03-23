@@ -1,4 +1,4 @@
-# --- File: 1_KG_Extraction.py ---
+# --- File: pages/1_KG_Extraction.py ---
 import streamlit as st
 from pyvis.network import Network
 import tempfile
@@ -15,7 +15,6 @@ import sys
 import base64
 import pandas as pd
 
-# Configure logging
 logging.basicConfig(stream=sys.stderr)
 logger = logging.getLogger("KGExtraction")
 logger.setLevel(logging.INFO)
@@ -27,10 +26,9 @@ st.set_page_config(
 WIKIDATA_ONTOLOGY_DB_NAME = "wikidata_ontology"
 TRIPLETS_DB_NAME = "demo"
 
-# --- Mongo Setup ---
 _ = load_dotenv(find_dotenv())
 mongo_client = MongoClient(os.getenv("MONGO_URI"))
-api_key = os.getenv("KEY")
+api_key   = os.getenv("KEY")
 proxy_url = os.getenv("PROXY_URL")
 ontology_db = mongo_client.get_database(WIKIDATA_ONTOLOGY_DB_NAME)
 triplets_db = mongo_client.get_database(TRIPLETS_DB_NAME)
@@ -41,7 +39,6 @@ aligner = Aligner(ontology_db=ontology_db, triplets_db=triplets_db)
 with open("media/wikontic.png", "rb") as f:
     img_bytes = f.read()
 encoded = base64.b64encode(img_bytes).decode()
-
 st.markdown(
     f"""
     <div style="display: flex; align-items: center;">
@@ -52,10 +49,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ── Kullanıcı adı girişi ──────────────────────────────────────────────────────
-# Aynı kullanıcı adı → aynı KG, uygulama kapansa bile.
-# user_id olarak doğrudan username kullanılır (boşluk trim edilir).
-
+# ── Kullanıcı adı (sidebar) ───────────────────────────────────────────────────
 if "user_id" not in st.session_state:
     st.session_state["user_id"] = ""
 
@@ -70,16 +64,14 @@ with st.sidebar:
 
     if username_input:
         if username_input != st.session_state["user_id"]:
-            # Kullanıcı adı değişti — session'ı sıfırla
-            st.session_state["user_id"]          = username_input
-            st.session_state["last_run_id"]      = None
-            st.session_state["input_text"]       = ""
+            st.session_state["user_id"]             = username_input
+            st.session_state["last_run_id"]         = None
+            st.session_state["input_text"]          = ""
             st.session_state["selected_predefined"] = None
             st.rerun()
         user_id = username_input
         st.success(f"KG: **{user_id}**")
     else:
-        # Kullanıcı adı girilmemişse geçici UUID kullan (session boyunca sabit)
         if not st.session_state["user_id"]:
             st.session_state["user_id"] = f"guest_{str(uuid.uuid4())[:8]}"
         user_id = st.session_state["user_id"]
@@ -91,98 +83,94 @@ logger.info(f"User ID: {user_id}")
 # ── Yardımcı fonksiyonlar ─────────────────────────────────────────────────────
 
 def fetch_related_triplets(entities, sample_id_override: str | None = None):
-    """
-    demo.triplets koleksiyonundan entity'lerle ilgili tripletleri çeker.
-    sample_id_override: Run Viewer'dan gelince run'ın kendi sample_id'si geçilir.
-    """
     sid = sample_id_override if sample_id_override else user_id
     collection = triplets_db.get_collection("triplets")
     query = {
         "$or": [{"subject": {"$in": entities}}, {"object": {"$in": entities}}],
         "sample_id": sid,
     }
-    results = collection.find(
-        query, {"_id": 0, "subject": 1, "relation": 1, "object": 1}
-    )
+    results = collection.find(query, {"_id": 0, "subject": 1, "relation": 1, "object": 1})
     return [(doc["subject"], doc["relation"], doc["object"]) for doc in results]
 
 
 def visualize_knowledge_graph(triplets, highlight_entities=None):
-    net = Network(
-        height="600px", width="100%", bgcolor="#ffffff",
-        font_color="black", directed=True,
-    )
+    net = Network(height="600px", width="100%", bgcolor="#ffffff",
+                  font_color="black", directed=True)
     highlight_entities = highlight_entities or set()
     added_nodes = set()
-
     for s, r, o in triplets:
         for node in [s, o]:
             if node not in added_nodes:
-                net.add_node(
-                    node, label=node,
-                    color="#B2CD9C" if node in highlight_entities else "#C7C8CC",
-                )
+                net.add_node(node, label=node,
+                             color="#B2CD9C" if node in highlight_entities else "#C7C8CC")
                 added_nodes.add(node)
         net.add_edge(s, o, label=r, color="#000000")
-
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as tmp_file:
-        net.save_graph(tmp_file.name)
-        html_path = tmp_file.name
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as tmp:
+        net.save_graph(tmp.name)
+        html_path = tmp.name
     with open(html_path, "r", encoding="utf-8") as f:
         st.components.v1.html(f.read(), height=600, scrolling=True)
     os.remove(html_path)
 
 
 def visualize_initial_knowledge_graph(initial_triplets):
-    net = Network(
-        height="600px", width="100%", bgcolor="#ffffff",
-        font_color="black", directed=True,
-    )
+    net = Network(height="600px", width="100%", bgcolor="#ffffff",
+                  font_color="black", directed=True)
     for t in initial_triplets:
         s, r, o = t["subject"], t["relation"], t["object"]
         net.add_node(s, label=s, color="#B2CD9C")
         net.add_node(o, label=o, color="#B2CD9C")
         net.add_edge(s, o, label=r, color="#000000")
-
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as tmp_file:
-        net.save_graph(tmp_file.name)
-        html_path = tmp_file.name
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as tmp:
+        net.save_graph(tmp.name)
+        html_path = tmp.name
     with open(html_path, "r", encoding="utf-8") as f:
         st.components.v1.html(f.read(), height=600, scrolling=True)
     os.remove(html_path)
 
 
 def visualize_ontology_neighborhood(neighborhood: dict):
-    net = Network(
-        height="500px", width="100%", bgcolor="#ffffff",
-        font_color="black", directed=True,
-    )
+    net = Network(height="500px", width="100%", bgcolor="#ffffff",
+                  font_color="black", directed=True)
     center = neighborhood["center"]
     net.add_node(center["id"], label=f"{center['label']}\n({center['id']})",
                  color="#4A90D9", size=25)
-
     for parent in neighborhood.get("parents", []):
         net.add_node(parent["id"], label=f"{parent['label']}\n({parent['id']})",
                      color="#F5A623", size=18)
-        net.add_edge(center["id"], parent["id"], label="is a",
-                     color="#F5A623", dashes=True)
-
+        net.add_edge(center["id"], parent["id"], label="is a", color="#F5A623", dashes=True)
     for prop in neighborhood.get("properties", []):
-        prop_node_id = f"prop_{prop['id']}"
-        color = "#5CB85C" if prop["direction"] == "subject" else "#9B59B6"
+        prop_node_id   = f"prop_{prop['id']}"
+        color          = "#5CB85C" if prop["direction"] == "subject" else "#9B59B6"
         direction_label = "→ subject" if prop["direction"] == "subject" else "← object"
         net.add_node(prop_node_id,
                      label=f"{prop['label']}\n({prop['id']})\n{direction_label}",
                      color=color, size=14, shape="box")
         net.add_edge(center["id"], prop_node_id, label=prop["label"], color=color)
-
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as tmp_file:
-        net.save_graph(tmp_file.name)
-        html_path = tmp_file.name
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as tmp:
+        net.save_graph(tmp.name)
+        html_path = tmp.name
     with open(html_path, "r", encoding="utf-8") as f:
         st.components.v1.html(f.read(), height=500, scrolling=True)
     os.remove(html_path)
 
+
+def _show_sentence_detail(triplets: list, key_prefix: str):
+    """Triplet tablosunun altında opsiyonel cümle detayı."""
+    has_sentences = any(t.get("sentence_full") for t in triplets)
+    if not has_sentences:
+        return
+    if st.checkbox("📖 Cümle detaylarını göster", key=f"{key_prefix}_sent_detail"):
+        for t in triplets:
+            if t.get("sentence_full"):
+                st.caption(
+                    f"[{t.get('sentence_id', '?')}] "
+                    f"**{t.get('subject','')}** — {t.get('relation','')} — **{t.get('object','')}**"
+                )
+                st.info(t["sentence_full"])
+
+
+# ── Şeffaflık Paneli ──────────────────────────────────────────────────────────
 
 def render_transparency_panel(selected_run_id: str):
     if not selected_run_id:
@@ -191,14 +179,14 @@ def render_transparency_panel(selected_run_id: str):
 
     run_meta = get_run(selected_run_id)
     if run_meta:
-        meta_cols = st.columns(4)
-        meta_cols[0].metric("Status", run_meta.get("status", "—"))
-        meta_cols[1].metric("Model", run_meta.get("model", "—"))
+        mc = st.columns(4)
+        mc[0].metric("Status", run_meta.get("status", "—"))
+        mc[1].metric("Model",  run_meta.get("model",  "—"))
         created_at = run_meta.get("created_at", "")
         if hasattr(created_at, "strftime"):
             created_at = created_at.strftime("%Y-%m-%d %H:%M:%S")
-        meta_cols[2].metric("Created At", str(created_at))
-        meta_cols[3].metric("Sample ID", str(run_meta.get("sample_id", "—"))[:12] + "…")
+        mc[2].metric("Created At", str(created_at))
+        mc[3].metric("Sample ID", str(run_meta.get("sample_id", "—"))[:12] + "…")
         if run_meta.get("status") == "FAILED" and run_meta.get("error"):
             st.error(f"Run hatası: {run_meta['error']}")
     else:
@@ -208,10 +196,14 @@ def render_transparency_panel(selected_run_id: str):
     st.caption(f"🔑 Run ID: `{selected_run_id}`")
 
     tab0, tab1, tab2, tab3, tab4 = st.tabs([
-        "🔴 Raw-0: LLM Output", "🟡 Raw-1: Parsed Triplets",
-        "🔀 Merge Log", "🚫 Filtered Out", "🟢 Final Triplets",
+        "🔴 Raw-0: LLM Output",
+        "🟡 Raw-1: Parsed Triplets",
+        "🔀 Merge Log",
+        "🚫 Filtered Out",
+        "🟢 Final Triplets",
     ])
 
+    # ── Tab 0: Ham LLM çıktısı ────────────────────────────────────────────────
     with tab0:
         art = get_artifact(selected_run_id, "raw_llm_output")
         if art is None:
@@ -220,6 +212,7 @@ def render_transparency_panel(selected_run_id: str):
             with st.expander("Ham LLM Çıktısı", expanded=True):
                 st.code(art.get("text", ""), language="json")
 
+    # ── Tab 1: Parsed Triplets ────────────────────────────────────────────────
     with tab1:
         art = get_artifact(selected_run_id, "parsed_triplets")
         if art is None:
@@ -228,11 +221,15 @@ def render_transparency_panel(selected_run_id: str):
             triplets = art.get("triplets", [])
             st.caption(f"**{art.get('count', len(triplets))} triplet** parse edildi")
             if triplets:
-                st.dataframe(pd.DataFrame(triplets)[["subject", "relation", "object"]],
+                cols     = ["subject", "relation", "object", "sentence_id", "sentence_preview"]
+                existing = [c for c in cols if c in pd.DataFrame(triplets).columns]
+                st.dataframe(pd.DataFrame(triplets)[existing],
                              use_container_width=True, hide_index=True)
+                _show_sentence_detail(triplets, key_prefix=f"parsed_{selected_run_id}")
             else:
                 st.info("Parse edilmiş triplet bulunamadı.")
 
+    # ── Tab 2: Merge Log ──────────────────────────────────────────────────────
     with tab2:
         art = get_artifact(selected_run_id, "merge_map_entities")
         if art is None:
@@ -247,46 +244,59 @@ def render_transparency_panel(selected_run_id: str):
                 existing = [c for c in ["from", "to", "entity_type", "method"] if c in df.columns]
                 st.dataframe(df[existing], use_container_width=True, hide_index=True)
 
+    # ── Tab 3: Filtered Out ───────────────────────────────────────────────────
     with tab3:
         art = get_artifact(selected_run_id, "filtered_out")
         if art is None:
             st.warning("Bu stage için kayıt bulunamadı.")
         else:
-            triplets = art.get("triplets", [])
-            total = art.get("count", len(triplets))
+            triplets    = art.get("triplets", [])
+            total       = art.get("count", len(triplets))
+            pipeline_exc = art.get("pipeline_exception_count", 0)
+            ontology_flt = art.get("ontology_filtered_count", 0)
+
             if total == 0:
                 st.success("Bu run'da hiçbir triplet elenmedi.")
             else:
                 fc = st.columns(3)
-                fc[0].metric("🚫 Toplam Elenen", total)
-                fc[1].metric("⚠️ Pipeline Exception", art.get("pipeline_exception_count", 0))
-                fc[2].metric("🔴 Ontology Violation", art.get("ontology_filtered_count", 0))
-                df = pd.DataFrame(triplets)
-                cols = ["subject", "relation", "object", "reason_code", "filter_stage", "exception_text"]
-                st.dataframe(df[[c for c in cols if c in df.columns]],
-                             use_container_width=True, hide_index=True)
+                fc[0].metric("🚫 Toplam Elenen",     total)
+                fc[1].metric("⚠️ Pipeline Exception", pipeline_exc)
+                fc[2].metric("🔴 Ontology Violation", ontology_flt)
 
+                cols     = ["subject", "relation", "object", "reason_code",
+                            "filter_stage", "sentence_id", "sentence_preview", "exception_text"]
+                df       = pd.DataFrame(triplets)
+                existing = [c for c in cols if c in df.columns]
+                st.dataframe(df[existing], use_container_width=True, hide_index=True)
+                _show_sentence_detail(triplets, key_prefix=f"filtered_{selected_run_id}")
+
+    # ── Tab 4: Final Triplets ─────────────────────────────────────────────────
     with tab4:
         art = get_artifact(selected_run_id, "final_triplets")
         if art is None:
             st.warning("Bu stage için kayıt bulunamadı.")
         else:
             triplets = art.get("triplets", [])
-            count = art.get("count", len(triplets))
-            fc = st.columns(3)
+            count    = art.get("count", len(triplets))
+            fc       = st.columns(3)
             fc[0].metric("✅ Final", count)
             if art.get("filtered_count") is not None:
                 fc[1].metric("⚠️ Filtered", art["filtered_count"])
             if art.get("ontology_filtered_count") is not None:
                 fc[2].metric("🚫 Ontology Filtered", art["ontology_filtered_count"])
+
             if triplets:
-                df = pd.DataFrame(triplets)
-                cols = ["subject", "relation", "object", "subject_type", "object_type"]
-                st.dataframe(df[[c for c in cols if c in df.columns]],
-                             use_container_width=True, hide_index=True)
+                cols     = ["subject", "relation", "object", "subject_type", "object_type",
+                            "sentence_id", "sentence_preview"]
+                df       = pd.DataFrame(triplets)
+                existing = [c for c in cols if c in df.columns]
+                st.dataframe(df[existing], use_container_width=True, hide_index=True)
+                _show_sentence_detail(triplets, key_prefix=f"final_{selected_run_id}")
             else:
                 st.info("Final triplet bulunamadı.")
 
+
+# ── Ontoloji Neighborhood ─────────────────────────────────────────────────────
 
 def render_ontology_neighborhood_panel(selected_run_id: str):
     st.subheader("🗺️ Ontoloji Neighborhood")
@@ -321,7 +331,7 @@ def render_ontology_neighborhood_panel(selected_run_id: str):
         properties = neighborhood.get("properties", [])
 
         nc = st.columns(3)
-        nc[0].metric("🔵 Merkez Type", center["label"])
+        nc[0].metric("🔵 Merkez Type",   center["label"])
         nc[1].metric("🟠 Parent Sayısı", len(parents))
         nc[2].metric("🟢 Property Sayısı", len(properties))
 
@@ -347,7 +357,7 @@ def render_ontology_neighborhood_panel(selected_run_id: str):
 
 
 # ── Model seçimi ──────────────────────────────────────────────────────────────
-model_options = ["google/gemini-2.5-flash-lite", "gpt-4o-mini", "gpt-4.1-mini", "gpt-4.1"]
+model_options  = ["google/gemini-2.5-flash-lite", "gpt-4o-mini", "gpt-4.1-mini", "gpt-4.1"]
 selected_model = st.selectbox("Choose a model for KG extraction:", model_options, index=0)
 
 WIKIPEDIA_TEXTS = {
@@ -358,14 +368,11 @@ WIKIPEDIA_TEXTS = {
     "The Industrial Revolution": "The Industrial Revolution was the transition from creating goods by hand to using machines. Its start and end are widely debated by scholars, but the period generally spanned from about 1760 to 1840. According to some, this turning point in history is responsible for an increase in population, an increase in the standard of living, and the emergence of the capitalist economy. The Industrial Revolution began in Great Britain, and many of the technological and architectural innovations were of British origin. By the mid-18th century, Britain was the world's leading commercial nation, controlling a global trading empire with colonies in North America and the Caribbean.",
 }
 
-if "input_text" not in st.session_state:
-    st.session_state.input_text = ""
-if "selected_predefined" not in st.session_state:
-    st.session_state.selected_predefined = None
+if "input_text"        not in st.session_state: st.session_state.input_text        = ""
+if "selected_predefined" not in st.session_state: st.session_state.selected_predefined = None
 
-# ── selected_run_id'yi ERKEN hesapla ─────────────────────────────────────────
+# ── selected_run_id ERKEN hesapla ─────────────────────────────────────────────
 _rv_navigated: bool = bool(st.session_state.get("selected_run_id"))
-
 _last_run_id_early: str | None = st.session_state.get("last_run_id")
 if _rv_navigated:
     _last_run_id_early = st.session_state["selected_run_id"]
@@ -379,8 +386,7 @@ if _recent_runs_early:
     _run_ids_early = [r["run_id"] for r in _recent_runs_early]
     _default_early = (
         _run_ids_early.index(_last_run_id_early)
-        if _last_run_id_early in _run_ids_early
-        else 0
+        if _last_run_id_early in _run_ids_early else 0
     )
     selected_run_id: str | None = _run_ids_early[_default_early]
 else:
@@ -388,7 +394,7 @@ else:
 
 _nav_sample_id: str | None = None
 if _rv_navigated and selected_run_id:
-    _nav_meta = get_run(selected_run_id)
+    _nav_meta      = get_run(selected_run_id)
     _nav_sample_id = (_nav_meta or {}).get("sample_id") or user_id
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -397,19 +403,14 @@ col1, col2 = st.columns([1, 2])
 with col1:
     st.subheader("Text Examples")
     predefined_options = ["Custom Text"] + list(WIKIPEDIA_TEXTS.keys())
-
-    if st.session_state.selected_predefined is None:
-        initial_index = 0
-    elif st.session_state.selected_predefined in predefined_options:
-        initial_index = predefined_options.index(st.session_state.selected_predefined)
-    else:
-        initial_index = 0
-
+    initial_index = (
+        predefined_options.index(st.session_state.selected_predefined)
+        if st.session_state.selected_predefined in predefined_options else 0
+    )
     selected_predefined = st.radio(
         "Choose a text option:", predefined_options,
         index=initial_index, key="predefined_selector",
     )
-
     if selected_predefined != st.session_state.selected_predefined:
         st.session_state.selected_predefined = selected_predefined
         if selected_predefined != "Custom Text" and selected_predefined in WIKIPEDIA_TEXTS:
@@ -435,9 +436,7 @@ if trigger:
     elif not selected_model:
         st.warning("Please select a model for KG extraction.")
     else:
-        extractor = LLMTripletExtractor(
-            model=selected_model, api_key=api_key, proxy=proxy_url
-        )
+        extractor = LLMTripletExtractor(model=selected_model, api_key=api_key, proxy=proxy_url)
         inference_with_db = StructuredInferenceWithDB(
             extractor=extractor, aligner=aligner, triplets_db=triplets_db
         )
@@ -453,14 +452,10 @@ if trigger:
         st.session_state["last_run_id"] = run_id
         selected_run_id = run_id
 
-        logger.info("Initial triplets: %s", initial_triplets)
-        logger.info("Refined triplets: %s", final_triplets)
-        logger.info("filtered_triplets: %s", filtered_triplets)
-        logger.info("ontology_filtered_triplets: %s", ontology_filtered_triplets)
-
-        new_entities = {t["subject"] for t in final_triplets} | {
-            t["object"] for t in final_triplets
-        }
+        new_entities = (
+            {t["subject"] for t in final_triplets} |
+            {t["object"]  for t in final_triplets}
+        )
         subgraph = fetch_related_triplets(list(new_entities))
         st.success(
             f"✅ Extracted {len(final_triplets)} triplets and visualized {len(subgraph)} related ones."
@@ -482,17 +477,14 @@ elif _rv_navigated and selected_run_id:
     final_art  = get_artifact(selected_run_id, "final_triplets")
 
     initial_from_db = parsed_art.get("triplets", []) if parsed_art else []
-    final_from_db   = final_art.get("triplets", [])  if final_art  else []
+    final_from_db   = final_art.get("triplets",  []) if final_art  else []
 
     if initial_from_db or final_from_db:
         new_entities = (
             {t.get("subject") for t in final_from_db} |
             {t.get("object")  for t in final_from_db}
         )
-        subgraph = fetch_related_triplets(
-            list(new_entities),
-            sample_id_override=_nav_sample_id,
-        )
+        subgraph = fetch_related_triplets(list(new_entities), sample_id_override=_nav_sample_id)
         st.success(
             f"✅ Run Viewer'dan yüklendi: "
             f"{len(final_from_db)} final triplet, {len(subgraph)} related."
@@ -518,16 +510,13 @@ except Exception as e:
     st.error(f"Run listesi alınamadı: {e}")
 
 if recent_runs:
-    run_labels = [r["label"] for r in recent_runs]
+    run_labels = [r["label"]  for r in recent_runs]
     run_ids    = [r["run_id"] for r in recent_runs]
-
     default_index = 0
     if selected_run_id and selected_run_id in run_ids:
         default_index = run_ids.index(selected_run_id)
-
-    selected_label = st.selectbox(
-        "Run seç:", run_labels, index=default_index, key="run_selector",
-    )
+    selected_label  = st.selectbox("Run seç:", run_labels,
+                                    index=default_index, key="run_selector")
     selected_run_id = run_ids[run_labels.index(selected_label)]
 
 render_transparency_panel(selected_run_id)
