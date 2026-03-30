@@ -1,0 +1,208 @@
+"""
+llm_client_logger.py
+
+Tüm LLM API çağrılarını JSONL formatında loglar.
+
+Kullanım:
+    from .llm_client_logger import set_llm_context, LoggedOpenAIClient
+
+    # Pipeline'da her LLM çağrısından önce:
+    set_llm_context(run_id="abc-123", stage="triplet_extraction")
+
+    # openai_utils.py __init__'inde:
+    raw_client = openai.OpenAI(api_key=..., base_url=...)
+    self.client = LoggedOpenAIClient(raw_client, model=self.model)
+
+Config (.env):
+    LLM_LOG_LEVEL = full | preview   (default: preview)
+    LLM_LOG_PATH  = logs/llm_requests.jsonl
+"""
+
+import json
+import logging
+import os
+import threading
+from contextvars import ContextVar
+from datetime import datetime, timezone
+from pathlib import Path
+from time import perf_counter
+from typing import Optional
+
+logger = logging.getLogger("LLMClientLogger")
+logger.setLevel(logging.WARNING)
+
+# ── Context vars (Streamlit thread-safe) ──────────────────────────────────────
+_ctx_run_id: ContextVar[Optional[str]] = ContextVar("run_id",  default=None)
+_ctx_stage:  ContextVar[Optional[str]] = ContextVar("stage",   default=None)
+
+# ── File lock (atomic append) ─────────────────────────────────────────────────
+_file_lock = threading.Lock()
+
+# ── Config ────────────────────────────────────────────────────────────────────
+_LOG_LEVEL = os.environ.get("LLM_LOG_LEVEL", "preview").lower()   # full | preview
+_LOG_PATH  = Path(os.environ.get("LLM_LOG_PATH", "logs/llm_requests.jsonl"))
+
+
+def set_llm_context(run_id: Optional[str], stage: Optional[str]) -> None:
+    """
+    Pipeline'ın her LLM çağrısından önce bu fonksiyonu çağır.
+
+    Örnek:
+        set_llm_context(run_id, "triplet_extraction")
+        extracted = self.extractor.extract_triplets_from_text(text)
+    """
+    _ctx_run_id.set(run_id)
+    _ctx_stage.set(stage)
+
+
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+
+def _build_request_payload(messages: list, model: str, temperature: float) -> dict:
+    """LLM_LOG_LEVEL'e göre request payload üretir."""
+    if _LOG_LEVEL == "full":
+        return {
+            "messages":    messages,
+            "model":       model,
+            "temperature": temperature,
+        }
+    else:  # preview
+        preview_messages = []
+        for m in messages:
+            content = m.get("content", "")
+            preview_messages.append({
+                "role":        m.get("role"),
+                "char_count":  len(content),
+                "preview":     content[:200],
+            })
+        return {
+            "messages_preview": preview_messages,
+            "model":            model,
+            "temperature":      temperature,
+        }
+
+
+def _build_response_preview(content: str) -> str:
+    if _LOG_LEVEL == "full":
+        return content
+    return content[:300] + ("…" if len(content) > 300 else "")
+
+
+def _append_log(entry: dict) -> None:
+    """JSONL dosyasına thread-safe append."""
+    try:
+        _LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        line = json.dumps(entry, ensure_ascii=False, default=str) + "\n"
+        with _file_lock:
+            with open(_LOG_PATH, "a", encoding="utf-8") as f:
+                f.write(line)
+    except Exception as e:
+        logger.warning("LLM log write failed: %s", e)
+
+
+# ── Wrapper ───────────────────────────────────────────────────────────────────
+
+class _CompletionsWrapper:
+    """chat.completions interface'ini taklit eder, her çağrıyı loglar."""
+
+    def __init__(self, real_completions, base_url: str, model: str):
+        self._real  = real_completions
+        self._base_url = base_url
+        self._model    = model
+
+    def create(self, model: str, messages: list, temperature: float = 0, **kwargs):
+        run_id = _ctx_run_id.get()
+        stage  = _ctx_stage.get()
+        ts     = _now_iso()
+        t0     = perf_counter()
+
+        request_payload = _build_request_payload(messages, model, temperature)
+
+        try:
+            response = self._real.create(
+                model=model, messages=messages, temperature=temperature, **kwargs
+            )
+        except Exception as exc:
+            latency_ms = round((perf_counter() - t0) * 1000, 2)
+            _append_log({
+                "ts":               ts,
+                "run_id":           run_id,
+                "stage":            stage,
+                "provider_base_url": self._base_url,
+                "model":            model,
+                "endpoint":         "chat.completions",
+                "request":          request_payload,
+                "response_meta":    {"latency_ms": latency_ms},
+                "response_preview": None,
+                "error":            str(exc),
+            })
+            raise
+
+        latency_ms = round((perf_counter() - t0) * 1000, 2)
+
+        # Response meta
+        usage = getattr(response, "usage", None)
+        usage_dict = None
+        if usage:
+            usage_dict = {
+                "prompt_tokens":     getattr(usage, "prompt_tokens",     None),
+                "completion_tokens": getattr(usage, "completion_tokens", None),
+                "total_tokens":      getattr(usage, "total_tokens",      None),
+            }
+
+        choice        = response.choices[0] if response.choices else None
+        finish_reason = getattr(choice, "finish_reason", None) if choice else None
+        content       = (choice.message.content or "") if choice else ""
+
+        response_meta = {
+            "id":           getattr(response, "id", None),
+            "finish_reason": finish_reason,
+            "usage":        usage_dict,
+            "latency_ms":   latency_ms,
+        }
+
+        _append_log({
+            "ts":               ts,
+            "run_id":           run_id,
+            "stage":            stage,
+            "provider_base_url": self._base_url,
+            "model":            model,
+            "endpoint":         "chat.completions",
+            "request":          request_payload,
+            "response_meta":    response_meta,
+            "response_preview": _build_response_preview(content),
+            "error":            None,
+        })
+
+        return response
+
+
+class _ChatWrapper:
+    def __init__(self, real_chat, base_url: str, model: str):
+        self.completions = _CompletionsWrapper(
+            real_chat.completions, base_url=base_url, model=model
+        )
+
+
+class LoggedOpenAIClient:
+    """
+    openai.OpenAI client'ını wrap eder.
+    Sadece chat.completions.create çağrılarını loglar.
+    Diğer özellikler olduğu gibi delegate edilir.
+
+    Kullanım:
+        raw = openai.OpenAI(api_key=..., base_url=...)
+        self.client = LoggedOpenAIClient(raw, model="gpt-4o-mini")
+    """
+
+    def __init__(self, raw_client, model: str = "unknown"):
+        self._raw   = raw_client
+        self._model = model
+
+        base_url = str(getattr(raw_client, "base_url", "unknown"))
+        self.chat = _ChatWrapper(raw_client.chat, base_url=base_url, model=model)
+
+    def __getattr__(self, name: str):
+        """chat dışındaki her attribute doğrudan raw_client'a yönlendir."""
+        return getattr(self._raw, name)

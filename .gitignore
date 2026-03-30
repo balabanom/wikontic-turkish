@@ -4,3 +4,4 @@ __pycache__/
 .venv
 qa_logs/
 inference_logs/
+logs/

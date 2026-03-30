@@ -98,13 +98,18 @@ def visualize_knowledge_graph(triplets, highlight_entities=None):
                   font_color="black", directed=True)
     highlight_entities = highlight_entities or set()
     added_nodes = set()
+
     for s, r, o in triplets:
+        if not s or not o:          # None/boş kontrolü
+            continue
+        s, r, o = str(s), str(r), str(o)
         for node in [s, o]:
             if node not in added_nodes:
                 net.add_node(node, label=node,
                              color="#B2CD9C" if node in highlight_entities else "#C7C8CC")
                 added_nodes.add(node)
         net.add_edge(s, o, label=r, color="#000000")
+
     with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as tmp:
         net.save_graph(tmp.name)
         html_path = tmp.name
@@ -117,10 +122,17 @@ def visualize_initial_knowledge_graph(initial_triplets):
     net = Network(height="600px", width="100%", bgcolor="#ffffff",
                   font_color="black", directed=True)
     for t in initial_triplets:
-        s, r, o = t["subject"], t["relation"], t["object"]
+        s = t.get("subject") or ""
+        r = t.get("relation") or ""
+        o = t.get("object") or ""
+        # subject veya object None/boş ise atla
+        if not s or not o:
+            continue
+        s, o = str(s), str(o)   # pyvis str veya int bekliyor
         net.add_node(s, label=s, color="#B2CD9C")
         net.add_node(o, label=o, color="#B2CD9C")
-        net.add_edge(s, o, label=r, color="#000000")
+        net.add_edge(s, o, label=str(r), color="#000000")
+
     with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as tmp:
         net.save_graph(tmp.name)
         html_path = tmp.name

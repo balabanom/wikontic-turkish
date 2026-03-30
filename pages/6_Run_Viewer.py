@@ -1,5 +1,7 @@
 # --- File: pages/6_Run_Viewer.py ---
 import json
+import os
+from pathlib import Path
 import streamlit as st
 from dotenv import load_dotenv, find_dotenv
 import pandas as pd
@@ -24,6 +26,25 @@ st.set_page_config(
 )
 
 _ = load_dotenv(find_dotenv())
+
+# ── Sidebar: LLM Request Log download ────────────────────────────────────────
+_LLM_LOG_PATH = Path(os.environ.get("LLM_LOG_PATH", "logs/llm_requests.jsonl"))
+with st.sidebar:
+    st.markdown("### 🔬 LLM Request Log")
+    if _LLM_LOG_PATH.exists():
+        with open(_LLM_LOG_PATH, "rb") as _lf:
+            st.download_button(
+                label="⬇️ llm_requests.jsonl indir",
+                data=_lf.read(),
+                file_name="llm_requests.jsonl",
+                mime="application/jsonlines",
+                key="download_llm_log",
+            )
+        _log_lines = sum(1 for _ in open(_LLM_LOG_PATH, encoding="utf-8"))
+        _log_size  = _LLM_LOG_PATH.stat().st_size
+        st.caption(f"{_log_lines} istek · {_log_size / 1024:.1f} KB")
+    else:
+        st.info("Henüz log yok.\nBir extraction çalıştır.")
 
 # ── Session state ─────────────────────────────────────────────────────────────
 for _k in ("rv_selected_run_id", "rv_delete_confirm_input"):
