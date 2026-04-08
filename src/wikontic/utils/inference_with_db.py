@@ -153,7 +153,6 @@ class InferenceWithDB(BaseInferenceWithDB):
             entity = triplet["object"]
         else:
             entity = triplet["subject"]
-            # entity = unidecode(entity)
         entity = self.sanitize_string(entity)
 
         similar_entities = self.aligner.retrieve_similar_entity_names(
@@ -162,24 +161,17 @@ class InferenceWithDB(BaseInferenceWithDB):
 
         similar_entities = [self.sanitize_string(entity) for entity in similar_entities]
 
-        # if there are similar entities -> refine entity name
-        # if no similar entities -> return the original entity
-        # if exact match found -> return the exact match
         if len(similar_entities) == 0 or entity in similar_entities:
             updated_entity = entity
         else:
-            # if not exact match -> refine entity name
             updated_entity = self.extractor.refine_entity(
                 text=text,
                 triplet=triplet,
                 candidates=similar_entities,
                 is_object=is_object,
             )
-            # unidecode the updated entity
-            # updated_entity = unidecode(updated_entity)
             updated_entity = self.sanitize_string(updated_entity)
-            # if the updated entity is None (meaning that LLM didn't find any similar entities)
-            # -> return the original entity
+            # LLM returns "None" when no candidate is a good match.
             if re.sub(r"[^\w\s]", "", updated_entity) == "None":
                 updated_entity = entity
 
@@ -195,7 +187,6 @@ class InferenceWithDB(BaseInferenceWithDB):
         """
         self.extractor.reset_error_state()
 
-        # relation = unidecode(triplet['relation'])
         relation = self.sanitize_string(triplet["relation"])
 
         similar_relations: List[str] = self.aligner.retrieve_similar_properties(
@@ -212,7 +203,6 @@ class InferenceWithDB(BaseInferenceWithDB):
                 text=text, triplet=triplet, candidate_relations=similar_relations
             )
 
-            # updated_relation = unidecode(updated_relation)
             updated_relation = self.sanitize_string(updated_relation)
 
             if re.sub(r"[^\w\s]", "", updated_relation) == "None":

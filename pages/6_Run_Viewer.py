@@ -1,4 +1,3 @@
-# --- File: pages/6_Run_Viewer.py ---
 import json
 import os
 from pathlib import Path
@@ -444,13 +443,12 @@ def _render_delete_zone(run_id: str):
                     st.error(f"Silme başarısız: {result.get('error', 'bilinmeyen hata')}")
 
 
-# ── UI ─────────────────────────────────────────────────────────────────────────
 st.title("🗂️ Run Viewer")
 st.caption("Geçmiş extraction run'larını inceleyin, filtreleyin, export edin ve replay edin.")
 
 left_col, right_col = st.columns([3, 7])
 
-# ── Sol panel ─────────────────────────────────────────────────────────────────
+# ── Filters (left column) ─────────────────────────────────────────────────────
 with left_col:
     st.subheader("Filtreler")
     try:
@@ -495,7 +493,7 @@ with left_col:
                 st.session_state["rv_selected_run_id"] = r["run_id"]
                 st.rerun()
 
-# ── Sağ panel ─────────────────────────────────────────────────────────────────
+# ── Detail view (right column) ────────────────────────────────────────────────
 with right_col:
     selected_run_id = st.session_state.get("rv_selected_run_id")
 

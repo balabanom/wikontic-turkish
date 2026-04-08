@@ -1,10 +1,9 @@
 """
 sentence_splitter.py
 
-input_text'i cümlelere böler.
-Deterministic: aynı input → aynı çıktı.
+Splits input text into sentences. Deterministic: identical input → identical output.
 
-Kullanım:
+Usage:
     from .sentence_splitter import split_sentences
 
     sentences = split_sentences("Einstein was born in Ulm. He won the Nobel Prize.")
@@ -18,24 +17,24 @@ import re
 from typing import List
 
 
-# Cümle sonlandırıcı + ardından boşluk + büyük harf/rakam
-# Parantez içindeki kısaltmalar (U.S.A., Mr., Dr.) bölünmesin
+# Splits on sentence-ending punctuation followed by whitespace + capital/digit.
+# Negative lookbehinds prevent splitting on abbreviations like U.S.A., Mr., Dr.
 _SPLIT_PATTERN = re.compile(
-    r"(?<!\w\.\w.)"            # kısaltma değil: U.S.A.
-    r"(?<![A-Z][a-z]\.)"       # kısaltma değil: Mr. Dr.
-    r"(?<=\.|\!|\?)"           # nokta/ünlem/soru işaretinden sonra
-    r"\s+"                     # en az bir boşluk
-    r"(?=[A-ZÇĞİÖŞÜ0-9\"])"   # büyük harf, rakam veya tırnak ile devam
+    r"(?<!\w\.\w.)"            # not an abbreviation: U.S.A.
+    r"(?<![A-Z][a-z]\.)"       # not an abbreviation: Mr. Dr.
+    r"(?<=\.|\!|\?)"           # after sentence-ending punctuation
+    r"\s+"                     # at least one whitespace
+    r"(?=[A-ZÇĞİÖŞÜ0-9\"])"   # followed by capital letter, digit, or quote
 )
 
 
 def split_sentences(text: str) -> List[dict]:
     """
-    input_text'i cümlelere böler.
+    Split text into sentences with character-level provenance.
 
     Returns:
         List[{id: int, text: str, start: int, end: int}]
-        start/end: orijinal text içindeki karakter indeksleri (end exclusive)
+        start/end are character indices into the original text (end exclusive).
     """
     if not text or not text.strip():
         return []
@@ -65,7 +64,7 @@ def split_sentences(text: str) -> List[dict]:
         })
         cursor = end
 
-    # Hiç bölünemediyse tüm text tek cümle
+    # If no split occurred, treat the entire text as a single sentence.
     if not sentences and text.strip():
         sentences.append({
             "id":    0,
@@ -79,9 +78,9 @@ def split_sentences(text: str) -> List[dict]:
 
 def sentences_to_numbered_str(sentences: List[dict]) -> str:
     """
-    LLM prompt'una eklenecek numaralı cümle listesi üretir.
+    Format sentences for inclusion in an LLM prompt.
 
-    Örnek çıktı:
+    Example output:
         [0] Einstein was born in Ulm.
         [1] He won the Nobel Prize in 1921.
     """

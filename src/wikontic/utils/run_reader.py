@@ -17,7 +17,7 @@ def _get_db():
     return _db
 
 
-# ── Normalizasyon ──────────────────────────────────────────────────────────────
+# ── Normalization ─────────────────────────────────────────────────────────────
 
 def _normalize_raw_llm_output(payload: dict) -> dict:
     return {
@@ -49,7 +49,7 @@ def _normalize_triplets_payload(payload: dict) -> dict:
     sentences    = payload.get("sentences", [])
     sid_to_text  = {s["id"]: s["text"] for s in sentences} if sentences else {}
 
-    # sentence_preview alanı türet
+    # Derive sentence_preview from the sentence lookup table.
     for t in normalized:
         sid = t.get("sentence_id")
         if sid is not None and sid in sid_to_text:
@@ -129,9 +129,7 @@ def _fmt_datetime(dt) -> str:
 # ── Public API ─────────────────────────────────────────────────────────────────
 
 def get_run(run_id: str) -> Optional[dict]:
-    """
-    Verilen run_id için metadata döner. Bulunamazsa None döner.
-    """
+    """Return run metadata for the given run_id, or None if not found."""
     try:
         db = _get_db()
         return db["extraction_runs"].find_one({"_id": run_id})
@@ -140,10 +138,7 @@ def get_run(run_id: str) -> Optional[dict]:
 
 
 def get_artifact(run_id: str, stage: str) -> Optional[dict]:
-    """
-    Verilen run_id + stage için normalize edilmiş payload döner.
-    Bulunamazsa None döner.
-    """
+    """Return the normalized artifact payload for the given run_id + stage, or None."""
     try:
         db = _get_db()
         doc = db["extraction_artifacts"].find_one({"run_id": run_id, "stage": stage})
@@ -156,9 +151,8 @@ def get_artifact(run_id: str, stage: str) -> Optional[dict]:
 
 def get_all_artifacts(run_id: str) -> dict:
     """
-    Verilen run_id için tüm stage artifact'larını dict olarak döner.
-    Export paketi için kullanılır.
-    Format: {"stage_name": payload_dict, ...}
+    Return all stage artifacts for a run as {"stage_name": payload_dict, ...}.
+    Used by the ZIP export pipeline.
     """
     try:
         db = _get_db()
@@ -181,20 +175,12 @@ def list_recent_runs(
     date_to: Optional[datetime] = None,
 ) -> list:
     """
-    Son run'ların özetini döner.
+    Return a summary list of recent runs, sorted by creation time descending.
 
-    Her eleman:
-    {
-        run_id, created_at, model, sample_id, status,
-        input_preview, stats, label
-    }
+    Each entry contains: run_id, created_at, model, sample_id, status,
+                         input_preview, stats, label.
 
-    Filtreler:
-        sample_id: tam eşleşme
-        status:    tam eşleşme ("DONE" | "FAILED" | "STARTED")
-        model:     tam eşleşme
-        date_from: bu tarihten itibaren (inclusive)
-        date_to:   bu tarihe kadar (inclusive)
+    All filters are exact-match; date_from/date_to are inclusive bounds.
     """
     try:
         db = _get_db()
@@ -251,7 +237,6 @@ def list_recent_runs(
                     "error": doc.get("error"),
                     "finished_at": _fmt_datetime(doc.get("finished_at")),
                     "extra_config": doc.get("extra_config") or {},
-                    # Dropdown label (kısa)
                     "label": f"{created_str}  |  {model_name}  |  {status_val}",
                 }
             )
@@ -262,7 +247,7 @@ def list_recent_runs(
 
 
 def get_distinct_models() -> list:
-    """Dropdown için mevcut model listesini döner."""
+    """Return the list of distinct models seen across all runs."""
     try:
         db = _get_db()
         return db["extraction_runs"].distinct("model")
@@ -271,10 +256,7 @@ def get_distinct_models() -> list:
 
 
 def get_child_runs(parent_run_id: str) -> list:
-    """
-    Verilen parent_run_id için child run'ları (replay'leri) döner.
-    Her eleman: {run_id, created_at, model, status, label}
-    """
+    """Return all replay runs that reference the given parent_run_id."""
     try:
         db = _get_db()
         cursor = (
@@ -302,8 +284,8 @@ def get_child_runs(parent_run_id: str) -> list:
 
 def delete_run(run_id: str) -> dict:
     """
-    Verilen run_id için run + tüm artifact'larını siler.
-    Artifacts önce, run sonra (orphan riski yok).
+    Delete a run and all its artifacts.
+    Artifacts are deleted first to avoid orphaned documents.
 
     Returns: {"runs_deleted": int, "artifacts_deleted": int, "ok": bool}
     """

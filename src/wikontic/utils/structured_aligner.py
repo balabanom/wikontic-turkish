@@ -567,15 +567,15 @@ class Aligner:
         result_dict = [{"entity": item["label"]} for item in result_list]
         return result_dict
 
-    # ── Ontoloji Neighborhood ──────────────────────────────────────────────────
+    # ── Ontology Neighborhood ─────────────────────────────────────────────────
 
     def get_ontology_neighborhood(
         self, entity_type_label: str, max_properties: int = 15
     ) -> Optional[Dict]:
         """
-        Verilen entity type label için 1-hop ontoloji neighborhood döner.
+        Return the 1-hop ontology neighborhood for the given entity type label.
 
-        Döndürülen dict:
+        Returns:
         {
             "center": {"id": ..., "label": ...},
             "parents": [{"id": ..., "label": ...}, ...],
@@ -583,21 +583,20 @@ class Aligner:
                 {
                     "id": ...,
                     "label": ...,
-                    "direction": "subject" | "object",   # type'ın bu prop'ta subject mi object mi olduğu
+                    "direction": "subject" | "object",  # whether this type acts as subject or object
                     "valid_subject_type_ids": [...],
                     "valid_object_type_ids": [...],
                 },
                 ...
             ]
         }
-        Bulunamazsa None döner.
+        Returns None if the entity type is not found.
         """
         try:
             et_collection = self.ontology_db.get_collection(
                 self.entity_type_collection_name
             )
 
-            # ── Merkez node'u bul (label'dan ara) ────────────────────────────
             center_doc = et_collection.find_one(
                 {"label": entity_type_label},
                 {"entity_type_id": 1, "label": 1, "parent_type_ids": 1,
@@ -612,7 +611,6 @@ class Aligner:
             subj_prop_ids = center_doc.get("valid_subject_property_ids", [])
             obj_prop_ids  = center_doc.get("valid_object_property_ids", [])
 
-            # ── Parent node'ları çek ──────────────────────────────────────────
             parents = []
             if parent_ids:
                 parent_docs = et_collection.find(
@@ -624,12 +622,12 @@ class Aligner:
                     for d in parent_docs
                 ]
 
-            # ── Property'leri çek (subject + object, max_properties ile sınırla) ──
             prop_collection = self.ontology_db.get_collection(
                 self.property_collection_name
             )
 
-            # Her property'nin hangi yönde kullanıldığını tut
+            # Build a direction map: property_id → "subject" | "object".
+            # Subject properties come first; object properties fill remaining slots.
             prop_direction_map: Dict[str, str] = {}
             all_prop_ids = []
 
@@ -642,7 +640,6 @@ class Aligner:
                     prop_direction_map[pid] = "object"
                     all_prop_ids.append(pid)
 
-            # max_properties ile sınırla
             all_prop_ids = all_prop_ids[:max_properties]
 
             properties = []

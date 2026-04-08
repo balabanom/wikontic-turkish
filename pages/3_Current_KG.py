@@ -1,29 +1,19 @@
-# --- File: 0_KG_Extraction.py ---
 import streamlit as st
 from pyvis.network import Network
-
-# import networkx as nx
 import tempfile
 import os
 from dotenv import load_dotenv, find_dotenv
-
-# from neo4j import GraphDatabase
 from pymongo import MongoClient
-from src.wikontic.utils.openai_utils import LLMTripletExtractor
-from src.wikontic.utils.structured_aligner import Aligner
-from src.wikontic.utils.structured_inference_with_db import StructuredInferenceWithDB
 import uuid
 import logging
 import sys
 import base64
 
-# Configure logging
 logging.basicConfig(stream=sys.stderr)
 logger = logging.getLogger("KGExtraction")
 logger.setLevel(logging.INFO)
 
-
-# Ensure the same user_id across all pages
+# Persist user_id across pages via session state.
 if "user_id" not in st.session_state:
     st.session_state.user_id = str(uuid.uuid4())
 
@@ -34,7 +24,6 @@ st.set_page_config(
     page_title="Wikontic", page_icon="media/wikotic-wo-text.png", layout="wide"
 )
 
-# --- Mongo Setup ---
 _ = load_dotenv(find_dotenv())
 mongo_client = MongoClient(os.getenv("MONGO_URI"))
 triplets_db = mongo_client.get_database("demo")
@@ -49,7 +38,6 @@ def fetch_triplets():
     return [(doc["subject"], doc["relation"], doc["object"]) for doc in results]
 
 
-# --- Visualize ---
 def visualize_knowledge_graph(
     triplets,
 ):
@@ -73,18 +61,14 @@ def visualize_knowledge_graph(
         net.save_graph(tmp_file.name)
         html_path = tmp_file.name
     with open(html_path, "r", encoding="utf-8") as f:
-        # graph_container.components.v1.html(f.read(), height=600, scrolling=True)
-        # with expanded_kg_container:
         st.components.v1.html(f.read(), height=600, scrolling=True)
     os.remove(html_path)
 
 
-# --- UI ---
 with open("media/wikontic.png", "rb") as f:
     img_bytes = f.read()
 encoded = base64.b64encode(img_bytes).decode()
 
-# Embed in header using HTML + Markdown
 st.markdown(
     f"""
     <div style="display: flex; align-items: center;">
@@ -97,9 +81,6 @@ st.markdown(
 
 
 subgraph = fetch_triplets()
-# st.session_state.kg = nx.DiGraph()
-# for s, r, o in subgraph:
-# st.session_state.kg.add_edge(s, o, label=r, highlight=s in new_entities or o in new_entities)
 st.success(f"✅ Retrieved {len(subgraph)} triplets.")
 st.subheader("Current Knowledge Graph")
 visualize_knowledge_graph(subgraph)

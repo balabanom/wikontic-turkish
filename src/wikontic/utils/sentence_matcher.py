@@ -1,37 +1,37 @@
 """
 sentence_matcher.py
 
-LLM sentence_id vermediğinde veya geçersiz verdiğinde çalışan fallback matcher.
+Fallback matcher used when the LLM omits or provides an invalid sentence_id.
 
-Kullanım:
+Usage:
     from .sentence_matcher import assign_sentence_id
 
     sid = assign_sentence_id(triplet, sentences)
-    # → int veya None (min_score altındaysa)
+    # → int or None (if best score is below min_score)
 """
 
 import re
 from typing import Optional, List
 
 
-# Minimum eşik: en az bu kadar puan olmadan eşleştirme yapmayız
+# Matches scoring below this threshold are treated as unmatched (return None).
 _MIN_SCORE = 2
 
 
 def _normalize(text: str) -> str:
-    """Küçük harf, noktalama temizle."""
+    """Lowercase and strip punctuation."""
     return re.sub(r"[^\w\s]", "", text.lower()).strip()
 
 
 def _word_overlap(a: str, b: str) -> int:
-    """İki string arasındaki ortak kelime sayısı."""
+    """Count shared words between two strings."""
     words_a = set(_normalize(a).split())
     words_b = set(_normalize(b).split())
     return len(words_a & words_b)
 
 
 def _contains(needle: str, haystack: str) -> bool:
-    """needle, haystack içinde substring olarak geçiyor mu? (case-insensitive)"""
+    """Case-insensitive substring check."""
     return _normalize(needle) in _normalize(haystack)
 
 
@@ -41,23 +41,20 @@ def assign_sentence_id(
     min_score: int = _MIN_SCORE,
 ) -> Optional[int]:
     """
-    Triplet için en uygun sentence_id'yi döner.
+    Return the best-matching sentence_id for a triplet using word-overlap scoring.
 
-    Puanlama:
-        subject substring geçiyorsa   +2
-        object  substring geçiyorsa   +2
-        relation kelime overlap       +1 per ortak kelime (max 2)
+    Scoring:
+        subject appears as substring  → +2
+        object  appears as substring  → +2
+        relation word overlap         → +1 per shared word (capped at 2)
 
-    Eşitlikte: daha düşük id (ilk geçen cümle) kazanır.
-    min_score altında: None döner (unmatched).
+    Ties are broken by lowest id (earliest sentence wins).
+    Returns None if the best score is below min_score.
 
     Args:
         triplet:   {"subject": ..., "relation": ..., "object": ...}
-        sentences: split_sentences() çıktısı
-        min_score: bu puanın altındaki eşleşmeler None döner
-
-    Returns:
-        sentence_id (int) veya None
+        sentences: output of split_sentences()
+        min_score: minimum score to accept a match
     """
     if not sentences:
         return None
@@ -78,7 +75,7 @@ def assign_sentence_id(
         if obj and _contains(obj, text):
             score += 2
 
-        # Relation kelime overlap (max 2 puan)
+        # Relation word overlap capped at 2 points.
         if relation:
             overlap = min(_word_overlap(relation, text), 2)
             score += overlap
@@ -98,20 +95,17 @@ def enrich_triplets_with_sentence_ids(
     sentences: List[dict],
 ) -> List[dict]:
     """
-    Triplet listesindeki her triplet için:
-    - sentence_id None veya geçersizse → fallback matcher çalıştır
-    - Geçerliyse → olduğu gibi bırak
-
-    Returns: güncellenmiş triplet listesi (in-place değil, kopya)
+    Ensure every triplet has a valid sentence_id.
+    Runs the fallback matcher for any triplet whose sentence_id is missing or out-of-range.
+    Returns a new list of copies; the originals are not modified.
     """
     n = len(sentences)
     result = []
 
     for t in triplets:
-        t = dict(t)  # kopya al
+        t = dict(t)
         sid = t.get("sentence_id")
 
-        # Geçerli mi? (int, 0 <= sid < n)
         valid = (
             isinstance(sid, int)
             and 0 <= sid < n

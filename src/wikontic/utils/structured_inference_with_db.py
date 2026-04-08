@@ -87,7 +87,6 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
         return "unknown"
 
     def _refine_entity_types(self, text, triplet, run_id=None):
-        # ── LLM context: her refine çağrısı loglanır ─────────────────────────
         set_llm_context(run_id, "refine_entity_types")
 
         candidate_subj_type_ids, candidate_obj_type_ids = (
@@ -179,7 +178,6 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
         self, text, triplet, refined_subject_type_id, refined_object_type_id, run_id=None
     ):
         """Refine relation using LLM."""
-        # ── LLM context ───────────────────────────────────────────────────────
         set_llm_context(run_id, "refine_relation")
 
         if refined_subject_type_id and refined_object_type_id:
@@ -289,7 +287,6 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
 
     def _refine_entity_name(self, text, triplet, sample_id, is_object=False, run_id=None):
         """Refine entity names using type constraints."""
-        # ── LLM context ───────────────────────────────────────────────────────
         set_llm_context(run_id, "refine_entity_name")
 
         self.extractor.reset_error_state()
@@ -353,7 +350,7 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
         self.extractor.reset_messages()
         self.extractor.reset_error_state()
 
-        # ── Cümlelere böl (sentence provenance için) ──────────────────────────
+        # Split text upfront so each triplet can reference its source sentence.
         sentences = split_sentences(text)
 
         # ── Stage: llm_extract ────────────────────────────────────────────────
@@ -394,7 +391,7 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                 extracted_triplets.get("triplets", [])
                 if isinstance(extracted_triplets, dict) else []
             )
-            # Fallback matcher: LLM sentence_id vermemiş/geçersizse ata
+            # Fallback: if the LLM omitted or gave an invalid sentence_id, assign via word-overlap.
             enriched = enrich_triplets_with_sentence_ids(raw_triplets, sentences)
             for triplet in enriched:
                 triplet["prompt_token_num"], triplet["completion_token_num"] = (
@@ -438,11 +435,11 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
         ontology_filtered_triplets = []
         entity_merge_log           = []
 
-        # ── Stage: ontology_alignment (per-triplet döngüsü) ───────────────────
+        # ── Stage: ontology_alignment ─────────────────────────────────────────
         def _process_triplets():
             for triplet in (initial_triplets if initial_triplets else []):
                 self.extractor.reset_tokens()
-                # sentence_id'yi başta sakla — refinement boyunca kaybolmasın
+                # Preserve sentence_id before refinement mutates the triplet dict.
                 sentence_id = triplet.get("sentence_id")
 
                 try:
@@ -499,7 +496,6 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                             if refined_relation_direction == "direct"
                             else refined_subject_type
                         ),
-                        # sentence_id refinement boyunca taşınıyor
                         "sentence_id": sentence_id,
                     }
 
@@ -583,7 +579,6 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                     backbone_triplet["sample_id"]      = sample_id
                     backbone_triplet["exception_text"] = str(e)
                     backbone_triplet["reason_code"]    = reason_code
-                    # sentence_id exception durumunda da taşınsın
                     backbone_triplet["sentence_id"]    = sentence_id
                     filtered_triplets.append(backbone_triplet.copy())
                     logger.log(
@@ -706,7 +701,6 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
             extra_config={"source_text_id": source_text_id},
         )
 
-        # Timer tüm pipeline boyunca yaşar
         timer = StageTimer()
 
         try:
@@ -736,7 +730,6 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                         ontology_filtered_triplets, sample_id=sample_id
                     )
 
-            # Stats: timer süreleri + triplet count'ları birleştir
             stats = timer.to_stats()
             stats.update({
                 "initial_count":           len(initial_triplets),

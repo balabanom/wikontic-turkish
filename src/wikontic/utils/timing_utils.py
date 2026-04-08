@@ -1,10 +1,9 @@
 """
 timing_utils.py
 
-Pipeline stage'leri için izole timer yardımcısı.
+Lightweight per-stage timer for pipeline instrumentation.
 
-Kullanım (structured_inference_with_db.py içinde):
-
+Usage:
     from .timing_utils import StageTimer
 
     timer = StageTimer()
@@ -27,9 +26,9 @@ from typing import Optional
 
 class StageTimer:
     """
-    Context manager tabanlı stage timer.
-    Her `with timer.measure(stage_name)` bloğu ms cinsinden süreyi kaydeder.
-    total_time_ms otomatik hesaplanır.
+    Context-manager based stage timer.
+    Each `with timer.measure(stage_name)` block records elapsed time in ms.
+    total_time_ms is derived from the wall-clock start time, not stage sums.
     """
 
     def __init__(self):
@@ -41,11 +40,6 @@ class StageTimer:
 
     @contextmanager
     def measure(self, stage: str):
-        """
-        Kullanım:
-            with timer.measure("llm_extract"):
-                ...
-        """
         t0 = time.perf_counter()
         try:
             yield
@@ -54,16 +48,15 @@ class StageTimer:
             self._times[stage] = round(elapsed_ms, 2)
 
     def mark_failed_at(self, stage: str):
-        """Hata hangi stage'de oluştuysa işaretle."""
+        """Record which pipeline stage raised an exception."""
         self._failed_stage = stage
 
     def record_token_usage(self, usage):
         """
-        OpenAI/OpenRouter usage objesini veya dict'i alır.
-        usage None ise sessizce geçer.
+        Accept an OpenAI SDK usage object or a plain dict; silently no-ops on None.
 
-        Desteklenen formatlar:
-            usage.prompt_tokens / completion_tokens / total_tokens (SDK object)
+        Supported formats:
+            usage.prompt_tokens / completion_tokens / total_tokens  (SDK object)
             {"prompt_tokens": ..., "completion_tokens": ..., "total_tokens": ...}
         """
         if usage is None:
@@ -82,26 +75,21 @@ class StageTimer:
                     "total_tokens":      usage.get("total_tokens", 0),
                 }
         except Exception:
-            pass  # token bilgisi alınamazsa sistem bozulmasın
+            pass  # never let token-parsing errors surface to the caller
 
     def record_cost(self, cost: Optional[float]):
-        """
-        Manuel maliyet kaydı.
-        Model price mapping yoksa 0.0 geçilebilir.
-        """
+        """Record estimated cost. Pass 0.0 when pricing data is unavailable."""
         self.cost_estimate = cost
 
     def to_stats(self) -> dict:
         """
-        finish_run(stats=...) içine geçirilecek dict üretir.
+        Build the stats dict passed to finish_run(stats=...).
 
-        Örnek:
+        Example output:
         {
             "llm_extract_time_ms": 320.5,
             "parse_time_ms": 12.1,
-            "merge_time_ms": 45.0,
             "ontology_alignment_time_ms": 210.3,
-            "filter_time_ms": 8.7,
             "db_write_time_ms": 35.2,
             "total_time_ms": 632.0,
             "failed_stage": null,
@@ -115,14 +103,12 @@ class StageTimer:
 
         stats: dict = {}
 
-        # Stage süreleri — her stage için "{stage}_time_ms" key'i
         for stage, ms in self._times.items():
             stats[f"{stage}_time_ms"] = ms
 
         stats["total_time_ms"] = total_ms
         stats["failed_stage"]  = self._failed_stage
 
-        # Token/cost — varsa ekle, yoksa None
         if self.token_usage:
             stats.update(self.token_usage)
         else:

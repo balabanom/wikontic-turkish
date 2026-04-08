@@ -1,4 +1,3 @@
-# --- File: pages/1_KG_Extraction.py ---
 import streamlit as st
 from pyvis.network import Network
 import tempfile
@@ -49,7 +48,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ── Kullanıcı adı (sidebar) ───────────────────────────────────────────────────
+# ── User identity (sidebar) ───────────────────────────────────────────────────
 if "user_id" not in st.session_state:
     st.session_state["user_id"] = ""
 
@@ -80,7 +79,7 @@ with st.sidebar:
 logger.info(f"User ID: {user_id}")
 
 
-# ── Yardımcı fonksiyonlar ─────────────────────────────────────────────────────
+# ── Helpers ───────────────────────────────────────────────────────────────────
 
 def fetch_related_triplets(entities, sample_id_override: str | None = None):
     sid = sample_id_override if sample_id_override else user_id
@@ -100,7 +99,7 @@ def visualize_knowledge_graph(triplets, highlight_entities=None):
     added_nodes = set()
 
     for s, r, o in triplets:
-        if not s or not o:          # None/boş kontrolü
+        if not s or not o:
             continue
         s, r, o = str(s), str(r), str(o)
         for node in [s, o]:
@@ -125,10 +124,9 @@ def visualize_initial_knowledge_graph(initial_triplets):
         s = t.get("subject") or ""
         r = t.get("relation") or ""
         o = t.get("object") or ""
-        # subject veya object None/boş ise atla
         if not s or not o:
             continue
-        s, o = str(s), str(o)   # pyvis str veya int bekliyor
+        s, o = str(s), str(o)
         net.add_node(s, label=s, color="#B2CD9C")
         net.add_node(o, label=o, color="#B2CD9C")
         net.add_edge(s, o, label=str(r), color="#000000")
@@ -168,7 +166,7 @@ def visualize_ontology_neighborhood(neighborhood: dict):
 
 
 def _show_sentence_detail(triplets: list, key_prefix: str):
-    """Triplet tablosunun altında opsiyonel cümle detayı."""
+    """Render expandable sentence provenance detail below a triplet table."""
     has_sentences = any(t.get("sentence_full") for t in triplets)
     if not has_sentences:
         return
@@ -182,7 +180,7 @@ def _show_sentence_detail(triplets: list, key_prefix: str):
                 st.info(t["sentence_full"])
 
 
-# ── Şeffaflık Paneli ──────────────────────────────────────────────────────────
+# ── Transparency Panel ────────────────────────────────────────────────────────
 
 def render_transparency_panel(selected_run_id: str):
     if not selected_run_id:
@@ -215,7 +213,7 @@ def render_transparency_panel(selected_run_id: str):
         "🟢 Final Triplets",
     ])
 
-    # ── Tab 0: Ham LLM çıktısı ────────────────────────────────────────────────
+    # ── Tab 0: Raw LLM Output ────────────────────────────────────────────────
     with tab0:
         art = get_artifact(selected_run_id, "raw_llm_output")
         if art is None:
@@ -224,7 +222,6 @@ def render_transparency_panel(selected_run_id: str):
             with st.expander("Ham LLM Çıktısı", expanded=True):
                 st.code(art.get("text", ""), language="json")
 
-    # ── Tab 1: Parsed Triplets ────────────────────────────────────────────────
     with tab1:
         art = get_artifact(selected_run_id, "parsed_triplets")
         if art is None:
@@ -241,7 +238,6 @@ def render_transparency_panel(selected_run_id: str):
             else:
                 st.info("Parse edilmiş triplet bulunamadı.")
 
-    # ── Tab 2: Merge Log ──────────────────────────────────────────────────────
     with tab2:
         art = get_artifact(selected_run_id, "merge_map_entities")
         if art is None:
@@ -256,7 +252,6 @@ def render_transparency_panel(selected_run_id: str):
                 existing = [c for c in ["from", "to", "entity_type", "method"] if c in df.columns]
                 st.dataframe(df[existing], use_container_width=True, hide_index=True)
 
-    # ── Tab 3: Filtered Out ───────────────────────────────────────────────────
     with tab3:
         art = get_artifact(selected_run_id, "filtered_out")
         if art is None:
@@ -282,7 +277,6 @@ def render_transparency_panel(selected_run_id: str):
                 st.dataframe(df[existing], use_container_width=True, hide_index=True)
                 _show_sentence_detail(triplets, key_prefix=f"filtered_{selected_run_id}")
 
-    # ── Tab 4: Final Triplets ─────────────────────────────────────────────────
     with tab4:
         art = get_artifact(selected_run_id, "final_triplets")
         if art is None:
@@ -308,7 +302,7 @@ def render_transparency_panel(selected_run_id: str):
                 st.info("Final triplet bulunamadı.")
 
 
-# ── Ontoloji Neighborhood ─────────────────────────────────────────────────────
+# ── Ontology Neighborhood ─────────────────────────────────────────────────────
 
 def render_ontology_neighborhood_panel(selected_run_id: str):
     st.subheader("🗺️ Ontoloji Neighborhood")
@@ -368,7 +362,7 @@ def render_ontology_neighborhood_panel(selected_run_id: str):
                 st.info("Property bulunamadı.")
 
 
-# ── Model seçimi ──────────────────────────────────────────────────────────────
+# ── Model selection ───────────────────────────────────────────────────────────
 model_options  = ["google/gemini-2.5-flash-lite", "gpt-4o-mini", "gpt-4.1-mini", "gpt-4.1"]
 selected_model = st.selectbox("Choose a model for KG extraction:", model_options, index=0)
 
@@ -383,7 +377,7 @@ WIKIPEDIA_TEXTS = {
 if "input_text"        not in st.session_state: st.session_state.input_text        = ""
 if "selected_predefined" not in st.session_state: st.session_state.selected_predefined = None
 
-# ── selected_run_id ERKEN hesapla ─────────────────────────────────────────────
+# ── Resolve selected_run_id before rendering ──────────────────────────────────
 _rv_navigated: bool = bool(st.session_state.get("selected_run_id"))
 _last_run_id_early: str | None = st.session_state.get("last_run_id")
 if _rv_navigated:
@@ -408,7 +402,6 @@ _nav_sample_id: str | None = None
 if _rv_navigated and selected_run_id:
     _nav_meta      = get_run(selected_run_id)
     _nav_sample_id = (_nav_meta or {}).get("sample_id") or user_id
-# ─────────────────────────────────────────────────────────────────────────────
 
 col1, col2 = st.columns([1, 2])
 
@@ -511,7 +504,7 @@ elif _rv_navigated and selected_run_id:
     else:
         st.info("Bu run için gösterilecek triplet bulunamadı.")
 
-# ── Şeffaflık Paneli ──────────────────────────────────────────────────────────
+# ── Transparency Panel ────────────────────────────────────────────────────────
 st.divider()
 st.subheader("🔍 Extraction Transparency")
 

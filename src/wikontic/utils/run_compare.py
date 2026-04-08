@@ -1,7 +1,8 @@
 """
 run_compare.py
 
-İki run arasında final triplet, merge ve filter reason diff'lerini üretir.
+Produces diffs between two extraction runs:
+final triplets, entity merges, and filter reason breakdowns.
 """
 from collections import Counter
 from typing import Dict, List, Tuple
@@ -9,7 +10,7 @@ from typing import Dict, List, Tuple
 from .run_reader import get_artifact, get_run
 
 
-# ── Normalizasyon ──────────────────────────────────────────────────────────────
+# ── Normalization ─────────────────────────────────────────────────────────────
 
 def _triplet_key(t: dict) -> Tuple[str, str, str]:
     return (
@@ -26,7 +27,7 @@ def _merge_key(m: dict) -> Tuple[str, str]:
     )
 
 
-# ── Yardımcı getter'lar ───────────────────────────────────────────────────────
+# ── Artifact getters ──────────────────────────────────────────────────────────
 
 def _get_final_triplets(run_id: str) -> List[dict]:
     art = get_artifact(run_id, "final_triplets")
@@ -53,13 +54,13 @@ def _get_stats(run_id: str) -> dict:
     return meta.get("stats") or {}
 
 
-# ── Ana karşılaştırma fonksiyonu ──────────────────────────────────────────────
+# ── Comparison ────────────────────────────────────────────────────────────────
 
 def compare_runs(run_id_a: str, run_id_b: str) -> dict:
     """
-    İki run arasında kapsamlı diff raporu üretir.
+    Produce a comprehensive diff report between two runs.
 
-    Dönen dict:
+    Returns:
     {
         "run_id_a": ...,
         "run_id_b": ...,
@@ -78,8 +79,8 @@ def compare_runs(run_id_a: str, run_id_b: str) -> dict:
         "merge_diff": {
             "entity": {
                 "count_a": int, "count_b": int,
-                "added": [...],    # B'de var A'da yok
-                "removed": [...],  # A'da var B'de yok
+                "added": [...],    # present in B but not in A
+                "removed": [...],  # present in A but not in B
             }
         },
         "filter_reason_diff": {
@@ -174,7 +175,7 @@ def compare_runs(run_id_a: str, run_id_b: str) -> dict:
     }
 
 
-# ── Telemetri diff ─────────────────────────────────────────────────────────────
+# ── Telemetry diff ────────────────────────────────────────────────────────────
 
 _TIMED_STAGES = [
     "llm_extract",
@@ -188,9 +189,9 @@ _TIMED_STAGES = [
 
 def compare_telemetry(run_id_a: str, run_id_b: str) -> dict:
     """
-    İki run arasında stage süre farkını üretir.
+    Produce a per-stage timing diff between two runs.
 
-    Döner:
+    Returns:
     {
         "total_time_ms_a": float | None,
         "total_time_ms_b": float | None,

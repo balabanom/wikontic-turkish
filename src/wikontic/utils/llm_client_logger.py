@@ -1,15 +1,15 @@
 """
 llm_client_logger.py
 
-Tüm LLM API çağrılarını JSONL formatında loglar.
+Logs all LLM API calls in JSONL format.
 
-Kullanım:
+Usage:
     from .llm_client_logger import set_llm_context, LoggedOpenAIClient
 
-    # Pipeline'da her LLM çağrısından önce:
+    # Before each LLM call in the pipeline:
     set_llm_context(run_id="abc-123", stage="triplet_extraction")
 
-    # openai_utils.py __init__'inde:
+    # In openai_utils.py __init__:
     raw_client = openai.OpenAI(api_key=..., base_url=...)
     self.client = LoggedOpenAIClient(raw_client, model=self.model)
 
@@ -45,11 +45,8 @@ _LOG_PATH  = Path(os.environ.get("LLM_LOG_PATH", "logs/llm_requests.jsonl"))
 
 def set_llm_context(run_id: Optional[str], stage: Optional[str]) -> None:
     """
-    Pipeline'ın her LLM çağrısından önce bu fonksiyonu çağır.
-
-    Örnek:
-        set_llm_context(run_id, "triplet_extraction")
-        extracted = self.extractor.extract_triplets_from_text(text)
+    Set the current run_id and pipeline stage for the LLM audit log.
+    Call this before each LLM invocation within a pipeline stage.
     """
     _ctx_run_id.set(run_id)
     _ctx_stage.set(stage)
@@ -60,7 +57,7 @@ def _now_iso() -> str:
 
 
 def _build_request_payload(messages: list, model: str, temperature: float) -> dict:
-    """LLM_LOG_LEVEL'e göre request payload üretir."""
+    """Build the request payload according to LLM_LOG_LEVEL."""
     if _LOG_LEVEL == "full":
         return {
             "messages":    messages,
@@ -90,7 +87,7 @@ def _build_response_preview(content: str) -> str:
 
 
 def _append_log(entry: dict) -> None:
-    """JSONL dosyasına thread-safe append."""
+    """Append a log entry to the JSONL file, thread-safe."""
     try:
         _LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
         line = json.dumps(entry, ensure_ascii=False, default=str) + "\n"
@@ -104,7 +101,7 @@ def _append_log(entry: dict) -> None:
 # ── Wrapper ───────────────────────────────────────────────────────────────────
 
 class _CompletionsWrapper:
-    """chat.completions interface'ini taklit eder, her çağrıyı loglar."""
+    """Mirrors the chat.completions interface; logs every call."""
 
     def __init__(self, real_completions, base_url: str, model: str):
         self._real  = real_completions
@@ -141,7 +138,6 @@ class _CompletionsWrapper:
 
         latency_ms = round((perf_counter() - t0) * 1000, 2)
 
-        # Response meta
         usage = getattr(response, "usage", None)
         usage_dict = None
         if usage:
@@ -187,11 +183,10 @@ class _ChatWrapper:
 
 class LoggedOpenAIClient:
     """
-    openai.OpenAI client'ını wrap eder.
-    Sadece chat.completions.create çağrılarını loglar.
-    Diğer özellikler olduğu gibi delegate edilir.
+    Wraps openai.OpenAI, intercepting chat.completions.create for logging.
+    All other attributes are transparently delegated to the underlying client.
 
-    Kullanım:
+    Usage:
         raw = openai.OpenAI(api_key=..., base_url=...)
         self.client = LoggedOpenAIClient(raw, model="gpt-4o-mini")
     """
@@ -204,5 +199,5 @@ class LoggedOpenAIClient:
         self.chat = _ChatWrapper(raw_client.chat, base_url=base_url, model=model)
 
     def __getattr__(self, name: str):
-        """chat dışındaki her attribute doğrudan raw_client'a yönlendir."""
+        """Delegate any attribute not explicitly overridden to the raw client."""
         return getattr(self._raw, name)

@@ -139,15 +139,13 @@ if trigger:
 		st.warning("Please enter name and surname of the person you want to extract KG for.")
 		st.stop()
 
-	# 1) extractor önce oluşmalı (LLM fallback için lazım)
 	extractor = LLMTripletExtractor(
 		model=selected_model, api_key=api_key, proxy=proxy_url
 	)
 
-	# 2) Wikipedia’dan metin çek
 	personal_text = fetch_wikipedia_summary(input_text)
 
-	# 3) Wikipedia boşsa LLM ile kısa paragraf üret
+	# Fall back to LLM-generated summary when Wikipedia returns nothing.
 	if not personal_text:
 		resp = extractor.client.chat.completions.create(
 			model=selected_model,

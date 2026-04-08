@@ -5,7 +5,6 @@ import tempfile
 import os
 from dotenv import load_dotenv, find_dotenv
 
-# from neo4j import GraphDatabase
 from pymongo import MongoClient
 from src.wikontic.utils.structured_aligner import Aligner
 from src.wikontic.utils.openai_utils import LLMTripletExtractor
@@ -15,13 +14,12 @@ import logging
 import sys
 import base64
 
-# Configure logging
 logging.basicConfig(stream=sys.stderr)
 logger = logging.getLogger("QA")
 logger.setLevel(logging.ERROR)
 
 
-# Ensure the same user_id across all pages
+# Persist user_id across pages via session state.
 if "user_id" not in st.session_state:
 	st.session_state.user_id = str(uuid.uuid4())
 
@@ -45,7 +43,6 @@ st.set_page_config(
 )
 
 
-# --- Visualize ---
 def visualize_knowledge_graph(triplets, highlight_entities=None):
 	net = Network(
 		height="600px",
@@ -91,7 +88,6 @@ with open("media/wikontic.png", "rb") as f:
 	img_bytes = f.read()
 encoded = base64.b64encode(img_bytes).decode()
 
-# Embed in header using HTML + Markdown
 st.markdown(
 	f"""
 	<div style="display: flex; align-items: center;">
@@ -152,7 +148,6 @@ if trigger:
 			supporting_triplets, highlight_entities=identified_entities_names
 		)
 
-		# st.success(f"✅ Answer to the question is {ans}")
 		st.subheader("Answer")
 		st.markdown(
 			f"""

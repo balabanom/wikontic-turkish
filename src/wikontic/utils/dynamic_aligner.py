@@ -7,7 +7,6 @@ from dotenv import load_dotenv, find_dotenv
 import os
 import torch
 
-# os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 _ = load_dotenv(find_dotenv())
 
 
@@ -50,9 +49,7 @@ class Aligner:
 				device = "cpu"
 
 		self.device = torch.device(device)
-		# self.tokenizer = AutoTokenizer.from_pretrained('facebook/contriever', token=os.getenv("HF_KEY"))
 		self.tokenizer = AutoTokenizer.from_pretrained("facebook/contriever")
-		# self.model = AutoModel.from_pretrained('facebook/contriever', token=os.getenv("HF_KEY")).to(self.device)
 		self.model = AutoModel.from_pretrained(
 			"facebook/contriever", use_safetensors=True
 		).to(self.device)
@@ -98,7 +95,7 @@ class Aligner:
 			return []
 
 		query_k = k * 2
-		max_attempts = 5  #
+		max_attempts = 5
 		attempt = 0
 		unique_ranked_properties: List[str] = []
 
@@ -112,17 +109,12 @@ class Aligner:
 						"path": "alias_text_embedding",
 						"numCandidates": 150,
 						"limit": query_k if query_k < 150 else 150,
-						# "filter": {
-						#                 "sample_id": {"$eq": sample_id},
-						#             },
 					}
 				},
 				{
 					"$project": {
 						"_id": 0,
 						"label": 1,
-						# "alias": 1
-						# "score": {"$meta": "vectorSearchScore"}
 					}
 				},
 			]
@@ -160,7 +152,7 @@ class Aligner:
 			return []
 
 		query_k = k * 2
-		max_attempts = 5  #
+		max_attempts = 5
 		attempt = 0
 		unique_ranked_entities: List[str] = []
 
@@ -188,7 +180,6 @@ class Aligner:
 					"$project": {
 						"_id": 0,
 						"label": 1,
-						# "score": {"$meta": "vectorSearchScore"}
 					}
 				},
 			]
@@ -228,7 +219,6 @@ class Aligner:
 				{
 					"label": property_name,
 					"alias": alias,
-					# "sample_id": sample_id,
 					"alias_text_embedding": self.get_embedding(alias),
 				}
 			)

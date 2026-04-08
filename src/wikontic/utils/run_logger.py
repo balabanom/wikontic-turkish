@@ -43,14 +43,14 @@ def start_run(
     parent_run_id: str | None = None,
 ) -> str:
     """
-    Yeni bir extraction run başlatır.
+    Create a new extraction run document and return its run_id.
 
     Args:
-        sample_id:      Streamlit user/session ID
-        model:          Kullanılan model adı
-        input_text:     Ham input metni (export/replay için şart)
-        extra_config:   Ek config parametreleri
-        parent_run_id:  Replay ise orijinal run'ın ID'si
+        sample_id:      Streamlit user/session identifier.
+        model:          Model name used for this run.
+        input_text:     Raw input text (required for export and replay).
+        extra_config:   Arbitrary pipeline configuration metadata.
+        parent_run_id:  Original run_id if this is a replay; None otherwise.
     """
     db = _get_db()
     run_id = str(uuid.uuid4())
@@ -65,7 +65,7 @@ def start_run(
         "error": None,
         "stats": None,
         "extra_config": extra_config or {},
-        "parent_run_id": parent_run_id,   # None ise normal run, dolu ise replay
+        "parent_run_id": parent_run_id,   # None for normal runs; set for replays
     }
 
     db["extraction_runs"].insert_one(doc)
@@ -74,14 +74,10 @@ def start_run(
 
 def log_artifact(run_id: str, stage: str, payload: dict) -> None:
     """
-    Bir pipeline stage'inin çıktısını kaydeder.
+    Persist the output of a pipeline stage.
 
-    stage örnekleri:
-        "raw_llm_output"
-        "parsed_triplets"
-        "merge_map_entities"
-        "filtered_out"
-        "final_triplets"
+    Known stage names: raw_llm_output, parsed_triplets, merge_map_entities,
+                       filtered_out, final_triplets.
     """
     db = _get_db()
 
@@ -105,9 +101,7 @@ def finish_run(
     error: str | None = None,
     stats: dict | None = None,
 ) -> None:
-    """
-    Run'ı tamamlandı (DONE) ya da hatalı (FAILED) olarak işaretler.
-    """
+    """Mark a run as DONE or FAILED and store final timing/token stats."""
     db = _get_db()
 
     update = {

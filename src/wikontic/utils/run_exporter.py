@@ -46,10 +46,7 @@ def _build_repro_config(run_meta: dict) -> dict:
 
 
 def _enrich_triplets_with_sentences(triplets: list, sentences: list) -> list:
-    """
-    Her triplet'e sentence_id → sentences lookup ile "sentence" alanı ekler.
-    sentences: [{id, text, start, end}]
-    """
+    """Add a "sentence" field to each triplet via sentence_id lookup."""
     if not sentences:
         return triplets
 
@@ -83,7 +80,6 @@ def _build_export_dict(run_id: str) -> dict:
 
         payload = json.loads(_safe_json(payload))
 
-        # sentence alanını triplet'lere ekle (parsed_triplets ve final_triplets)
         if stage in ("parsed_triplets", "final_triplets", "filtered_out"):
             sentences = payload.get("sentences", [])
             triplets  = payload.get("triplets", [])
@@ -92,7 +88,7 @@ def _build_export_dict(run_id: str) -> dict:
 
         artifacts[stage] = payload
 
-    # Tanımlı sıra dışındaki stage'ler
+    # Include any stages not in the predefined order.
     for stage, payload in all_artifacts.items():
         if stage not in artifacts:
             artifacts[stage] = json.loads(_safe_json(payload)) if payload else None
@@ -108,13 +104,13 @@ def _build_export_dict(run_id: str) -> dict:
 
 def export_run(run_id: str) -> Tuple[bytes, str, str]:
     """
-    Verilen run_id için ZIP export paketi üretir.
+    Build a ZIP export package for the given run_id.
 
-    ZIP içeriği:
-        run.json               — tüm metadata + artifacts (sentence alanı dahil)
+    ZIP contents:
+        run.json                    — full metadata + all artifacts
         stages/raw_llm_output.json
         stages/parsed_triplets.json
-        ... (mevcut stage'ler)
+        ...  (one file per recorded stage)
     """
     export_dict = _build_export_dict(run_id)
 

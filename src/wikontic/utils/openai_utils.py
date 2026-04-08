@@ -1,6 +1,5 @@
 import openai
 
-# from dotenv import load_dotenv, find_dotenv
 from tenacity import (
     retry,
     wait_random_exponential,
@@ -19,13 +18,10 @@ import httpx
 
 from .llm_client_logger import LoggedOpenAIClient
 
-# Configure logging
 logger = logging.getLogger("OpenAIUtils")
 logger.setLevel(logging.ERROR)
 logging.getLogger("httpx").setLevel(logging.ERROR)
 
-# _ = load_dotenv(find_dotenv())
-# OpenAI
 MAX_ATTEMPTS = 1
 
 
@@ -59,44 +55,30 @@ class LLMTripletExtractor:
         if proxy:
             client_kwargs["http_client"] = httpx.Client(proxy=proxy)
 
-        # ── Tüm LLM çağrıları LoggedOpenAIClient üzerinden loglanır ──────────
+        # All LLM calls are routed through LoggedOpenAIClient for audit logging.
         raw_client  = openai.OpenAI(**client_kwargs)
         self.client = LoggedOpenAIClient(raw_client, model=model)
-        # ─────────────────────────────────────────────────────────────────────
 
-        """
-        Initialize the LLMTripletExtractor.
-
-        Args:
-            prompt_folder_path: Path to folder containing prompt files
-            system_prompt_paths: Dictionary mapping prompt types to file paths
-            model: Name of the OpenAI model to use
-        """
         if system_prompt_paths is None:
             system_prompt_paths = {
                 "triplet_extraction": "triplet_extraction/propmt_1_types_qualifiers.txt",
-                # 'triplet_extraction': 'triplet_extraction/prompt_1_types_qualifiers_dialog_bench.txt',
                 "relation_entity_types_ranker": "ontology_refinement/prompt_choose_relation_and_types.txt",
                 "relation_ranker": "ontology_refinement/prompt_choose_relation.txt",
                 "entity_types_ranker": "ontology_refinement/prompt_choose_entity_types.txt",
                 "relation_ranker_wo_entity_types": "name_refinement/prompt_choose_relation_wo_entity_types.txt",
-                # 'relation_ranker_wo_entity_types': 'name_refinement/prompt_choose_relation_wo_entity_types_dialog_bench.txt',
-                # 'subject_ranker': 'name_refinement/rank_subject_names_dialog_bench.txt',
                 "subject_ranker": "name_refinement/rank_subject_names.txt",
-                # 'object_ranker': 'name_refinement/rank_object_names_dialog_bench.txt',
                 "object_ranker": "name_refinement/rank_object_names.txt",
                 "quailfier_object_ranker": "name_refinement/rank_object_qualifiers.txt",
                 "question_entity_extractor": "qa/prompt_entity_extraction_from_question.txt",
                 "question_entity_ranker": "qa/prompt_choose_relevant_entities_for_question.txt",
                 "question_entity_ranker_wo_types": "qa/prompt_choose_relevant_entities_for_question_wo_types.txt",
-                # 'qa': 'qa_prompt_hotpot.txt'
                 "question_decomposition_1": "qa/question_decomposition_1.txt",
                 "qa_collapsing": "qa/qa_collapsing_prompt.txt",
                 "qa_is_answered": "qa/prompt_is_answered.txt",
                 "qa": "qa/qa_prompt.txt",
             }
 
-        # Load all prompts
+        # Load all prompt templates from disk at init time.
         prompt_folder = Path(prompt_folder_path)
         self.prompts = {}
         for prompt_type, filename in system_prompt_paths.items():
@@ -149,8 +131,8 @@ class LLMTripletExtractor:
     ) -> Union[dict, list, str]:
         """Get completion from OpenAI API with retry logic.
 
-        Tüm LLM istekleri buradan geçer. LoggedOpenAIClient her isteği ve
-        yanıtı otomatik olarak logs/llm_requests.jsonl dosyasına yazar.
+        All LLM requests flow through here. LoggedOpenAIClient automatically
+        writes each request and response to logs/llm_requests.jsonl.
         """
         if self.model == "qwen/qwen3-32b":
             user_prompt = "/no_think \n" + user_prompt
@@ -159,11 +141,9 @@ class LLMTripletExtractor:
             {"role": "user",   "content": user_prompt},
         ]
 
-        # ── TEK LLM ÇAĞRISI — LoggedOpenAIClient burada devreye girer ────────
         response = self.client.chat.completions.create(
             model=self.model, messages=messages, temperature=0
         )
-        # ─────────────────────────────────────────────────────────────────────
 
         self.completion_tokens_num += response.usage.completion_tokens
         self.prompt_tokens_num     += response.usage.prompt_tokens
@@ -198,7 +178,7 @@ class LLMTripletExtractor:
             )
             logger.log(logging.ERROR, "System prompt: %s", system_prompt)
 
-        # Numaralı cümle listesi varsa prompt'a ekle
+        # Append numbered sentence list so the LLM can assign sentence_id per triplet.
         if sentences:
             numbered = "\n".join(f"[{s['id']}] {s['text']}" for s in sentences)
             user_prompt = (
