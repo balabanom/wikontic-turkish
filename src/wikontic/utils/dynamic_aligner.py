@@ -60,6 +60,7 @@ class Aligner:
 		self.model = AutoModel.from_pretrained(
 			resolved_model_name, use_safetensors=True
 		).to(self.device)
+		self.model.eval()
 
 	def get_embedding(self, text):
 
@@ -78,7 +79,8 @@ class Aligner:
 		inputs = self.tokenizer(
 			[text], padding=True, truncation=True, return_tensors="pt"
 		)
-		outputs = self.model(**inputs.to(self.device))
+		with torch.no_grad():
+			outputs = self.model(**inputs.to(self.device))
 		embeddings = mean_pooling(outputs[0], inputs["attention_mask"])
 		return embeddings.detach().cpu().tolist()[0]
 
