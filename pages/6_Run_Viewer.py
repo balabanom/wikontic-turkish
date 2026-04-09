@@ -130,7 +130,7 @@ def _render_performance_card(run_meta: dict):
             st.warning(f"Hata olan stage: `{stats['failed_stage']}`")
 
 
-def _render_stage_tabs(run_id: str):
+def _render_stage_tabs(run_id: str, db_name: str):
     tabs = st.tabs([
         "📋 Input & Config",
         "🔴 Raw-0: LLM Output",
@@ -142,7 +142,7 @@ def _render_stage_tabs(run_id: str):
 
     # ── Tab 0: Input & Config ─────────────────────────────────────────────────
     with tabs[0]:
-        run_meta = get_run(run_id)
+        run_meta = get_run(run_id, db_name=db_name)
         if run_meta is None:
             st.warning("Run metadata bulunamadı.")
         else:
@@ -167,7 +167,7 @@ def _render_stage_tabs(run_id: str):
 
     # ── Tab 1: Raw LLM Output ─────────────────────────────────────────────────
     with tabs[1]:
-        art = get_artifact(run_id, "raw_llm_output")
+        art = get_artifact(run_id, "raw_llm_output", db_name=db_name)
         if art is None:
             st.warning("Stage kaydı bulunamadı: raw_llm_output")
         else:
@@ -176,7 +176,7 @@ def _render_stage_tabs(run_id: str):
 
     # ── Tab 2: Parsed Triplets ────────────────────────────────────────────────
     with tabs[2]:
-        art = get_artifact(run_id, "parsed_triplets")
+        art = get_artifact(run_id, "parsed_triplets", db_name=db_name)
         if art is None:
             st.warning("Stage kaydı bulunamadı: parsed_triplets")
         else:
@@ -192,7 +192,7 @@ def _render_stage_tabs(run_id: str):
 
     # ── Tab 3: Merge Log ──────────────────────────────────────────────────────
     with tabs[3]:
-        art = get_artifact(run_id, "merge_map_entities")
+        art = get_artifact(run_id, "merge_map_entities", db_name=db_name)
         if art is None:
             st.warning("Stage kaydı bulunamadı: merge_map_entities")
         else:
@@ -207,7 +207,7 @@ def _render_stage_tabs(run_id: str):
 
     # ── Tab 4: Filtered Out ───────────────────────────────────────────────────
     with tabs[4]:
-        art = get_artifact(run_id, "filtered_out")
+        art = get_artifact(run_id, "filtered_out", db_name=db_name)
         if art is None:
             st.warning("Stage kaydı bulunamadı: filtered_out")
         else:
@@ -229,7 +229,7 @@ def _render_stage_tabs(run_id: str):
 
     # ── Tab 5: Final Triplets ─────────────────────────────────────────────────
     with tabs[5]:
-        art = get_artifact(run_id, "final_triplets")
+        art = get_artifact(run_id, "final_triplets", db_name=db_name)
         if art is None:
             st.warning("Stage kaydı bulunamadı: final_triplets")
         else:
@@ -251,9 +251,9 @@ def _render_stage_tabs(run_id: str):
                 st.info("Final triplet bulunamadı.")
 
 
-def _render_lineage(run_id: str, run_meta: dict):
+def _render_lineage(run_id: str, run_meta: dict, db_name: str):
     parent_id = run_meta.get("parent_run_id")
-    children  = get_child_runs(run_id)
+    children  = get_child_runs(run_id, db_name=db_name)
     if not parent_id and not children:
         return
     st.markdown("**🔗 Run Lineage**")
@@ -261,7 +261,7 @@ def _render_lineage(run_id: str, run_meta: dict):
     with lc[0]:
         if parent_id:
             st.caption("Parent Run")
-            pm = get_run(parent_id)
+            pm = get_run(parent_id, db_name=db_name)
             if pm and hasattr(pm.get("created_at"), "strftime"):
                 lbl = f"{pm['created_at'].strftime('%Y-%m-%d %H:%M:%S')} | {pm.get('model','')}"
             else:
@@ -305,7 +305,7 @@ def _render_telemetry_compare(tele: dict):
         st.info("Stage telemetrisi bulunamadı.")
 
 
-def _render_compare_panel(run_id_a: str, runs: list):
+def _render_compare_panel(run_id_a: str, runs: list, db_name: str):
     st.subheader("⚖️ Run Karşılaştırma (A/B)")
     other    = [r for r in runs if r["run_id"] != run_id_a]
     if not other:
@@ -316,7 +316,7 @@ def _render_compare_panel(run_id_a: str, runs: list):
 
     ca, cb = st.columns(2)
     with ca:
-        m  = get_run(run_id_a) or {}
+        m  = get_run(run_id_a, db_name=db_name) or {}
         ca_str = m.get("created_at", "")
         if hasattr(ca_str, "strftime"):
             ca_str = ca_str.strftime("%Y-%m-%d %H:%M:%S")
@@ -331,8 +331,8 @@ def _render_compare_panel(run_id_a: str, runs: list):
 
     with st.spinner("Karşılaştırılıyor…"):
         try:
-            report = compare_runs(run_id_a, run_id_b)
-            tele   = compare_telemetry(run_id_a, run_id_b)
+            report = compare_runs(run_id_a, run_id_b, db_name=db_name)
+            tele   = compare_telemetry(run_id_a, run_id_b, db_name=db_name)
         except Exception as e:
             st.error(f"Karşılaştırma hatası: {e}")
             return
@@ -420,7 +420,7 @@ def _render_compare_panel(run_id_a: str, runs: list):
         st.error(f"Compare export hatası: {e}")
 
 
-def _render_delete_zone(run_id: str):
+def _render_delete_zone(run_id: str, db_name: str):
     with st.expander("🗑️ Danger Zone: Run Sil", expanded=False):
         st.error("Bu işlem geri alınamaz. Run ve tüm artifact'ları kalıcı olarak silinir.",
                  icon="⚠️")
@@ -434,7 +434,7 @@ def _render_delete_zone(run_id: str):
                 st.warning('Silmek için tam olarak "DELETE" yazmanız gerekiyor.')
             else:
                 with st.spinner("Siliniyor…"):
-                    result = delete_run(run_id)
+                    result = delete_run(run_id, db_name=db_name)
                 if result.get("ok"):
                     st.success(
                         f"Silindi: {result['runs_deleted']} run, "
@@ -456,7 +456,7 @@ left_col, right_col = st.columns([3, 7])
 with left_col:
     st.subheader("Filtreler")
     try:
-        all_models = ["(tümü)"] + get_distinct_models()
+        all_models = ["(tümü)"] + get_distinct_models(db_name=_db_name)
     except Exception:
         all_models = ["(tümü)"]
 
@@ -473,8 +473,13 @@ with left_col:
     st.divider()
 
     try:
-        runs = list_recent_runs(limit=50, sample_id=filter_sample_id,
-                                status=filter_status, model=filter_model)
+        runs = list_recent_runs(
+            limit=50,
+            sample_id=filter_sample_id,
+            status=filter_status,
+            model=filter_model,
+            db_name=_db_name,
+        )
     except Exception as e:
         runs = []
         st.error(f"Run listesi alınamadı: {e}")
@@ -504,7 +509,7 @@ with right_col:
     if not selected_run_id:
         st.info("Sol panelden bir run seçin.")
     else:
-        run_meta = get_run(selected_run_id)
+        run_meta = get_run(selected_run_id, db_name=_db_name)
 
         compare_mode = st.toggle("⚖️ Compare mode",
                                   value=st.session_state["rv_compare_mode"],
@@ -513,7 +518,7 @@ with right_col:
 
         if compare_mode:
             if runs:
-                _render_compare_panel(selected_run_id, runs)
+                _render_compare_panel(selected_run_id, runs, db_name=_db_name)
             else:
                 st.warning("Karşılaştırma için run listesi yüklenemedi.")
         else:
@@ -534,7 +539,7 @@ with right_col:
 
             with btn_col2:
                 try:
-                    zip_bytes, filename, mimetype = export_run(selected_run_id)
+                    zip_bytes, filename, mimetype = export_run(selected_run_id, db_name=_db_name)
                     st.download_button(
                         label="⬇️ Export Run (ZIP)",
                         data=zip_bytes, file_name=filename, mime=mimetype,
@@ -576,14 +581,14 @@ with right_col:
                                     st.error(f"Replay başarısız: {e}")
 
             if run_meta:
-                _render_lineage(selected_run_id, run_meta)
+                _render_lineage(selected_run_id, run_meta, db_name=_db_name)
 
             st.divider()
 
             try:
-                _render_stage_tabs(selected_run_id)
+                _render_stage_tabs(selected_run_id, db_name=_db_name)
             except Exception as e:
                 st.error(f"Stage tabları yüklenirken hata: {e}")
 
             st.divider()
-            _render_delete_zone(selected_run_id)
+            _render_delete_zone(selected_run_id, db_name=_db_name)

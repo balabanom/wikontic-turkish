@@ -110,7 +110,7 @@ def create_triplets_database(
     filtered_triplets_collection: str = "filtered_triplets",
     entity_aliases_index: str = "entity_aliases",
     property_aliases_index: str = "property_aliases",
-    embedding_dimensions: int = 768,
+    embedding_dimensions: int | None = None,
     drop_collections: bool = False,
 ):
     """
@@ -134,6 +134,10 @@ def create_triplets_database(
     """
     mongo_client = get_mongo_client(mongo_uri)
     db = mongo_client.get_database(db_name)
+    if embedding_dimensions is None:
+        raise ValueError(
+            "embedding_dimensions must be provided by runtime profile; hardcoded defaults are disabled."
+        )
 
     # Drop all existing collections
     if drop_collections:
@@ -236,7 +240,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--embedding_dimensions",
         type=int,
-        default=768,
+        required=True,
         help="Dimensions for embeddings",
     )
     parser.add_argument(

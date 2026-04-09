@@ -389,6 +389,7 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                     },
                     db_name=self.runtime_profile.triplets_db_name,
                     profile_id=self.runtime_profile.profile_id,
+                    runtime_profile=self.runtime_profile,
                 )
             except Exception as log_exc:
                 logger.warning("run_logger raw_llm_output failed: %s", log_exc)
@@ -438,6 +439,7 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                     },
                     db_name=self.runtime_profile.triplets_db_name,
                     profile_id=self.runtime_profile.profile_id,
+                    runtime_profile=self.runtime_profile,
                 )
             except Exception as log_exc:
                 logger.warning("run_logger parsed_triplets failed: %s", log_exc)
@@ -640,6 +642,7 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                     },
                     db_name=self.runtime_profile.triplets_db_name,
                     profile_id=self.runtime_profile.profile_id,
+                    runtime_profile=self.runtime_profile,
                 )
             except Exception as log_exc:
                 logger.warning("run_logger filtered_out failed: %s", log_exc)
@@ -656,6 +659,7 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                     },
                     db_name=self.runtime_profile.triplets_db_name,
                     profile_id=self.runtime_profile.profile_id,
+                    runtime_profile=self.runtime_profile,
                 )
             except Exception as log_exc:
                 logger.warning("run_logger merge_map_entities failed: %s", log_exc)
@@ -685,6 +689,7 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                     },
                     db_name=self.runtime_profile.triplets_db_name,
                     profile_id=self.runtime_profile.profile_id,
+                    runtime_profile=self.runtime_profile,
                 )
             except Exception as log_exc:
                 logger.warning("run_logger final_triplets failed: %s", log_exc)

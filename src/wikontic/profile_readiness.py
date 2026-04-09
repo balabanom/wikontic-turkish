@@ -25,6 +25,108 @@ class ReadinessResult:
         return "\n".join(self.issues) if self.issues else ""
 
 
+def _append_profile_metadata_issues(
+    *,
+    issues: list[str],
+    profile: RuntimeProfile,
+    meta: dict | None,
+    db_name: str,
+    source: str,
+) -> None:
+    if meta is None:
+        issues.append(
+            f"{source}.system_profile_metadata has no document for "
+            f"profile_id='{profile.profile_id}' in DB '{db_name}'"
+        )
+        return
+    if meta.get("embedding_dimension") != profile.embedding_dimension:
+        issues.append(
+            f"Embedding dimension mismatch in {source} DB '{db_name}': "
+            f"stored={meta.get('embedding_dimension')}, expected={profile.embedding_dimension}"
+        )
+    if meta.get("embedding_model_name") != profile.embedding_model_name:
+        issues.append(
+            f"Embedding model mismatch in {source} DB '{db_name}': "
+            f"stored={meta.get('embedding_model_name')}, expected={profile.embedding_model_name}"
+        )
+    if meta.get("embedding_profile_id") != profile.embedding_profile_id:
+        issues.append(
+            f"Embedding profile mismatch in {source} DB '{db_name}': "
+            f"stored={meta.get('embedding_profile_id')}, expected={profile.embedding_profile_id}"
+        )
+
+
+def _validate_vector_index_exists(
+    *,
+    issues: list[str],
+    db_name: str,
+    collection,
+    collection_name: str,
+    index_name: str,
+) -> None:
+    try:
+        names = {idx.get("name") for idx in collection.list_search_indexes()}
+    except Exception as e:
+        issues.append(
+            f"Cannot validate vector index '{index_name}' on "
+            f"'{db_name}.{collection_name}': {e}"
+        )
+        return
+    if index_name not in names:
+        issues.append(
+            f"Missing vector index '{index_name}' on '{db_name}.{collection_name}'"
+        )
+
+
+def _extract_vector_dimensions(index_doc: dict) -> list[int]:
+    dims: list[int] = []
+
+    def _walk(obj):
+        if isinstance(obj, dict):
+            if obj.get("type") == "knnVector" and isinstance(obj.get("dimensions"), int):
+                dims.append(obj["dimensions"])
+            for v in obj.values():
+                _walk(v)
+        elif isinstance(obj, list):
+            for v in obj:
+                _walk(v)
+
+    _walk(index_doc)
+    return dims
+
+
+def _validate_vector_index_dimension(
+    *,
+    issues: list[str],
+    db_name: str,
+    collection,
+    collection_name: str,
+    index_name: str,
+    expected_dimension: int,
+) -> None:
+    try:
+        index_docs = list(collection.list_search_indexes())
+    except Exception:
+        return
+
+    target = next((d for d in index_docs if d.get("name") == index_name), None)
+    if target is None:
+        return
+    dims = _extract_vector_dimensions(target)
+    if not dims:
+        issues.append(
+            f"Cannot verify vector dimensions for index '{index_name}' on "
+            f"'{db_name}.{collection_name}'"
+        )
+        return
+    if expected_dimension not in dims:
+        issues.append(
+            f"Vector dimension mismatch for index '{index_name}' on "
+            f"'{db_name}.{collection_name}': stored={sorted(set(dims))}, "
+            f"expected={expected_dimension}"
+        )
+
+
 def check_profile_readiness(
     profile: RuntimeProfile,
     mongo_client: MongoClient,
@@ -44,7 +146,6 @@ def check_profile_readiness(
     issues: list[str] = []
     required_triplets_cols = {
         "entity_aliases",
-        "property_aliases",
         "triplets",
         "initial_triplets",
         "filtered_triplets",
@@ -93,22 +194,18 @@ def check_profile_readiness(
             f"{sorted(missing_ontology)}"
         )
 
-    # Validate embedding dimension in stored metadata
+    # Validate ontology metadata integrity for embedding compatibility
     if profile.requires_system_profile_metadata and "system_profile_metadata" in existing_ontology_cols:
         meta = ontology_db["system_profile_metadata"].find_one(
             {"profile_id": profile.profile_id}
         )
-        if meta is None:
-            issues.append(
-                f"system_profile_metadata has no document for "
-                f"profile_id='{profile.profile_id}'"
-            )
-        elif meta.get("embedding_dimension") != profile.embedding_dimension:
-            issues.append(
-                f"Embedding dimension mismatch in '{profile.ontology_db_name}': "
-                f"stored={meta.get('embedding_dimension')}, "
-                f"expected={profile.embedding_dimension}"
-            )
+        _append_profile_metadata_issues(
+            issues=issues,
+            profile=profile,
+            meta=meta,
+            db_name=profile.ontology_db_name,
+            source="ontology",
+        )
 
     # ── Triplets DB ───────────────────────────────────────────────────────────
     if profile.profile_id == "en_legacy__contriever":
@@ -138,8 +235,6 @@ def check_profile_readiness(
         chosen = preferred or fallback
         if chosen:
             profile.triplets_db_name = chosen
-            # Do not enforce strict triplets schema for legacy DBs.
-            return ReadinessResult(ready=True, profile_id=profile.profile_id, issues=[])
 
     if profile.triplets_db_name not in db_names:
         issues.append(
@@ -163,6 +258,73 @@ def check_profile_readiness(
         issues.append(
             f"Missing collections in triplets DB '{profile.triplets_db_name}': "
             f"{sorted(missing_triplets)}"
+        )
+
+    # Validate triplets metadata integrity for embedding compatibility
+    if profile.requires_system_profile_metadata:
+        if "system_profile_metadata" not in existing_triplets_cols:
+            issues.append(
+                f"Missing collection in triplets DB '{profile.triplets_db_name}': "
+                "['system_profile_metadata']"
+            )
+        else:
+            triplets_meta = triplets_db["system_profile_metadata"].find_one(
+                {"profile_id": profile.profile_id}
+            )
+            _append_profile_metadata_issues(
+                issues=issues,
+                profile=profile,
+                meta=triplets_meta,
+                db_name=profile.triplets_db_name,
+                source="triplets",
+            )
+
+    # Validate required vector indexes for embedding-based retrieval.
+    if profile.requires_system_profile_metadata:
+        _validate_vector_index_exists(
+            issues=issues,
+            db_name=profile.ontology_db_name,
+            collection=ontology_db["entity_type_aliases"],
+            collection_name="entity_type_aliases",
+            index_name=profile.entity_type_vector_index_name,
+        )
+        _validate_vector_index_dimension(
+            issues=issues,
+            db_name=profile.ontology_db_name,
+            collection=ontology_db["entity_type_aliases"],
+            collection_name="entity_type_aliases",
+            index_name=profile.entity_type_vector_index_name,
+            expected_dimension=profile.embedding_dimension,
+        )
+        _validate_vector_index_exists(
+            issues=issues,
+            db_name=profile.ontology_db_name,
+            collection=ontology_db["property_aliases"],
+            collection_name="property_aliases",
+            index_name=profile.property_vector_index_name,
+        )
+        _validate_vector_index_dimension(
+            issues=issues,
+            db_name=profile.ontology_db_name,
+            collection=ontology_db["property_aliases"],
+            collection_name="property_aliases",
+            index_name=profile.property_vector_index_name,
+            expected_dimension=profile.embedding_dimension,
+        )
+        _validate_vector_index_exists(
+            issues=issues,
+            db_name=profile.triplets_db_name,
+            collection=triplets_db["entity_aliases"],
+            collection_name="entity_aliases",
+            index_name=profile.entity_aliases_vector_index_name,
+        )
+        _validate_vector_index_dimension(
+            issues=issues,
+            db_name=profile.triplets_db_name,
+            collection=triplets_db["entity_aliases"],
+            collection_name="entity_aliases",
+            index_name=profile.entity_aliases_vector_index_name,
+            expected_dimension=profile.embedding_dimension,
         )
 
     return ReadinessResult(

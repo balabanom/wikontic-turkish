@@ -13,6 +13,7 @@ from src.wikontic.profiles import (
     ONTOLOGY_PROFILES,
     get_available_ontology_profiles,
     get_compatible_embedding_profiles,
+    get_unavailable_embedding_profiles,
 )
 from src.wikontic.profile_readiness import check_profile_readiness
 from pymongo import MongoClient
@@ -146,6 +147,14 @@ with st.sidebar:
         get_compatible_embedding_profiles(selected_ont_profile.language)
         if selected_ont_profile else []
     )
+    unavailable_emb = [
+        p for p in get_unavailable_embedding_profiles()
+        if selected_ont_profile and selected_ont_profile.language in p.compatible_languages
+    ]
+    if unavailable_emb:
+        st.caption(
+            "🔒 Unavailable embeddings: " + ", ".join(p.display_name for p in unavailable_emb)
+        )
     emb_display_names = [p.display_name for p in compatible_emb_profiles]
 
     current_emb_display = next(
@@ -154,14 +163,21 @@ with st.sidebar:
         emb_display_names[0] if emb_display_names else "",
     )
 
-    selected_emb_display = st.selectbox(
-        "Embedding model:",
-        emb_display_names,
-        index=emb_display_names.index(current_emb_display) if current_emb_display in emb_display_names else 0,
-        key="sidebar_embedding_selector",
-        help="Changing the embedding model changes the vector workspace. "
-             "Runs from different embedding models are stored in separate databases.",
-    )
+    if emb_display_names:
+        selected_emb_display = st.selectbox(
+            "Embedding model:",
+            emb_display_names,
+            index=emb_display_names.index(current_emb_display) if current_emb_display in emb_display_names else 0,
+            key="sidebar_embedding_selector",
+            help="Changing the embedding model changes the vector workspace. "
+                 "Runs from different embedding models are stored in separate databases.",
+        )
+    else:
+        st.warning(
+            "No available embedding profile for selected ontology language. "
+            "Enable one in `configs/embedding_profiles.json`."
+        )
+        selected_emb_display = ""
 
     # Resolve profile from selection
     new_profile, profile_error = _build_profile_from_selection(

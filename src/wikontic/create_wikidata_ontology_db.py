@@ -374,8 +374,8 @@ def create_wikidata_ontology_database(
     entity_types_index: str = "entity_type_aliases",
     property_aliases_index: str = "property_aliases",
     drop_collections: bool = True,
-    model_name: str = "facebook/contriever",
-    embedding_dimension: int = 768,
+    model_name: Optional[str] = None,
+    embedding_dimension: Optional[int] = None,
     profile_metadata: Optional[dict] = None,
 ):
     """
@@ -405,6 +405,14 @@ def create_wikidata_ontology_database(
     if database is None:
         raise ValueError(
             "database name must be provided. Use resolve_runtime_profile() to derive it."
+        )
+    if not model_name:
+        raise ValueError(
+            "model_name must be provided by runtime profile; hardcoded defaults are disabled."
+        )
+    if embedding_dimension is None:
+        raise ValueError(
+            "embedding_dimension must be provided by runtime profile; hardcoded defaults are disabled."
         )
 
     # Default mappings directory
@@ -551,13 +559,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model_name",
         type=str,
-        default="facebook/contriever",
+        required=True,
         help="HuggingFace embedding model name",
     )
     parser.add_argument(
         "--embedding_dimension",
         type=int,
-        default=768,
+        required=True,
         help="Embedding vector dimension",
     )
     parser.add_argument(

@@ -29,34 +29,34 @@ def _merge_key(m: dict) -> Tuple[str, str]:
 
 # ── Artifact getters ──────────────────────────────────────────────────────────
 
-def _get_final_triplets(run_id: str) -> List[dict]:
-    art = get_artifact(run_id, "final_triplets")
+def _get_final_triplets(run_id: str, db_name: str | None = None) -> List[dict]:
+    art = get_artifact(run_id, "final_triplets", db_name=db_name)
     return (art or {}).get("triplets", [])
 
 
-def _get_parsed_triplets(run_id: str) -> List[dict]:
-    art = get_artifact(run_id, "parsed_triplets")
+def _get_parsed_triplets(run_id: str, db_name: str | None = None) -> List[dict]:
+    art = get_artifact(run_id, "parsed_triplets", db_name=db_name)
     return (art or {}).get("triplets", [])
 
 
-def _get_entity_merges(run_id: str) -> List[dict]:
-    art = get_artifact(run_id, "merge_map_entities")
+def _get_entity_merges(run_id: str, db_name: str | None = None) -> List[dict]:
+    art = get_artifact(run_id, "merge_map_entities", db_name=db_name)
     return (art or {}).get("merges", [])
 
 
-def _get_filtered_triplets(run_id: str) -> List[dict]:
-    art = get_artifact(run_id, "filtered_out")
+def _get_filtered_triplets(run_id: str, db_name: str | None = None) -> List[dict]:
+    art = get_artifact(run_id, "filtered_out", db_name=db_name)
     return (art or {}).get("triplets", [])
 
 
-def _get_stats(run_id: str) -> dict:
-    meta = get_run(run_id) or {}
+def _get_stats(run_id: str, db_name: str | None = None) -> dict:
+    meta = get_run(run_id, db_name=db_name) or {}
     return meta.get("stats") or {}
 
 
 # ── Comparison ────────────────────────────────────────────────────────────────
 
-def compare_runs(run_id_a: str, run_id_b: str) -> dict:
+def compare_runs(run_id_a: str, run_id_b: str, db_name: str | None = None) -> dict:
     """
     Produce a comprehensive diff report between two runs.
 
@@ -92,8 +92,8 @@ def compare_runs(run_id_a: str, run_id_b: str) -> dict:
     }
     """
     # ── Final triplet diff ────────────────────────────────────────────────────
-    final_a = _get_final_triplets(run_id_a)
-    final_b = _get_final_triplets(run_id_b)
+    final_a = _get_final_triplets(run_id_a, db_name=db_name)
+    final_b = _get_final_triplets(run_id_b, db_name=db_name)
 
     keys_a = {_triplet_key(t): t for t in final_a}
     keys_b = {_triplet_key(t): t for t in final_b}
@@ -105,8 +105,8 @@ def compare_runs(run_id_a: str, run_id_b: str) -> dict:
     removed_edges = [keys_a[k] for k in removed_keys]
 
     # ── Merge diff ────────────────────────────────────────────────────────────
-    merges_a = _get_entity_merges(run_id_a)
-    merges_b = _get_entity_merges(run_id_b)
+    merges_a = _get_entity_merges(run_id_a, db_name=db_name)
+    merges_b = _get_entity_merges(run_id_b, db_name=db_name)
 
     mkeys_a = {_merge_key(m): m for m in merges_a}
     mkeys_b = {_merge_key(m): m for m in merges_b}
@@ -115,8 +115,8 @@ def compare_runs(run_id_a: str, run_id_b: str) -> dict:
     entity_merge_removed = [mkeys_a[k] for k in set(mkeys_a) - set(mkeys_b)]
 
     # ── Filter reason diff ────────────────────────────────────────────────────
-    filtered_a = _get_filtered_triplets(run_id_a)
-    filtered_b = _get_filtered_triplets(run_id_b)
+    filtered_a = _get_filtered_triplets(run_id_a, db_name=db_name)
+    filtered_b = _get_filtered_triplets(run_id_b, db_name=db_name)
 
     reason_count_a: Counter = Counter(
         t.get("reason_code", "UNKNOWN") for t in filtered_a
@@ -137,8 +137,8 @@ def compare_runs(run_id_a: str, run_id_b: str) -> dict:
     ]
 
     # ── Summary ───────────────────────────────────────────────────────────────
-    parsed_a = _get_parsed_triplets(run_id_a)
-    parsed_b = _get_parsed_triplets(run_id_b)
+    parsed_a = _get_parsed_triplets(run_id_a, db_name=db_name)
+    parsed_b = _get_parsed_triplets(run_id_b, db_name=db_name)
 
     summary = {
         "raw_count_a":            len(parsed_a),
@@ -187,7 +187,7 @@ _TIMED_STAGES = [
 ]
 
 
-def compare_telemetry(run_id_a: str, run_id_b: str) -> dict:
+def compare_telemetry(run_id_a: str, run_id_b: str, db_name: str | None = None) -> dict:
     """
     Produce a per-stage timing diff between two runs.
 
@@ -202,8 +202,8 @@ def compare_telemetry(run_id_a: str, run_id_b: str) -> dict:
         ]
     }
     """
-    meta_a = get_run(run_id_a) or {}
-    meta_b = get_run(run_id_b) or {}
+    meta_a = get_run(run_id_a, db_name=db_name) or {}
+    meta_b = get_run(run_id_b, db_name=db_name) or {}
 
     stats_a = meta_a.get("stats") or {}
     stats_b = meta_b.get("stats") or {}

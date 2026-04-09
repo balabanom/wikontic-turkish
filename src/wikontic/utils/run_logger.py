@@ -45,6 +45,9 @@ def _ensure_indexes(db):
         background=True,
     )
     artifacts.create_index([("profile_id", ASCENDING)], background=True)
+    artifacts.create_index([("embedding_model_name", ASCENDING)], background=True)
+    artifacts.create_index([("embedding_profile_id", ASCENDING)], background=True)
+    artifacts.create_index([("ontology_profile_id", ASCENDING)], background=True)
 
 
 def start_run(
@@ -110,6 +113,7 @@ def log_artifact(
     payload: dict,
     db_name: Optional[str] = None,
     profile_id: Optional[str] = None,
+    runtime_profile: Optional[RuntimeProfile] = None,
 ) -> None:
     """
     Persist the output of a pipeline stage.
@@ -118,21 +122,29 @@ def log_artifact(
                        filtered_out, final_triplets.
 
     Args:
-        run_id:     Run identifier.
-        stage:      Pipeline stage name.
-        payload:    Stage output data.
-        db_name:    DB to write to. Defaults to global default.
-        profile_id: Profile ID to store at top-level in the artifact doc
-                    (enables future audit filtering by profile).
+        run_id:           Run identifier.
+        stage:            Pipeline stage name.
+        payload:          Stage output data.
+        db_name:          DB to write to. Defaults to global default.
+        profile_id:       Optional explicit profile_id override.
+        runtime_profile:  Optional RuntimeProfile for top-level filter fields.
     """
     db = _get_db(db_name or _DEFAULT_DB_NAME)
+    profile_meta = runtime_profile.to_metadata_dict() if runtime_profile else {}
 
     doc = {
         "run_id": run_id,
         "stage": stage,
         "payload": payload,
         "created_at": datetime.now(timezone.utc),
-        "profile_id": profile_id or "",
+        "profile_id": profile_id or profile_meta.get("profile_id", ""),
+        "ontology_profile_id": profile_meta.get("ontology_profile_id", ""),
+        "embedding_profile_id": profile_meta.get("embedding_profile_id", ""),
+        "ontology_db_name": profile_meta.get("ontology_db_name", ""),
+        "triplets_db_name": profile_meta.get("triplets_db_name", db_name or _DEFAULT_DB_NAME),
+        "ontology_language": profile_meta.get("ontology_language", ""),
+        "embedding_model_name": profile_meta.get("embedding_model_name", ""),
+        "embedding_dimension": profile_meta.get("embedding_dimension", None),
     }
 
     db["extraction_artifacts"].update_one(

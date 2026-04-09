@@ -73,7 +73,7 @@ def create_ontological_triplets_database(
     filtered_triplets_collection: str = "filtered_triplets",
     ontology_filtered_triplets_collection: str = "ontology_filtered_triplets",
     entity_aliases_index: str = "entity_aliases",
-    embedding_dimension: int = 768,
+    embedding_dimension: int | None = None,
     drop_collections: bool = False,
 ):
     """
@@ -95,6 +95,10 @@ def create_ontological_triplets_database(
     """
     mongo_client = get_mongo_client(mongo_uri)
     db = mongo_client.get_database(db_name)
+    if embedding_dimension is None:
+        raise ValueError(
+            "embedding_dimension must be provided by runtime profile; hardcoded defaults are disabled."
+        )
 
     if drop_collections:
         for collection_name in db.list_collection_names():
@@ -180,6 +184,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--drop_collections", type=bool, default=False, help="Drop existing collections"
     )
+    parser.add_argument(
+        "--embedding_dimension",
+        type=int,
+        required=True,
+        help="Embedding vector dimension",
+    )
 
     args = parser.parse_args()
     create_ontological_triplets_database(
@@ -191,5 +201,6 @@ if __name__ == "__main__":
         filtered_triplets_collection=args.filtered_triplets_collection,
         ontology_filtered_triplets_collection=args.ontology_filtered_triplets_collection,
         entity_aliases_index=args.entity_aliases_index,
+        embedding_dimension=args.embedding_dimension,
         drop_collections=args.drop_collections,
     )

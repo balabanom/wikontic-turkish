@@ -1,0 +1,38 @@
+[
+  {
+    "embedding_profile_id": "contriever_v1",
+    "embedding_model_name": "facebook/contriever",
+    "embedding_dimension": 768,
+    "display_name": "Contriever",
+    "embedding_key": "contriever",
+    "compatible_languages": ["en"],
+    "family": "hf_local",
+    "supports_turkish": "limited",
+    "available": true,
+    "notes": "Default installed model."
+  },
+  {
+    "embedding_profile_id": "bge_m3_v1",
+    "embedding_model_name": "BAAI/bge-m3",
+    "embedding_dimension": 1024,
+    "display_name": "BGE-M3",
+    "embedding_key": "bge_m3",
+    "compatible_languages": ["en", "tr"],
+    "family": "hf_local",
+    "supports_turkish": "medium",
+    "available": false,
+    "notes": "Set available=true after model installation."
+  },
+  {
+    "embedding_profile_id": "turkish_e5_large_v1",
+    "embedding_model_name": "ytu-ce-cosmos/turkish-e5-large",
+    "embedding_dimension": 1024,
+    "display_name": "Turkish E5 Large",
+    "embedding_key": "turkish_e5_large",
+    "compatible_languages": ["tr"],
+    "family": "hf_local",
+    "supports_turkish": "strong",
+    "available": false,
+    "notes": "Set available=true after model installation."
+  }
+]

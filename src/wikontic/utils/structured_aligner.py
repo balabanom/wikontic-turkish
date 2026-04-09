@@ -7,6 +7,7 @@ import torch
 from dotenv import load_dotenv, find_dotenv
 import os
 from pathlib import Path
+from ..profiles.runtime_profile import DEFAULT_RUNTIME_PROFILE
 
 _ = load_dotenv(find_dotenv())
 
@@ -31,7 +32,7 @@ class Aligner:
         self,
         ontology_db,
         triplets_db,
-        embedding_model_name: str = "facebook/contriever",
+        embedding_model_name: str | None = None,
         device=None,
     ):
         self.ontology_db = ontology_db
@@ -62,9 +63,10 @@ class Aligner:
 
         self.device = torch.device(device)
 
-        self.tokenizer = AutoTokenizer.from_pretrained(embedding_model_name)
+        resolved_model_name = embedding_model_name or DEFAULT_RUNTIME_PROFILE.embedding_model_name
+        self.tokenizer = AutoTokenizer.from_pretrained(resolved_model_name)
         self.model = AutoModel.from_pretrained(
-            embedding_model_name, use_safetensors=True
+            resolved_model_name, use_safetensors=True
         ).to(self.device)
 
     def get_embedding(self, text):

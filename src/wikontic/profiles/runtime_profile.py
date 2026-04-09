@@ -19,7 +19,7 @@ class RuntimeProfile:
 
     Examples:
         en + contriever  →  ontology__en__contriever  /  triplets__en__contriever
-        en_legacy + contriever → wikidata_ontology / triplets__en__contriever
+        en_legacy + contriever → wikidata_ontology / demo
         tr + turkish_e5  →  ontology__tr__turkish_e5_large  /  triplets__tr__turkish_e5_large
     """
 
@@ -76,15 +76,21 @@ def resolve_runtime_profile(
     runtime_key = ontology.runtime_key
     emb_key = embedding.embedding_key
     profile_id = f"{runtime_key}__{emb_key}"
+    is_legacy_contriever = (
+        ontology.profile_id == "ontology_en_legacy_v1" and emb_key == "contriever"
+    )
     ontology_db_name = (
         ontology.ontology_db_name_override
-        if ontology.ontology_db_name_override
+        if (ontology.ontology_db_name_override and is_legacy_contriever)
         else f"ontology__{runtime_key}__{emb_key}"
     )
     triplets_db_name = (
         ontology.triplets_db_name_override
-        if ontology.triplets_db_name_override
+        if (ontology.triplets_db_name_override and is_legacy_contriever)
         else f"triplets__{runtime_key}__{emb_key}"
+    )
+    requires_system_profile_metadata = (
+        ontology.requires_system_profile_metadata if is_legacy_contriever else True
     )
 
     return RuntimeProfile(
@@ -96,7 +102,7 @@ def resolve_runtime_profile(
         ontology_language=lang,
         embedding_model_name=embedding.model_name,
         embedding_dimension=embedding.dimension,
-        requires_system_profile_metadata=ontology.requires_system_profile_metadata,
+        requires_system_profile_metadata=requires_system_profile_metadata,
         entity_type_vector_index_name="entity_type_aliases",
         property_vector_index_name="property_aliases",
         entity_aliases_vector_index_name="entity_aliases",

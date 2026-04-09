@@ -106,11 +106,31 @@ def replay_run(
     original_profile = _restore_profile_from_run(run_meta)
 
     overrides = overrides or {}
+    override_ontology_profile_id = overrides.get("ontology_profile_id")
+    override_embedding_profile_id = overrides.get("embedding_profile_id")
+
+    if (override_ontology_profile_id is None) ^ (override_embedding_profile_id is None):
+        raise ValueError(
+            "Explicit profile override requires both 'ontology_profile_id' and "
+            "'embedding_profile_id'."
+        )
+
+    if override_ontology_profile_id and override_embedding_profile_id:
+        from ..profiles import resolve_runtime_profile
+        original_profile = resolve_runtime_profile(
+            override_ontology_profile_id,
+            override_embedding_profile_id,
+        )
+
     model     = overrides.get("model") or run_meta.get("model", "google/gemini-2.5-flash-lite")
     sample_id = overrides.get("sample_id") or run_meta.get("sample_id", "replay")
 
     extra_config = dict(run_meta.get("extra_config") or {})
-    extra_config.update({k: v for k, v in overrides.items() if k not in ("model", "sample_id")})
+    extra_config.update({
+        k: v
+        for k, v in overrides.items()
+        if k not in ("model", "sample_id", "ontology_profile_id", "embedding_profile_id")
+    })
     source_text_id = extra_config.get("source_text_id")
 
     # Lazy imports to avoid circular dependencies and defer heavy model loading.

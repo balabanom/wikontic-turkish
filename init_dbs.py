@@ -20,6 +20,7 @@ No silent fallback: if the profile is unknown, the script exits with an error.
 import argparse
 import os
 import sys
+from datetime import datetime, timezone
 
 from dotenv import load_dotenv, find_dotenv
 from pymongo import MongoClient
@@ -149,6 +150,21 @@ def main():
                 f"⚠️  Some triplets collections already exist: {e}\n"
                 f"✅ Triplets DB init skipped safely (data preserved).\n"
             )
+
+    # ── 3) Triplets metadata (required for strict profile readiness) ───────────
+    triplets_meta = {
+        **profile_metadata,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "build_version": "v1",
+    }
+    triplets_db["system_profile_metadata"].replace_one(
+        {"profile_id": profile.profile_id},
+        triplets_meta,
+        upsert=True,
+    )
+    print(
+        f"✅ Triplets system_profile_metadata written for profile '{profile.profile_id}'.\n"
+    )
 
     print(f"✅ Profile '{profile.profile_id}' fully initialized.")
 
