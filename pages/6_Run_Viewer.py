@@ -17,6 +17,7 @@ from src.wikontic.utils.run_reader import (
 )
 from src.wikontic.utils.run_exporter import export_run
 from src.wikontic.utils.run_compare import compare_runs, compare_telemetry
+from src.wikontic.profiles import DEFAULT_RUNTIME_PROFILE
 
 st.set_page_config(
     page_title="Run Viewer — Wikontic",
@@ -25,6 +26,9 @@ st.set_page_config(
 )
 
 _ = load_dotenv(find_dotenv())
+
+_current_profile = st.session_state.get("active_runtime_profile", DEFAULT_RUNTIME_PROFILE)
+_db_name = _current_profile.triplets_db_name
 
 # ── Sidebar: LLM Request Log download ────────────────────────────────────────
 _LLM_LOG_PATH = Path(os.environ.get("LLM_LOG_PATH", "logs/llm_requests.jsonl"))

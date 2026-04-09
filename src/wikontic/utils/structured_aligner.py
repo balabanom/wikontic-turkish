@@ -27,7 +27,13 @@ class EntityAlias(BaseModel):
 
 
 class Aligner:
-    def __init__(self, ontology_db, triplets_db, device=None):
+    def __init__(
+        self,
+        ontology_db,
+        triplets_db,
+        embedding_model_name: str = "facebook/contriever",
+        device=None,
+    ):
         self.ontology_db = ontology_db
         self.triplets_db = triplets_db
 
@@ -56,13 +62,10 @@ class Aligner:
 
         self.device = torch.device(device)
 
-        model_name = "facebook/contriever"
-        model_path = model_name
-
-        self.tokenizer = AutoTokenizer.from_pretrained(model_path)
-        self.model = AutoModel.from_pretrained(model_path, use_safetensors=True).to(
-            self.device
-        )
+        self.tokenizer = AutoTokenizer.from_pretrained(embedding_model_name)
+        self.model = AutoModel.from_pretrained(
+            embedding_model_name, use_safetensors=True
+        ).to(self.device)
 
     def get_embedding(self, text):
 

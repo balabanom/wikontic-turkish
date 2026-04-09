@@ -31,6 +31,7 @@ def create_search_index_for_entities(
     embedding_field_name="alias_text_embedding",
     entity_type_id_field_name="entity_type",
     index_name="entities",
+    dimensions=768,
 ):
     logger.info(f"Starting to create index {index_name} for {collection_name}")
     collection = db.get_collection(collection_name)
@@ -40,13 +41,12 @@ def create_search_index_for_entities(
                 "dynamic": True,
                 "fields": {
                     embedding_field_name: {
-                        "dimensions": 768,
+                        "dimensions": dimensions,
                         "similarity": "cosine",
                         "type": "knnVector",
                     },
                     entity_type_id_field_name: {"type": "token"},
                     "sample_id": {
-                        # "type": "number"
                         "type": "token"
                     },
                 },
@@ -73,6 +73,7 @@ def create_ontological_triplets_database(
     filtered_triplets_collection: str = "filtered_triplets",
     ontology_filtered_triplets_collection: str = "ontology_filtered_triplets",
     entity_aliases_index: str = "entity_aliases",
+    embedding_dimension: int = 768,
     drop_collections: bool = False,
 ):
     """
@@ -122,6 +123,7 @@ def create_ontological_triplets_database(
         embedding_field_name="alias_text_embedding",
         entity_type_id_field_name="entity_type",
         index_name=entity_aliases_index,
+        dimensions=embedding_dimension,
     )
     logger.info("Search index created successfully")
     logger.info("All indexes created successfully")

@@ -27,7 +27,12 @@ class PropertyAlias(BaseModel):
 
 
 class Aligner:
-	def __init__(self, triplets_db, device="None"):
+	def __init__(
+		self,
+		triplets_db,
+		embedding_model_name: str = "facebook/contriever",
+		device="None",
+	):
 		self.db = triplets_db
 
 		self.entity_aliases_collection_name = "entity_aliases"
@@ -49,9 +54,9 @@ class Aligner:
 				device = "cpu"
 
 		self.device = torch.device(device)
-		self.tokenizer = AutoTokenizer.from_pretrained("facebook/contriever")
+		self.tokenizer = AutoTokenizer.from_pretrained(embedding_model_name)
 		self.model = AutoModel.from_pretrained(
-			"facebook/contriever", use_safetensors=True
+			embedding_model_name, use_safetensors=True
 		).to(self.device)
 
 	def get_embedding(self, text):

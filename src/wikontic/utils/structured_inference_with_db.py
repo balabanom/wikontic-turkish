@@ -11,6 +11,7 @@ from .timing_utils import StageTimer
 from .sentence_splitter import split_sentences
 from .sentence_matcher import enrich_triplets_with_sentence_ids
 from .llm_client_logger import set_llm_context
+from ..profiles.runtime_profile import DEFAULT_RUNTIME_PROFILE, RuntimeProfile
 
 warnings.filterwarnings("ignore")
 logger = logging.getLogger("StructuredInferenceWithDB")
@@ -57,10 +58,17 @@ def _reason_from_validation_msg(exception_msg: str) -> str:
 
 
 class StructuredInferenceWithDB(BaseInferenceWithDB):
-    def __init__(self, extractor, aligner, triplets_db):
+    def __init__(
+        self,
+        extractor,
+        aligner,
+        triplets_db,
+        runtime_profile: RuntimeProfile = None,
+    ):
         self.extractor = extractor
         self.aligner = aligner
         self.triplets_db = triplets_db
+        self.runtime_profile = runtime_profile or DEFAULT_RUNTIME_PROFILE
 
         self.extract_triplets_with_ontology_filtering_tool = tool(
             self.extract_triplets_with_ontology_filtering
@@ -379,6 +387,8 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                         "type":   type(extracted_triplets).__name__,
                         "format": "string",
                     },
+                    db_name=self.runtime_profile.triplets_db_name,
+                    profile_id=self.runtime_profile.profile_id,
                 )
             except Exception as log_exc:
                 logger.warning("run_logger raw_llm_output failed: %s", log_exc)
@@ -426,6 +436,8 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                         "count":     len(initial_triplets),
                         "sentences": sentences,
                     },
+                    db_name=self.runtime_profile.triplets_db_name,
+                    profile_id=self.runtime_profile.profile_id,
                 )
             except Exception as log_exc:
                 logger.warning("run_logger parsed_triplets failed: %s", log_exc)
@@ -626,6 +638,8 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                         "ontology_filtered_count":  len(ontology_filtered_triplets),
                         "sentences":                sentences,
                     },
+                    db_name=self.runtime_profile.triplets_db_name,
+                    profile_id=self.runtime_profile.profile_id,
                 )
             except Exception as log_exc:
                 logger.warning("run_logger filtered_out failed: %s", log_exc)
@@ -640,6 +654,8 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                         "merges": entity_merge_log,
                         "count":  len(entity_merge_log),
                     },
+                    db_name=self.runtime_profile.triplets_db_name,
+                    profile_id=self.runtime_profile.profile_id,
                 )
             except Exception as log_exc:
                 logger.warning("run_logger merge_map_entities failed: %s", log_exc)
@@ -667,6 +683,8 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                         "ontology_filtered_count": len(ontology_filtered_triplets),
                         "sentences":               sentences,
                     },
+                    db_name=self.runtime_profile.triplets_db_name,
+                    profile_id=self.runtime_profile.profile_id,
                 )
             except Exception as log_exc:
                 logger.warning("run_logger final_triplets failed: %s", log_exc)
@@ -699,6 +717,22 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
             model=model_name,
             input_text=text,
             extra_config={"source_text_id": source_text_id},
+            runtime_profile=self.runtime_profile,
+            db_name=self.runtime_profile.triplets_db_name,
+        )
+
+        # Propagate profile context to LLM audit log for all stages in this run
+        set_llm_context(
+            run_id=run_id,
+            stage=None,
+            profile_id=self.runtime_profile.profile_id,
+            ontology_profile_id=self.runtime_profile.ontology_profile_id,
+            embedding_profile_id=self.runtime_profile.embedding_profile_id,
+            ontology_db_name=self.runtime_profile.ontology_db_name,
+            triplets_db_name=self.runtime_profile.triplets_db_name,
+            ontology_language=self.runtime_profile.ontology_language,
+            embedding_model_name=self.runtime_profile.embedding_model_name,
+            embedding_dimension=self.runtime_profile.embedding_dimension,
         )
 
         timer = StageTimer()
@@ -738,7 +772,12 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                 "ontology_filtered_count": len(ontology_filtered_triplets),
             })
 
-            finish_run(run_id=run_id, status="DONE", stats=stats)
+            finish_run(
+                run_id=run_id,
+                status="DONE",
+                stats=stats,
+                db_name=self.runtime_profile.triplets_db_name,
+            )
 
         except Exception as e:
             timer.mark_failed_at("unknown")
@@ -747,6 +786,7 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                 status="FAILED",
                 error=str(e),
                 stats=timer.to_stats(),
+                db_name=self.runtime_profile.triplets_db_name,
             )
             raise
 

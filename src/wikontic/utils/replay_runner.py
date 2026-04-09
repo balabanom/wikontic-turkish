@@ -4,6 +4,10 @@ replay_runner.py
 Re-executes the extraction pipeline for a given run_id using its stored input and config.
 Creates a new run_id linked to the original via parent_run_id.
 
+The replay inherits the original run's ontology profile and embedding profile.
+Changing the model alone is acceptable.
+Changing the ontology/embedding profile must be an explicit, deliberate action.
+
 Usage:
     new_run_id = replay_run("some-uuid", overrides={"model": "gpt-4.1"})
 """
@@ -18,16 +22,47 @@ from .run_reader import get_run
 _ = load_dotenv(find_dotenv())
 
 
+def _restore_profile_from_run(run_meta: dict):
+    """
+    Reconstruct a RuntimeProfile from the metadata stored in a run document.
+
+    Tries top-level profile fields first (new format), then falls back to
+    extra_config (legacy format), then falls back to default profile.
+    """
+    from ..profiles import resolve_runtime_profile, DEFAULT_RUNTIME_PROFILE
+
+    ontology_profile_id = run_meta.get("ontology_profile_id") or (
+        (run_meta.get("extra_config") or {}).get("ontology_profile_id")
+    )
+    embedding_profile_id = run_meta.get("embedding_profile_id") or (
+        (run_meta.get("extra_config") or {}).get("embedding_profile_id")
+    )
+
+    if ontology_profile_id and embedding_profile_id:
+        try:
+            return resolve_runtime_profile(ontology_profile_id, embedding_profile_id)
+        except ValueError:
+            pass
+
+    return DEFAULT_RUNTIME_PROFILE
+
+
 def replay_run(
     run_id: str,
     overrides: Optional[dict] = None,
+    db_name: Optional[str] = None,
 ) -> str:
     """
     Re-run the extraction pipeline using the input_text and config of an existing run.
 
+    The ontology and embedding profile are inherited from the original run.
+    Only the LLM model and sample_id may be overridden without a profile switch.
+
     Args:
         run_id:    ID of the original run to replay.
         overrides: Optional overrides, e.g. {"model": "gpt-4.1", "sample_id": "..."}.
+        db_name:   DB containing the original run. Defaults to the original run's
+                   triplets_db_name (read from run metadata), then global default.
 
     Returns:
         new_run_id (str)
@@ -36,7 +71,28 @@ def replay_run(
         ValueError: if the run is not found or has no input_text.
         Exception:  on pipeline failure (run is marked FAILED).
     """
-    run_meta = get_run(run_id)
+    from ..profiles.runtime_profile import DEFAULT_RUNTIME_PROFILE
+
+    # Resolve which DB to look in for the original run
+    resolved_db = db_name or DEFAULT_RUNTIME_PROFILE.triplets_db_name
+    run_meta = get_run(run_id, db_name=resolved_db)
+
+    # Try other known profile DBs if not found in the resolved DB
+    if run_meta is None:
+        from ..profiles import ONTOLOGY_PROFILES, EMBEDDING_PROFILES, resolve_runtime_profile
+        for op_id in ONTOLOGY_PROFILES:
+            for ep_id in EMBEDDING_PROFILES:
+                try:
+                    candidate_profile = resolve_runtime_profile(op_id, ep_id)
+                    run_meta = get_run(run_id, db_name=candidate_profile.triplets_db_name)
+                    if run_meta is not None:
+                        resolved_db = candidate_profile.triplets_db_name
+                        break
+                except ValueError:
+                    continue
+            if run_meta is not None:
+                break
+
     if run_meta is None:
         raise ValueError(f"Run not found: {run_id}")
 
@@ -46,8 +102,11 @@ def replay_run(
             f"Run '{run_id}' has no input_text; replay requires a stored input."
         )
 
+    # Restore original profile — do NOT silently switch profiles
+    original_profile = _restore_profile_from_run(run_meta)
+
     overrides = overrides or {}
-    model = overrides.get("model") or run_meta.get("model", "google/gemini-2.5-flash-lite")
+    model     = overrides.get("model") or run_meta.get("model", "google/gemini-2.5-flash-lite")
     sample_id = overrides.get("sample_id") or run_meta.get("sample_id", "replay")
 
     extra_config = dict(run_meta.get("extra_config") or {})
@@ -61,29 +120,26 @@ def replay_run(
     from .structured_inference_with_db import StructuredInferenceWithDB
 
     mongo_uri = os.environ.get("MONGO_URI", "mongodb://localhost:27017")
-    api_key = os.environ.get("KEY")
+    api_key   = os.environ.get("KEY")
     proxy_url = os.environ.get("PROXY_URL")
 
     mongo_client = MongoClient(mongo_uri)
-    ontology_db = mongo_client.get_database("wikidata_ontology")
-    triplets_db = mongo_client.get_database("demo")
+    ontology_db  = mongo_client.get_database(original_profile.ontology_db_name)
+    triplets_db  = mongo_client.get_database(original_profile.triplets_db_name)
 
-    extractor = LLMTripletExtractor(
-        model=model,
-        api_key=api_key,
-        proxy=proxy_url,
+    extractor = LLMTripletExtractor(model=model, api_key=api_key, proxy=proxy_url)
+    aligner   = Aligner(
+        ontology_db=ontology_db,
+        triplets_db=triplets_db,
+        embedding_model_name=original_profile.embedding_model_name,
     )
-    aligner = Aligner(ontology_db=ontology_db, triplets_db=triplets_db)
     inference = StructuredInferenceWithDB(
         extractor=extractor,
         aligner=aligner,
         triplets_db=triplets_db,
+        runtime_profile=original_profile,
     )
 
-    # parent_run_id is patched into the run document after creation because
-    # extract_triplets_with_ontology_filtering_and_add_to_db calls start_run
-    # internally with no parent_run_id hook. Updating post-creation is the
-    # least invasive approach without modifying the pipeline signature.
     (
         _initial,
         _final,

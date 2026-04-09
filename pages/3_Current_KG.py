@@ -4,6 +4,7 @@ import tempfile
 import os
 from dotenv import load_dotenv, find_dotenv
 from pymongo import MongoClient
+from src.wikontic.profiles import DEFAULT_RUNTIME_PROFILE
 import uuid
 import logging
 import sys
@@ -26,7 +27,9 @@ st.set_page_config(
 
 _ = load_dotenv(find_dotenv())
 mongo_client = MongoClient(os.getenv("MONGO_URI"))
-triplets_db = mongo_client.get_database("demo")
+
+current_profile = st.session_state.get("active_runtime_profile", DEFAULT_RUNTIME_PROFILE)
+triplets_db = mongo_client.get_database(current_profile.triplets_db_name)
 
 
 def fetch_triplets():

@@ -7,6 +7,14 @@ from src.wikontic.utils.structured_inference_with_db import StructuredInferenceW
 from src.wikontic.utils.openai_utils import LLMTripletExtractor
 from src.wikontic.utils.structured_aligner import Aligner
 from src.wikontic.utils.run_reader import get_run, get_artifact, list_recent_runs
+from src.wikontic.profiles import (
+    resolve_runtime_profile,
+    DEFAULT_RUNTIME_PROFILE,
+    ONTOLOGY_PROFILES,
+    get_available_ontology_profiles,
+    get_compatible_embedding_profiles,
+)
+from src.wikontic.profile_readiness import check_profile_readiness
 from pymongo import MongoClient
 import uuid
 import logging
@@ -22,17 +30,41 @@ st.set_page_config(
     page_title="Wikontic", page_icon="media/wikotic-wo-text.png", layout="wide"
 )
 
-WIKIDATA_ONTOLOGY_DB_NAME = "wikidata_ontology"
-TRIPLETS_DB_NAME = "demo"
-
 _ = load_dotenv(find_dotenv())
 mongo_client = MongoClient(os.getenv("MONGO_URI"))
 api_key   = os.getenv("KEY")
 proxy_url = os.getenv("PROXY_URL")
-ontology_db = mongo_client.get_database(WIKIDATA_ONTOLOGY_DB_NAME)
-triplets_db = mongo_client.get_database(TRIPLETS_DB_NAME)
 
-aligner = Aligner(ontology_db=ontology_db, triplets_db=triplets_db)
+
+# ── Profile helpers ───────────────────────────────────────────────────────────
+
+def _get_active_profile():
+    """Return the RuntimeProfile stored in session state, or the default."""
+    return st.session_state.get("active_runtime_profile", DEFAULT_RUNTIME_PROFILE)
+
+
+def _build_profile_from_selection(ontology_display: str, embedding_display: str):
+    """Resolve a RuntimeProfile from UI display names."""
+    ont_profile = next(
+        (p for p in get_available_ontology_profiles() if p.display_name == ontology_display),
+        None,
+    )
+    if ont_profile is None:
+        return None, f"Unknown ontology profile: {ontology_display}"
+
+    emb_profiles = get_compatible_embedding_profiles(ont_profile.language)
+    emb_profile = next(
+        (p for p in emb_profiles if p.display_name == embedding_display), None
+    )
+    if emb_profile is None:
+        return None, f"No compatible embedding profile: {embedding_display}"
+
+    try:
+        profile = resolve_runtime_profile(ont_profile.profile_id, emb_profile.profile_id)
+        return profile, None
+    except ValueError as e:
+        return None, str(e)
+
 
 # ── Logo ──────────────────────────────────────────────────────────────────────
 with open("media/wikontic.png", "rb") as f:
@@ -76,12 +108,150 @@ with st.sidebar:
         user_id = st.session_state["user_id"]
         st.info("Kalıcı KG için bir kullanıcı adı gir.")
 
+    st.divider()
+
+    # ── Profile selector ──────────────────────────────────────────────────────
+    st.markdown("### ⚙️ Runtime Profile")
+
+    available_ont_profiles = get_available_ontology_profiles()
+    ont_display_names = [p.display_name for p in available_ont_profiles]
+
+    # Show unavailable profiles as informational note
+    unavailable = [p for p in ONTOLOGY_PROFILES.values() if not p.available]
+    if unavailable:
+        st.caption(
+            "🔒 Unavailable: " + ", ".join(p.display_name for p in unavailable)
+        )
+
+    current_profile = _get_active_profile()
+    current_ont_display = next(
+        (p.display_name for p in available_ont_profiles
+         if p.profile_id == current_profile.ontology_profile_id),
+        ont_display_names[0] if ont_display_names else "",
+    )
+
+    selected_ont_display = st.selectbox(
+        "Ontology profile:",
+        ont_display_names,
+        index=ont_display_names.index(current_ont_display) if current_ont_display in ont_display_names else 0,
+        key="sidebar_ontology_selector",
+        help="Select the ontology language variant to use for extraction.",
+    )
+
+    # Get compatible embedding profiles for selected ontology
+    selected_ont_profile = next(
+        (p for p in available_ont_profiles if p.display_name == selected_ont_display), None
+    )
+    compatible_emb_profiles = (
+        get_compatible_embedding_profiles(selected_ont_profile.language)
+        if selected_ont_profile else []
+    )
+    emb_display_names = [p.display_name for p in compatible_emb_profiles]
+
+    current_emb_display = next(
+        (p.display_name for p in compatible_emb_profiles
+         if p.profile_id == current_profile.embedding_profile_id),
+        emb_display_names[0] if emb_display_names else "",
+    )
+
+    selected_emb_display = st.selectbox(
+        "Embedding model:",
+        emb_display_names,
+        index=emb_display_names.index(current_emb_display) if current_emb_display in emb_display_names else 0,
+        key="sidebar_embedding_selector",
+        help="Changing the embedding model changes the vector workspace. "
+             "Runs from different embedding models are stored in separate databases.",
+    )
+
+    # Resolve profile from selection
+    new_profile, profile_error = _build_profile_from_selection(
+        selected_ont_display, selected_emb_display
+    )
+
+    profile_changed = (
+        new_profile is not None
+        and new_profile.profile_id != current_profile.profile_id
+    )
+
+    if profile_changed:
+        # Reset cached objects when profile changes (architecture rule 5.2)
+        st.session_state["active_runtime_profile"] = new_profile
+        st.session_state["_aligner_profile_id"] = None  # force aligner rebuild
+        st.session_state["last_run_id"] = None
+        current_profile = new_profile
+        st.rerun()
+    elif new_profile is not None:
+        current_profile = new_profile
+        st.session_state["active_runtime_profile"] = current_profile
+
+    # ── Profile readiness check ───────────────────────────────────────────────
+    if profile_error:
+        st.error(f"Profile error: {profile_error}")
+        readiness = None
+    else:
+        readiness = check_profile_readiness(current_profile, mongo_client)
+
+    st.divider()
+    st.markdown("### 📋 Active Profile")
+    st.code(current_profile.profile_id, language=None)
+
+    cols = st.columns(2)
+    cols[0].caption("Ontology DB")
+    cols[0].code(current_profile.ontology_db_name, language=None)
+    cols[1].caption("Triplets DB")
+    cols[1].code(current_profile.triplets_db_name, language=None)
+
+    st.caption(f"Model: `{current_profile.embedding_model_name}`  |  dim: `{current_profile.embedding_dimension}`")
+
+    if readiness is None:
+        st.warning("Profile could not be resolved.")
+    elif readiness.ready:
+        st.success("✅ Profile ready")
+    else:
+        st.error("❌ Profile not ready")
+        for issue in readiness.issues:
+            st.caption(f"• {issue}")
+        st.info(
+            f"Run: `python init_dbs.py --profile {current_profile.profile_id}`"
+        )
+
 logger.info(f"User ID: {user_id}")
+
+# ── Block extraction if profile not ready ─────────────────────────────────────
+_profile_ready = readiness is not None and readiness.ready
+
+
+# ── Aligner / DB — rebuilt per profile, cached in session state ───────────────
+@st.cache_resource(show_spinner="Loading embedding model...")
+def _build_aligner(profile_id: str, ontology_db_name: str, triplets_db_name: str, embedding_model_name: str):
+    """Cache aligner per profile_id. Rebuilt automatically when profile changes."""
+    od = mongo_client.get_database(ontology_db_name)
+    td = mongo_client.get_database(triplets_db_name)
+    return Aligner(
+        ontology_db=od,
+        triplets_db=td,
+        embedding_model_name=embedding_model_name,
+    )
+
+
+if _profile_ready:
+    aligner = _build_aligner(
+        current_profile.profile_id,
+        current_profile.ontology_db_name,
+        current_profile.triplets_db_name,
+        current_profile.embedding_model_name,
+    )
+    triplets_db = mongo_client.get_database(current_profile.triplets_db_name)
+else:
+    aligner = None
+    triplets_db = None
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def fetch_related_triplets(entities, sample_id_override: str | None = None):
+    if triplets_db is None:
+        return []
     sid = sample_id_override if sample_id_override else user_id
     collection = triplets_db.get_collection("triplets")
     query = {
@@ -150,8 +320,8 @@ def visualize_ontology_neighborhood(neighborhood: dict):
                      color="#F5A623", size=18)
         net.add_edge(center["id"], parent["id"], label="is a", color="#F5A623", dashes=True)
     for prop in neighborhood.get("properties", []):
-        prop_node_id   = f"prop_{prop['id']}"
-        color          = "#5CB85C" if prop["direction"] == "subject" else "#9B59B6"
+        prop_node_id    = f"prop_{prop['id']}"
+        color           = "#5CB85C" if prop["direction"] == "subject" else "#9B59B6"
         direction_label = "→ subject" if prop["direction"] == "subject" else "← object"
         net.add_node(prop_node_id,
                      label=f"{prop['label']}\n({prop['id']})\n{direction_label}",
@@ -187,7 +357,7 @@ def render_transparency_panel(selected_run_id: str):
         st.info("Henüz extraction yapılmadı.")
         return
 
-    run_meta = get_run(selected_run_id)
+    run_meta = get_run(selected_run_id, db_name=current_profile.triplets_db_name)
     if run_meta:
         mc = st.columns(4)
         mc[0].metric("Status", run_meta.get("status", "—"))
@@ -199,6 +369,14 @@ def render_transparency_panel(selected_run_id: str):
         mc[3].metric("Sample ID", str(run_meta.get("sample_id", "—"))[:12] + "…")
         if run_meta.get("status") == "FAILED" and run_meta.get("error"):
             st.error(f"Run hatası: {run_meta['error']}")
+
+        # Show profile metadata for the run
+        if run_meta.get("profile_id"):
+            st.caption(
+                f"🗂 Profile: `{run_meta['profile_id']}`  |  "
+                f"Lang: `{run_meta.get('ontology_language', '—')}`  |  "
+                f"Embedding: `{run_meta.get('embedding_model_name', '—')}`"
+            )
     else:
         st.warning(f"Run bulunamadı: `{selected_run_id}`")
         return
@@ -215,7 +393,7 @@ def render_transparency_panel(selected_run_id: str):
 
     # ── Tab 0: Raw LLM Output ────────────────────────────────────────────────
     with tab0:
-        art = get_artifact(selected_run_id, "raw_llm_output")
+        art = get_artifact(selected_run_id, "raw_llm_output", db_name=current_profile.triplets_db_name)
         if art is None:
             st.warning("Bu stage için kayıt bulunamadı.")
         else:
@@ -223,7 +401,7 @@ def render_transparency_panel(selected_run_id: str):
                 st.code(art.get("text", ""), language="json")
 
     with tab1:
-        art = get_artifact(selected_run_id, "parsed_triplets")
+        art = get_artifact(selected_run_id, "parsed_triplets", db_name=current_profile.triplets_db_name)
         if art is None:
             st.warning("Bu stage için kayıt bulunamadı.")
         else:
@@ -239,7 +417,7 @@ def render_transparency_panel(selected_run_id: str):
                 st.info("Parse edilmiş triplet bulunamadı.")
 
     with tab2:
-        art = get_artifact(selected_run_id, "merge_map_entities")
+        art = get_artifact(selected_run_id, "merge_map_entities", db_name=current_profile.triplets_db_name)
         if art is None:
             st.warning("Bu stage için kayıt bulunamadı.")
         else:
@@ -253,12 +431,12 @@ def render_transparency_panel(selected_run_id: str):
                 st.dataframe(df[existing], use_container_width=True, hide_index=True)
 
     with tab3:
-        art = get_artifact(selected_run_id, "filtered_out")
+        art = get_artifact(selected_run_id, "filtered_out", db_name=current_profile.triplets_db_name)
         if art is None:
             st.warning("Bu stage için kayıt bulunamadı.")
         else:
-            triplets    = art.get("triplets", [])
-            total       = art.get("count", len(triplets))
+            triplets     = art.get("triplets", [])
+            total        = art.get("count", len(triplets))
             pipeline_exc = art.get("pipeline_exception_count", 0)
             ontology_flt = art.get("ontology_filtered_count", 0)
 
@@ -278,7 +456,7 @@ def render_transparency_panel(selected_run_id: str):
                 _show_sentence_detail(triplets, key_prefix=f"filtered_{selected_run_id}")
 
     with tab4:
-        art = get_artifact(selected_run_id, "final_triplets")
+        art = get_artifact(selected_run_id, "final_triplets", db_name=current_profile.triplets_db_name)
         if art is None:
             st.warning("Bu stage için kayıt bulunamadı.")
         else:
@@ -308,7 +486,7 @@ def render_ontology_neighborhood_panel(selected_run_id: str):
     st.subheader("🗺️ Ontoloji Neighborhood")
     entity_types = []
     if selected_run_id:
-        art = get_artifact(selected_run_id, "final_triplets")
+        art = get_artifact(selected_run_id, "final_triplets", db_name=current_profile.triplets_db_name)
         if art:
             type_set = set()
             for t in art.get("triplets", []):
@@ -324,7 +502,7 @@ def render_ontology_neighborhood_panel(selected_run_id: str):
 
     selected_type = st.selectbox("Entity type seç:", entity_types,
                                   key="ontology_type_selector")
-    if selected_type:
+    if selected_type and aligner:
         with st.spinner(f"'{selected_type}' için ontoloji neighborhood yükleniyor..."):
             neighborhood = aligner.get_ontology_neighborhood(selected_type)
 
@@ -366,6 +544,18 @@ def render_ontology_neighborhood_panel(selected_run_id: str):
 model_options  = ["google/gemini-2.5-flash-lite", "gpt-4o-mini", "gpt-4.1-mini", "gpt-4.1"]
 selected_model = st.selectbox("Choose a model for KG extraction:", model_options, index=0)
 
+# ── Profile not ready guard ───────────────────────────────────────────────────
+if not _profile_ready:
+    st.error(
+        f"❌ Profile **{current_profile.profile_id}** is not initialized. "
+        f"Extraction is disabled until the profile is ready."
+    )
+    if readiness and readiness.issues:
+        with st.expander("Issues"):
+            for issue in readiness.issues:
+                st.warning(issue)
+    st.stop()
+
 WIKIPEDIA_TEXTS = {
     "Albert Einstein": "Albert Einstein was a German-born theoretical physicist who is widely held to be one of the greatest and most influential scientists of all time. Best known for developing the theory of relativity, Einstein also made important contributions to quantum mechanics. His mass–energy equivalence formula E = mc², which arises from relativity theory, has been called 'the world's most famous equation'. He received the 1921 Nobel Prize in Physics for his services to theoretical physics, and especially for his discovery of the law of the photoelectric effect.",
     "The Renaissance": "The Renaissance was a period in European history marking the transition from the Middle Ages to modernity and covering the 15th and 16th centuries. It occurred after the Crisis of the Late Middle Ages and was associated with great social change. In addition to the standard periodization, proponents of a 'long Renaissance' may put its beginning in the 14th century and its end in the 17th century. The traditional view focuses more on the early modern aspects of the Renaissance and argues that it was a break from the past, but many historians today focus more on its medieval aspects and argue that it was an extension of the Middle Ages.",
@@ -374,7 +564,7 @@ WIKIPEDIA_TEXTS = {
     "The Industrial Revolution": "The Industrial Revolution was the transition from creating goods by hand to using machines. Its start and end are widely debated by scholars, but the period generally spanned from about 1760 to 1840. According to some, this turning point in history is responsible for an increase in population, an increase in the standard of living, and the emergence of the capitalist economy. The Industrial Revolution began in Great Britain, and many of the technological and architectural innovations were of British origin. By the mid-18th century, Britain was the world's leading commercial nation, controlling a global trading empire with colonies in North America and the Caribbean.",
 }
 
-if "input_text"        not in st.session_state: st.session_state.input_text        = ""
+if "input_text"          not in st.session_state: st.session_state.input_text          = ""
 if "selected_predefined" not in st.session_state: st.session_state.selected_predefined = None
 
 # ── Resolve selected_run_id before rendering ──────────────────────────────────
@@ -384,7 +574,9 @@ if _rv_navigated:
     _last_run_id_early = st.session_state["selected_run_id"]
 
 try:
-    _recent_runs_early = list_recent_runs(limit=20, sample_id=user_id)
+    _recent_runs_early = list_recent_runs(
+        limit=20, sample_id=user_id, db_name=current_profile.triplets_db_name
+    )
 except Exception:
     _recent_runs_early = []
 
@@ -400,7 +592,7 @@ else:
 
 _nav_sample_id: str | None = None
 if _rv_navigated and selected_run_id:
-    _nav_meta      = get_run(selected_run_id)
+    _nav_meta      = get_run(selected_run_id, db_name=current_profile.triplets_db_name)
     _nav_sample_id = (_nav_meta or {}).get("sample_id") or user_id
 
 col1, col2 = st.columns([1, 2])
@@ -443,7 +635,10 @@ if trigger:
     else:
         extractor = LLMTripletExtractor(model=selected_model, api_key=api_key, proxy=proxy_url)
         inference_with_db = StructuredInferenceWithDB(
-            extractor=extractor, aligner=aligner, triplets_db=triplets_db
+            extractor=extractor,
+            aligner=aligner,
+            triplets_db=triplets_db,
+            runtime_profile=current_profile,
         )
         (
             initial_triplets,
@@ -478,8 +673,8 @@ elif _rv_navigated and selected_run_id:
     st.session_state["selected_run_id"]    = None
     st.session_state["_rv_just_navigated"] = False
 
-    parsed_art = get_artifact(selected_run_id, "parsed_triplets")
-    final_art  = get_artifact(selected_run_id, "final_triplets")
+    parsed_art = get_artifact(selected_run_id, "parsed_triplets", db_name=current_profile.triplets_db_name)
+    final_art  = get_artifact(selected_run_id, "final_triplets",  db_name=current_profile.triplets_db_name)
 
     initial_from_db = parsed_art.get("triplets", []) if parsed_art else []
     final_from_db   = final_art.get("triplets",  []) if final_art  else []
@@ -509,7 +704,9 @@ st.divider()
 st.subheader("🔍 Extraction Transparency")
 
 try:
-    recent_runs = list_recent_runs(limit=20, sample_id=user_id)
+    recent_runs = list_recent_runs(
+        limit=20, sample_id=user_id, db_name=current_profile.triplets_db_name
+    )
 except Exception as e:
     recent_runs = []
     st.error(f"Run listesi alınamadı: {e}")

@@ -7,7 +7,7 @@ Usage:
     from .llm_client_logger import set_llm_context, LoggedOpenAIClient
 
     # Before each LLM call in the pipeline:
-    set_llm_context(run_id="abc-123", stage="triplet_extraction")
+    set_llm_context(run_id="abc-123", stage="triplet_extraction", profile_id="en__contriever")
 
     # In openai_utils.py __init__:
     raw_client = openai.OpenAI(api_key=..., base_url=...)
@@ -32,8 +32,16 @@ logger = logging.getLogger("LLMClientLogger")
 logger.setLevel(logging.WARNING)
 
 # ── Context vars (Streamlit thread-safe) ──────────────────────────────────────
-_ctx_run_id: ContextVar[Optional[str]] = ContextVar("run_id",  default=None)
-_ctx_stage:  ContextVar[Optional[str]] = ContextVar("stage",   default=None)
+_ctx_run_id:              ContextVar[Optional[str]] = ContextVar("run_id",              default=None)
+_ctx_stage:               ContextVar[Optional[str]] = ContextVar("stage",               default=None)
+_ctx_profile_id:          ContextVar[Optional[str]] = ContextVar("profile_id",          default=None)
+_ctx_ontology_profile_id: ContextVar[Optional[str]] = ContextVar("ontology_profile_id", default=None)
+_ctx_embedding_profile_id: ContextVar[Optional[str]] = ContextVar("embedding_profile_id", default=None)
+_ctx_ontology_db_name:    ContextVar[Optional[str]] = ContextVar("ontology_db_name",    default=None)
+_ctx_triplets_db_name:    ContextVar[Optional[str]] = ContextVar("triplets_db_name",    default=None)
+_ctx_ontology_language:   ContextVar[Optional[str]] = ContextVar("ontology_language",   default=None)
+_ctx_embedding_model_name: ContextVar[Optional[str]] = ContextVar("embedding_model_name", default=None)
+_ctx_embedding_dimension: ContextVar[Optional[int]] = ContextVar("embedding_dimension", default=None)
 
 # ── File lock (atomic append) ─────────────────────────────────────────────────
 _file_lock = threading.Lock()
@@ -43,13 +51,43 @@ _LOG_LEVEL = os.environ.get("LLM_LOG_LEVEL", "preview").lower()   # full | previ
 _LOG_PATH  = Path(os.environ.get("LLM_LOG_PATH", "logs/llm_requests.jsonl"))
 
 
-def set_llm_context(run_id: Optional[str], stage: Optional[str]) -> None:
+def set_llm_context(
+    run_id: Optional[str],
+    stage: Optional[str],
+    profile_id: Optional[str] = None,
+    ontology_profile_id: Optional[str] = None,
+    embedding_profile_id: Optional[str] = None,
+    ontology_db_name: Optional[str] = None,
+    triplets_db_name: Optional[str] = None,
+    ontology_language: Optional[str] = None,
+    embedding_model_name: Optional[str] = None,
+    embedding_dimension: Optional[int] = None,
+) -> None:
     """
-    Set the current run_id and pipeline stage for the LLM audit log.
+    Set the current run_id, pipeline stage, and profile context for the LLM audit log.
     Call this before each LLM invocation within a pipeline stage.
+
+    Profile fields are optional — omit them to leave existing context vars unchanged.
+    Pass them once at run start (in StructuredInferenceWithDB) to propagate through all stages.
     """
     _ctx_run_id.set(run_id)
     _ctx_stage.set(stage)
+    if profile_id is not None:
+        _ctx_profile_id.set(profile_id)
+    if ontology_profile_id is not None:
+        _ctx_ontology_profile_id.set(ontology_profile_id)
+    if embedding_profile_id is not None:
+        _ctx_embedding_profile_id.set(embedding_profile_id)
+    if ontology_db_name is not None:
+        _ctx_ontology_db_name.set(ontology_db_name)
+    if triplets_db_name is not None:
+        _ctx_triplets_db_name.set(triplets_db_name)
+    if ontology_language is not None:
+        _ctx_ontology_language.set(ontology_language)
+    if embedding_model_name is not None:
+        _ctx_embedding_model_name.set(embedding_model_name)
+    if embedding_dimension is not None:
+        _ctx_embedding_dimension.set(embedding_dimension)
 
 
 def _now_iso() -> str:
@@ -98,21 +136,35 @@ def _append_log(entry: dict) -> None:
         logger.warning("LLM log write failed: %s", e)
 
 
+def _current_profile_context() -> dict:
+    """Return a dict of current profile context vars for inclusion in log entries."""
+    return {
+        "profile_id":           _ctx_profile_id.get(),
+        "ontology_profile_id":  _ctx_ontology_profile_id.get(),
+        "embedding_profile_id": _ctx_embedding_profile_id.get(),
+        "ontology_db_name":     _ctx_ontology_db_name.get(),
+        "triplets_db_name":     _ctx_triplets_db_name.get(),
+        "ontology_language":    _ctx_ontology_language.get(),
+        "embedding_model_name": _ctx_embedding_model_name.get(),
+        "embedding_dimension":  _ctx_embedding_dimension.get(),
+    }
+
+
 # ── Wrapper ───────────────────────────────────────────────────────────────────
 
 class _CompletionsWrapper:
     """Mirrors the chat.completions interface; logs every call."""
 
     def __init__(self, real_completions, base_url: str, model: str):
-        self._real  = real_completions
+        self._real     = real_completions
         self._base_url = base_url
         self._model    = model
 
     def create(self, model: str, messages: list, temperature: float = 0, **kwargs):
-        run_id = _ctx_run_id.get()
-        stage  = _ctx_stage.get()
-        ts     = _now_iso()
-        t0     = perf_counter()
+        run_id  = _ctx_run_id.get()
+        stage   = _ctx_stage.get()
+        ts      = _now_iso()
+        t0      = perf_counter()
 
         request_payload = _build_request_payload(messages, model, temperature)
 
@@ -123,16 +175,17 @@ class _CompletionsWrapper:
         except Exception as exc:
             latency_ms = round((perf_counter() - t0) * 1000, 2)
             _append_log({
-                "ts":               ts,
-                "run_id":           run_id,
-                "stage":            stage,
+                "ts":                ts,
+                "run_id":            run_id,
+                "stage":             stage,
                 "provider_base_url": self._base_url,
-                "model":            model,
-                "endpoint":         "chat.completions",
-                "request":          request_payload,
-                "response_meta":    {"latency_ms": latency_ms},
-                "response_preview": None,
-                "error":            str(exc),
+                "model":             model,
+                "endpoint":          "chat.completions",
+                "request":           request_payload,
+                "response_meta":     {"latency_ms": latency_ms},
+                "response_preview":  None,
+                "error":             str(exc),
+                **_current_profile_context(),
             })
             raise
 
@@ -152,23 +205,24 @@ class _CompletionsWrapper:
         content       = (choice.message.content or "") if choice else ""
 
         response_meta = {
-            "id":           getattr(response, "id", None),
+            "id":            getattr(response, "id", None),
             "finish_reason": finish_reason,
-            "usage":        usage_dict,
-            "latency_ms":   latency_ms,
+            "usage":         usage_dict,
+            "latency_ms":    latency_ms,
         }
 
         _append_log({
-            "ts":               ts,
-            "run_id":           run_id,
-            "stage":            stage,
+            "ts":                ts,
+            "run_id":            run_id,
+            "stage":             stage,
             "provider_base_url": self._base_url,
-            "model":            model,
-            "endpoint":         "chat.completions",
-            "request":          request_payload,
-            "response_meta":    response_meta,
-            "response_preview": _build_response_preview(content),
-            "error":            None,
+            "model":             model,
+            "endpoint":          "chat.completions",
+            "request":           request_payload,
+            "response_meta":     response_meta,
+            "response_preview":  _build_response_preview(content),
+            "error":             None,
+            **_current_profile_context(),
         })
 
         return response

@@ -9,6 +9,7 @@ from pymongo import MongoClient
 from src.wikontic.utils.structured_aligner import Aligner
 from src.wikontic.utils.openai_utils import LLMTripletExtractor
 from src.wikontic.utils.structured_inference_with_db import StructuredInferenceWithDB
+from src.wikontic.profiles import DEFAULT_RUNTIME_PROFILE
 import uuid
 import logging
 import sys
@@ -29,14 +30,31 @@ logger.info(f"User ID: {user_id}")
 
 _ = load_dotenv(find_dotenv())
 
-WIKIDATA_ONTOLOGY_DB_NAME = "wikidata_ontology"
-TRIPLETS_DB_NAME = "demo"
 mongo_client = MongoClient(os.getenv("MONGO_URI"))
 api_key = os.getenv("KEY")
 proxy_url = os.getenv("PROXY_URL")
-triplets_db = mongo_client.get_database(TRIPLETS_DB_NAME)
-ontology_db = mongo_client.get_database(WIKIDATA_ONTOLOGY_DB_NAME)
-aligner = Aligner(ontology_db=ontology_db, triplets_db=triplets_db)
+
+current_profile = st.session_state.get("active_runtime_profile", DEFAULT_RUNTIME_PROFILE)
+
+
+@st.cache_resource
+def _build_aligner(profile_id: str, ontology_db_name: str, triplets_db_name: str, embedding_model_name: str):
+	ontology_db = mongo_client.get_database(ontology_db_name)
+	triplets_db = mongo_client.get_database(triplets_db_name)
+	return Aligner(
+		ontology_db=ontology_db,
+		triplets_db=triplets_db,
+		embedding_model_name=embedding_model_name,
+	)
+
+
+aligner = _build_aligner(
+	current_profile.profile_id,
+	current_profile.ontology_db_name,
+	current_profile.triplets_db_name,
+	current_profile.embedding_model_name,
+)
+triplets_db = mongo_client.get_database(current_profile.triplets_db_name)
 
 st.set_page_config(
 	page_title="Wikontic", page_icon="media/wikotic-wo-text.png", layout="wide"
@@ -115,7 +133,8 @@ if trigger:
 			model=selected_model, api_key=api_key, proxy=proxy_url
 		)
 		inferer = StructuredInferenceWithDB(
-			extractor=extractor, aligner=aligner, triplets_db=triplets_db
+			extractor=extractor, aligner=aligner, triplets_db=triplets_db,
+			runtime_profile=current_profile,
 		)
 
 		st.markdown(f"#### Results for: *{question}*")
