@@ -20,7 +20,7 @@
     "compatible_languages": ["en", "tr"],
     "family": "hf_local",
     "supports_turkish": "medium",
-    "available": false,
+    "available": true,
     "notes": "Set available=true after model installation."
   },
   {
@@ -29,10 +29,10 @@
     "embedding_dimension": 1024,
     "display_name": "Turkish E5 Large",
     "embedding_key": "turkish_e5_large",
-    "compatible_languages": ["tr"],
+    "compatible_languages": ["en", "tr"],
     "family": "hf_local",
     "supports_turkish": "strong",
-    "available": false,
+    "available": true,
     "notes": "Set available=true after model installation."
   }
 ]

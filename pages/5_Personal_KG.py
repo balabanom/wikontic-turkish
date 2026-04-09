@@ -4,6 +4,7 @@ from pyvis.network import Network
 # import networkx as nx
 import tempfile
 import os
+from dataclasses import replace
 from dotenv import load_dotenv, find_dotenv
 from src.wikontic.utils.structured_inference_with_db import StructuredInferenceWithDB
 from src.wikontic.utils.openai_utils import LLMTripletExtractor
@@ -36,8 +37,19 @@ api_key = os.getenv("KEY")
 proxy_url = os.getenv("PROXY_URL")
 
 current_profile = st.session_state.get("active_runtime_profile", DEFAULT_RUNTIME_PROFILE)
-ontology_db = mongo_client.get_database(current_profile.ontology_db_name)
-triplets_db = mongo_client.get_database(current_profile.triplets_db_name)
+ontology_db_override = st.session_state.get("ontology_db_override_name")
+triplets_db_override = st.session_state.get("triplets_db_override_name")
+effective_profile = (
+	replace(
+		current_profile,
+		ontology_db_name=ontology_db_override or current_profile.ontology_db_name,
+		triplets_db_name=triplets_db_override or current_profile.triplets_db_name,
+	)
+	if (ontology_db_override or triplets_db_override)
+	else current_profile
+)
+ontology_db = mongo_client.get_database(effective_profile.ontology_db_name)
+triplets_db = mongo_client.get_database(effective_profile.triplets_db_name)
 
 
 @st.cache_resource
@@ -50,10 +62,10 @@ def _build_aligner(profile_id: str, ontology_db_name: str, triplets_db_name: str
 
 
 aligner = _build_aligner(
-	current_profile.profile_id,
-	current_profile.ontology_db_name,
-	current_profile.triplets_db_name,
-	current_profile.embedding_model_name,
+	effective_profile.profile_id,
+	effective_profile.ontology_db_name,
+	effective_profile.triplets_db_name,
+	effective_profile.embedding_model_name,
 )
 
 def fetch_wikipedia_summary(name: str) -> str:
@@ -176,7 +188,7 @@ if trigger:
 
 	inference_with_db = StructuredInferenceWithDB(
 		extractor=extractor, aligner=aligner, triplets_db=triplets_db,
-		runtime_profile=current_profile,
+		runtime_profile=effective_profile,
 	)
 
 	(

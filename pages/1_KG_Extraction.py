@@ -2,6 +2,7 @@ import streamlit as st
 from pyvis.network import Network
 import tempfile
 import os
+from dataclasses import replace
 from dotenv import load_dotenv, find_dotenv
 from src.wikontic.utils.structured_inference_with_db import StructuredInferenceWithDB
 from src.wikontic.utils.openai_utils import LLMTripletExtractor
@@ -200,12 +201,77 @@ with st.sidebar:
         current_profile = new_profile
         st.session_state["active_runtime_profile"] = current_profile
 
+    try:
+        available_db_names = sorted(mongo_client.list_database_names())
+    except Exception:
+        available_db_names = []
+
+    # Optional ontology DB override (keeps runtime profile default unless explicitly changed)
+    ontology_db_options = [current_profile.ontology_db_name]
+    if "wikidata_ontology" not in ontology_db_options:
+        ontology_db_options.append("wikidata_ontology")
+    ontology_db_options.extend(
+        db for db in available_db_names
+        if db.startswith("ontology__") and db not in ontology_db_options
+    )
+
+    stored_override_db = st.session_state.get("ontology_db_override_name")
+    default_selected_db = stored_override_db or current_profile.ontology_db_name
+    if default_selected_db not in ontology_db_options:
+        ontology_db_options.append(default_selected_db)
+
+    selected_ontology_db = st.selectbox(
+        "Ontology DB:",
+        ontology_db_options,
+        index=ontology_db_options.index(default_selected_db),
+        key="sidebar_ontology_db_selector",
+        help="Use profile default DB, or override with 'wikidata_ontology'.",
+    )
+    st.session_state["ontology_db_override_name"] = (
+        None if selected_ontology_db == current_profile.ontology_db_name else selected_ontology_db
+    )
+    is_external_ontology_override = st.session_state["ontology_db_override_name"] is not None
+
+    # Optional triplets DB override
+    triplets_db_options = [current_profile.triplets_db_name]
+    triplets_db_options.extend(
+        db for db in available_db_names
+        if (db.startswith("triplets__") or db == "demo") and db not in triplets_db_options
+    )
+    stored_triplets_override = st.session_state.get("triplets_db_override_name")
+    default_triplets_db = stored_triplets_override or current_profile.triplets_db_name
+    if default_triplets_db not in triplets_db_options:
+        triplets_db_options.append(default_triplets_db)
+
+    selected_triplets_db = st.selectbox(
+        "Triplets DB:",
+        triplets_db_options,
+        index=triplets_db_options.index(default_triplets_db),
+        key="sidebar_triplets_db_selector",
+        help="Use profile default triplets DB, or manually pick another workspace DB.",
+    )
+    st.session_state["triplets_db_override_name"] = (
+        None if selected_triplets_db == current_profile.triplets_db_name else selected_triplets_db
+    )
+    is_external_triplets_override = st.session_state["triplets_db_override_name"] is not None
+
+    effective_profile = replace(
+        current_profile,
+        ontology_db_name=selected_ontology_db,
+        triplets_db_name=selected_triplets_db,
+    )
+
     # ── Profile readiness check ───────────────────────────────────────────────
     if profile_error:
         st.error(f"Profile error: {profile_error}")
         readiness = None
     else:
-        readiness = check_profile_readiness(current_profile, mongo_client)
+        readiness = check_profile_readiness(
+            effective_profile,
+            mongo_client,
+            relax_ontology_metadata=is_external_ontology_override,
+            relax_triplets_metadata=is_external_triplets_override,
+        )
 
     st.divider()
     st.markdown("### 📋 Active Profile")
@@ -213,11 +279,11 @@ with st.sidebar:
 
     cols = st.columns(2)
     cols[0].caption("Ontology DB")
-    cols[0].code(current_profile.ontology_db_name, language=None)
+    cols[0].code(effective_profile.ontology_db_name, language=None)
     cols[1].caption("Triplets DB")
-    cols[1].code(current_profile.triplets_db_name, language=None)
+    cols[1].code(effective_profile.triplets_db_name, language=None)
 
-    st.caption(f"Model: `{current_profile.embedding_model_name}`  |  dim: `{current_profile.embedding_dimension}`")
+    st.caption(f"Model: `{effective_profile.embedding_model_name}`  |  dim: `{effective_profile.embedding_dimension}`")
 
     if readiness is None:
         st.warning("Profile could not be resolved.")
@@ -228,7 +294,7 @@ with st.sidebar:
         for issue in readiness.issues:
             st.caption(f"• {issue}")
         st.info(
-            f"Run: `python init_dbs.py --profile {current_profile.profile_id}`"
+            f"Run: `python init_dbs.py --profile {effective_profile.profile_id}`"
         )
 
 logger.info(f"User ID: {user_id}")
@@ -252,12 +318,12 @@ def _build_aligner(profile_id: str, ontology_db_name: str, triplets_db_name: str
 
 if _profile_ready:
     aligner = _build_aligner(
-        current_profile.profile_id,
-        current_profile.ontology_db_name,
-        current_profile.triplets_db_name,
-        current_profile.embedding_model_name,
+        effective_profile.profile_id,
+        effective_profile.ontology_db_name,
+        effective_profile.triplets_db_name,
+        effective_profile.embedding_model_name,
     )
-    triplets_db = mongo_client.get_database(current_profile.triplets_db_name)
+    triplets_db = mongo_client.get_database(effective_profile.triplets_db_name)
 else:
     aligner = None
     triplets_db = None
@@ -654,7 +720,7 @@ if trigger:
             extractor=extractor,
             aligner=aligner,
             triplets_db=triplets_db,
-            runtime_profile=current_profile,
+            runtime_profile=effective_profile,
         )
         (
             initial_triplets,

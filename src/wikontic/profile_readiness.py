@@ -130,6 +130,8 @@ def _validate_vector_index_dimension(
 def check_profile_readiness(
     profile: RuntimeProfile,
     mongo_client: MongoClient,
+    relax_ontology_metadata: bool = False,
+    relax_triplets_metadata: bool = False,
 ) -> ReadinessResult:
     """
     Validate that the given runtime profile has its DBs correctly initialized.
@@ -185,7 +187,7 @@ def check_profile_readiness(
         "properties",
         "property_aliases",
     }
-    if profile.requires_system_profile_metadata:
+    if profile.requires_system_profile_metadata and not relax_ontology_metadata:
         required_ontology_cols.add("system_profile_metadata")
     missing_ontology = required_ontology_cols - existing_ontology_cols
     if missing_ontology:
@@ -195,7 +197,11 @@ def check_profile_readiness(
         )
 
     # Validate ontology metadata integrity for embedding compatibility
-    if profile.requires_system_profile_metadata and "system_profile_metadata" in existing_ontology_cols:
+    if (
+        profile.requires_system_profile_metadata
+        and not relax_ontology_metadata
+        and "system_profile_metadata" in existing_ontology_cols
+    ):
         meta = ontology_db["system_profile_metadata"].find_one(
             {"profile_id": profile.profile_id}
         )
@@ -261,7 +267,7 @@ def check_profile_readiness(
         )
 
     # Validate triplets metadata integrity for embedding compatibility
-    if profile.requires_system_profile_metadata:
+    if profile.requires_system_profile_metadata and not relax_triplets_metadata:
         if "system_profile_metadata" not in existing_triplets_cols:
             issues.append(
                 f"Missing collection in triplets DB '{profile.triplets_db_name}': "
