@@ -12,12 +12,14 @@ class RuntimeProfile:
     Each unique combination maps to its own ontology DB and triplets DB so that
     different embedding models never silently share the same vector workspace.
 
-    DB naming convention (deterministic):
-        ontology_db_name = "ontology__{language}__{embedding_key}"
-        triplets_db_name = "triplets__{language}__{embedding_key}"
+    DB naming convention (deterministic by runtime_key + embedding_key):
+        ontology_db_name = "ontology__{runtime_key}__{embedding_key}"
+        triplets_db_name = "triplets__{runtime_key}__{embedding_key}"
+    Ontology profile may override ontology_db_name for legacy compatibility.
 
     Examples:
         en + contriever  →  ontology__en__contriever  /  triplets__en__contriever
+        en_legacy + contriever → wikidata_ontology / triplets__en__contriever
         tr + turkish_e5  →  ontology__tr__turkish_e5_large  /  triplets__tr__turkish_e5_large
     """
 
@@ -29,6 +31,7 @@ class RuntimeProfile:
     ontology_language: str
     embedding_model_name: str
     embedding_dimension: int
+    requires_system_profile_metadata: bool
     entity_type_vector_index_name: str
     property_vector_index_name: str
     entity_aliases_vector_index_name: str
@@ -48,6 +51,7 @@ class RuntimeProfile:
             "ontology_language": self.ontology_language,
             "embedding_model_name": self.embedding_model_name,
             "embedding_dimension": self.embedding_dimension,
+            "requires_system_profile_metadata": self.requires_system_profile_metadata,
         }
 
 
@@ -69,18 +73,30 @@ def resolve_runtime_profile(
         raise ValueError(f"Unknown embedding profile: {embedding_profile_id!r}")
 
     lang = ontology.language
+    runtime_key = ontology.runtime_key
     emb_key = embedding.embedding_key
-    profile_id = f"{lang}__{emb_key}"
+    profile_id = f"{runtime_key}__{emb_key}"
+    ontology_db_name = (
+        ontology.ontology_db_name_override
+        if ontology.ontology_db_name_override
+        else f"ontology__{runtime_key}__{emb_key}"
+    )
+    triplets_db_name = (
+        ontology.triplets_db_name_override
+        if ontology.triplets_db_name_override
+        else f"triplets__{runtime_key}__{emb_key}"
+    )
 
     return RuntimeProfile(
         profile_id=profile_id,
         ontology_profile_id=ontology_profile_id,
         embedding_profile_id=embedding_profile_id,
-        ontology_db_name=f"ontology__{lang}__{emb_key}",
-        triplets_db_name=f"triplets__{lang}__{emb_key}",
+        ontology_db_name=ontology_db_name,
+        triplets_db_name=triplets_db_name,
         ontology_language=lang,
         embedding_model_name=embedding.model_name,
         embedding_dimension=embedding.dimension,
+        requires_system_profile_metadata=ontology.requires_system_profile_metadata,
         entity_type_vector_index_name="entity_type_aliases",
         property_vector_index_name="property_aliases",
         entity_aliases_vector_index_name="entity_aliases",

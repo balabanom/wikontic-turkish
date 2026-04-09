@@ -38,17 +38,17 @@ def _resolve_profile(profile_id: str):
         resolve_runtime_profile,
     )
 
-    # profile_id is "{lang}__{embedding_key}" — derive profile IDs from registry
+    # profile_id is "{runtime_key}__{embedding_key}" — derive profile IDs from registry
     for op_id, op in ONTOLOGY_PROFILES.items():
         for ep_id, ep in EMBEDDING_PROFILES.items():
-            candidate_id = f"{op.language}__{ep.embedding_key}"
+            candidate_id = f"{op.runtime_key}__{ep.embedding_key}"
             if candidate_id == profile_id:
                 return resolve_runtime_profile(op_id, ep_id)
 
     known = []
     for op in ONTOLOGY_PROFILES.values():
         for ep in EMBEDDING_PROFILES.values():
-            known.append(f"{op.language}__{ep.embedding_key}")
+            known.append(f"{op.runtime_key}__{ep.embedding_key}")
 
     print(f"ERROR: Unknown profile_id '{profile_id}'.")
     print(f"Known profiles: {', '.join(known)}")
