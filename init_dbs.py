@@ -122,9 +122,6 @@ def main():
     required_collections = {
         "triplets",
         "entity_aliases",
-        "property_aliases",
-        "entity_types",
-        "properties",
         "initial_triplets",
         "filtered_triplets",
         "ontology_filtered_triplets",

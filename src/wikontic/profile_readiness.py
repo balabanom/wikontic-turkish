@@ -7,7 +7,7 @@ before extraction is allowed to start.
 No silent fallback is performed. If a profile is not ready, the caller receives
 a ReadinessResult with ready=False and a list of specific issues.
 """
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace as dc_replace
 
 from pymongo import MongoClient
 
@@ -163,22 +163,26 @@ def check_profile_readiness(
             issues=[f"Cannot connect to MongoDB: {e}"],
         )
 
+    # Work on local copies — never mutate the caller's profile object.
+    ontology_db_name = profile.ontology_db_name
+    triplets_db_name = profile.triplets_db_name
+
     # ── Ontology DB ───────────────────────────────────────────────────────────
-    if profile.profile_id == "en_legacy__contriever" and profile.ontology_db_name not in db_names:
+    if profile.profile_id == "en_legacy__contriever" and ontology_db_name not in db_names:
         # Legacy deployments may use different DB names.
         for candidate in ("wikidata_ontology", "wikontic_ontology"):
             if candidate in db_names:
-                profile.ontology_db_name = candidate
+                ontology_db_name = candidate
                 break
 
-    if profile.ontology_db_name not in db_names:
+    if ontology_db_name not in db_names:
         issues.append(
-            f"Ontology DB not found: '{profile.ontology_db_name}'. "
+            f"Ontology DB not found: '{ontology_db_name}'. "
             f"Initialize with: python init_dbs.py --profile {profile.profile_id}"
         )
         return ReadinessResult(ready=False, profile_id=profile.profile_id, issues=issues)
 
-    ontology_db = mongo_client[profile.ontology_db_name]
+    ontology_db = mongo_client[ontology_db_name]
     existing_ontology_cols = set(ontology_db.list_collection_names())
 
     required_ontology_cols = {
@@ -192,7 +196,7 @@ def check_profile_readiness(
     missing_ontology = required_ontology_cols - existing_ontology_cols
     if missing_ontology:
         issues.append(
-            f"Missing collections in ontology DB '{profile.ontology_db_name}': "
+            f"Missing collections in ontology DB '{ontology_db_name}': "
             f"{sorted(missing_ontology)}"
         )
 
@@ -209,7 +213,7 @@ def check_profile_readiness(
             issues=issues,
             profile=profile,
             meta=meta,
-            db_name=profile.ontology_db_name,
+            db_name=ontology_db_name,
             source="ontology",
         )
 
@@ -218,7 +222,7 @@ def check_profile_readiness(
         # Legacy mode: pick the most likely historical workspace DB automatically.
         # Priority: user-selected/default name -> known legacy names -> ontology DB.
         candidate_dbs: list[str] = [
-            profile.triplets_db_name,
+            triplets_db_name,
             "demo",
             "wikontic_ontology",
             "triplets__en__contriever",
@@ -240,29 +244,29 @@ def check_profile_readiness(
 
         chosen = preferred or fallback
         if chosen:
-            profile.triplets_db_name = chosen
+            triplets_db_name = chosen
 
-    if profile.triplets_db_name not in db_names:
+    if triplets_db_name not in db_names:
         issues.append(
-            f"Triplets DB not found: '{profile.triplets_db_name}'. "
+            f"Triplets DB not found: '{triplets_db_name}'. "
             f"Initialize with: python init_dbs.py --profile {profile.profile_id}"
         )
         return ReadinessResult(ready=False, profile_id=profile.profile_id, issues=issues)
 
-    if profile.triplets_db_name == profile.ontology_db_name:
+    if triplets_db_name == ontology_db_name:
         issues.append(
             "Triplets DB and Ontology DB must be different. "
-            f"Both are '{profile.triplets_db_name}'."
+            f"Both are '{triplets_db_name}'."
         )
         return ReadinessResult(ready=False, profile_id=profile.profile_id, issues=issues)
 
-    triplets_db = mongo_client[profile.triplets_db_name]
+    triplets_db = mongo_client[triplets_db_name]
     existing_triplets_cols = set(triplets_db.list_collection_names())
 
     missing_triplets = required_triplets_cols - existing_triplets_cols
     if missing_triplets:
         issues.append(
-            f"Missing collections in triplets DB '{profile.triplets_db_name}': "
+            f"Missing collections in triplets DB '{triplets_db_name}': "
             f"{sorted(missing_triplets)}"
         )
 
@@ -270,7 +274,7 @@ def check_profile_readiness(
     if profile.requires_system_profile_metadata and not relax_triplets_metadata:
         if "system_profile_metadata" not in existing_triplets_cols:
             issues.append(
-                f"Missing collection in triplets DB '{profile.triplets_db_name}': "
+                f"Missing collection in triplets DB '{triplets_db_name}': "
                 "['system_profile_metadata']"
             )
         else:
@@ -281,7 +285,7 @@ def check_profile_readiness(
                 issues=issues,
                 profile=profile,
                 meta=triplets_meta,
-                db_name=profile.triplets_db_name,
+                db_name=triplets_db_name,
                 source="triplets",
             )
 
@@ -289,14 +293,14 @@ def check_profile_readiness(
     if profile.requires_system_profile_metadata:
         _validate_vector_index_exists(
             issues=issues,
-            db_name=profile.ontology_db_name,
+            db_name=ontology_db_name,
             collection=ontology_db["entity_type_aliases"],
             collection_name="entity_type_aliases",
             index_name=profile.entity_type_vector_index_name,
         )
         _validate_vector_index_dimension(
             issues=issues,
-            db_name=profile.ontology_db_name,
+            db_name=ontology_db_name,
             collection=ontology_db["entity_type_aliases"],
             collection_name="entity_type_aliases",
             index_name=profile.entity_type_vector_index_name,
@@ -304,14 +308,14 @@ def check_profile_readiness(
         )
         _validate_vector_index_exists(
             issues=issues,
-            db_name=profile.ontology_db_name,
+            db_name=ontology_db_name,
             collection=ontology_db["property_aliases"],
             collection_name="property_aliases",
             index_name=profile.property_vector_index_name,
         )
         _validate_vector_index_dimension(
             issues=issues,
-            db_name=profile.ontology_db_name,
+            db_name=ontology_db_name,
             collection=ontology_db["property_aliases"],
             collection_name="property_aliases",
             index_name=profile.property_vector_index_name,
@@ -319,14 +323,14 @@ def check_profile_readiness(
         )
         _validate_vector_index_exists(
             issues=issues,
-            db_name=profile.triplets_db_name,
+            db_name=triplets_db_name,
             collection=triplets_db["entity_aliases"],
             collection_name="entity_aliases",
             index_name=profile.entity_aliases_vector_index_name,
         )
         _validate_vector_index_dimension(
             issues=issues,
-            db_name=profile.triplets_db_name,
+            db_name=triplets_db_name,
             collection=triplets_db["entity_aliases"],
             collection_name="entity_aliases",
             index_name=profile.entity_aliases_vector_index_name,
