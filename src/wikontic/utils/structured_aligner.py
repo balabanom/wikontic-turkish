@@ -64,9 +64,9 @@ class Aligner:
         self.device = torch.device(device)
 
         resolved_model_name = embedding_model_name or DEFAULT_RUNTIME_PROFILE.embedding_model_name
-        self.tokenizer = AutoTokenizer.from_pretrained(resolved_model_name)
+        self.tokenizer = AutoTokenizer.from_pretrained(resolved_model_name, trust_remote_code=True)
         self.model = AutoModel.from_pretrained(
-            resolved_model_name, use_safetensors=True
+            resolved_model_name, use_safetensors=True, trust_remote_code=True
         ).to(self.device)
         self.model.eval()
 

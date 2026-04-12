@@ -34,5 +34,17 @@
     "supports_turkish": "strong",
     "available": true,
     "notes": "Set available=true after model installation."
+  },
+  {
+    "embedding_profile_id": "mft_random_v1",
+    "embedding_model_name": "alibayram/mft-random",
+    "embedding_dimension": 768,
+    "display_name": "MFT-Random (EmbeddingGemma)",
+    "embedding_key": "mft_random",
+    "compatible_languages": ["en", "tr"],
+    "family": "hf_local",
+    "supports_turkish": "medium",
+    "available": true,
+    "notes": "Gemma3-based multilingual embedding model (300M params, 100+ languages, 2048 token context). Supports Matryoshka truncation to 512/256/128 dims."
   }
 ]

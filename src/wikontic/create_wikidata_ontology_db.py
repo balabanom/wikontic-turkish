@@ -36,8 +36,8 @@ def _resolve_device() -> torch.device:
 def _load_embedding_model(model_name: str, device: torch.device):
     """Load tokenizer and model by name. Model is moved to device."""
     logger.info(f"Loading embedding model: {model_name}")
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModel.from_pretrained(model_name, use_safetensors=True).to(device)
+    tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+    model = AutoModel.from_pretrained(model_name, use_safetensors=True, trust_remote_code=True).to(device)
     logger.info(f"Embedding model loaded on {device}")
     return tokenizer, model
 
