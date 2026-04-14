@@ -6,7 +6,7 @@ from pymongo import MongoClient, UpdateOne
 from dotenv import load_dotenv, find_dotenv
 import os
 import torch
-from ..profiles.runtime_profile import DEFAULT_RUNTIME_PROFILE
+from ..profiles.runtime_profile import DEFAULT_RUNTIME_PROFILE, RuntimeProfile
 
 _ = load_dotenv(find_dotenv())
 
@@ -33,14 +33,17 @@ class Aligner:
 		triplets_db,
 		embedding_model_name: str | None = None,
 		device="None",
+		runtime_profile: RuntimeProfile | None = None,
 	):
 		self.db = triplets_db
 
-		self.entity_aliases_collection_name = "entity_aliases"
-		self.property_aliases_collection_name = "property_aliases"
+		profile = runtime_profile or DEFAULT_RUNTIME_PROFILE
 
-		self.property_vector_index_name = "property_aliases"
-		self.entities_vector_index_name = "entity_aliases"
+		self.entity_aliases_collection_name = profile.entity_aliases_collection_name
+		self.property_aliases_collection_name = profile.property_aliases_collection_name
+
+		self.property_vector_index_name = profile.property_vector_index_name
+		self.entities_vector_index_name = profile.entity_aliases_vector_index_name
 
 		self.initial_triplets_collection_name = "initial_triplets"
 		self.triplets_collection_name = "triplets"

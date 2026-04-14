@@ -7,7 +7,7 @@ import torch
 from dotenv import load_dotenv, find_dotenv
 import os
 from pathlib import Path
-from ..profiles.runtime_profile import DEFAULT_RUNTIME_PROFILE
+from ..profiles.runtime_profile import DEFAULT_RUNTIME_PROFILE, RuntimeProfile
 
 _ = load_dotenv(find_dotenv())
 
@@ -34,24 +34,27 @@ class Aligner:
         triplets_db,
         embedding_model_name: str | None = None,
         device=None,
+        runtime_profile: RuntimeProfile | None = None,
     ):
         self.ontology_db = ontology_db
         self.triplets_db = triplets_db
 
+        profile = runtime_profile or DEFAULT_RUNTIME_PROFILE
+
         self.entity_type_collection_name = "entity_types"
-        self.entity_type_aliases_collection_name = "entity_type_aliases"
+        self.entity_type_aliases_collection_name = profile.entity_type_aliases_collection_name
         self.property_collection_name = "properties"
-        self.property_aliases_collection_name = "property_aliases"
+        self.property_aliases_collection_name = profile.property_aliases_collection_name
 
-        self.entity_type_vector_index_name = "entity_type_aliases"
-        self.property_vector_index_name = "property_aliases"
+        self.entity_type_vector_index_name = profile.entity_type_vector_index_name
+        self.property_vector_index_name = profile.property_vector_index_name
 
-        self.entity_aliases_collection_name = "entity_aliases"
+        self.entity_aliases_collection_name = profile.entity_aliases_collection_name
         self.triplets_collection_name = "triplets"
         self.filtered_triplets_collection_name = "filtered_triplets"
         self.ontology_filtered_triplets_collection_name = "ontology_filtered_triplets"
         self.initial_triplets_collection_name = "initial_triplets"
-        self.entities_vector_index_name = "entity_aliases"
+        self.entities_vector_index_name = profile.entity_aliases_vector_index_name
 
         if device is None:
             if torch.cuda.is_available():

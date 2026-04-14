@@ -103,7 +103,7 @@ with st.expander("🗑 Drop Knowledge Graph", expanded=True):
         collection.delete_many({"sample_id": user_id})
         collection = triplets_db.get_collection("initial_triplets")
         collection.delete_many({"sample_id": user_id})
-        collection = triplets_db.get_collection("entity_aliases")
+        collection = triplets_db.get_collection(current_profile.entity_aliases_collection_name)
         collection.delete_many({"sample_id": user_id})
 
         st.success("Knowledge Graph dropped.")

@@ -100,25 +100,42 @@ def create_ontological_triplets_database(
             "embedding_dimension must be provided by runtime profile; hardcoded defaults are disabled."
         )
 
-    if drop_collections:
-        for collection_name in db.list_collection_names():
-            db.drop_collection(collection_name)
-            logger.info(f"Dropped collection: {collection_name}")
+    existing_cols = set(db.list_collection_names())
+
+    # ── Shared collections ────────────────────────────────────────────────────
+    # The triplets DB is shared across all profiles. Shared collections hold
+    # documents tagged with profile_id / sample_id, so we create them once and
+    # let them accumulate data from multiple profiles over time.
+    # drop_collections=True only removes the model-specific entity_aliases
+    # collection (see below); it does NOT wipe shared collections.
+    shared_collections = [
+        triplets_collection,
+        initial_triplets_collection,
+        filtered_triplets_collection,
+        ontology_filtered_triplets_collection,
+    ]
+    for col in shared_collections:
+        if col not in existing_cols:
+            db.create_collection(col)
+            logger.info(f"Created shared collection: {col}")
+            db.get_collection(col).create_index([("sample_id", 1)])
+        else:
+            logger.info(f"Shared collection '{col}' already exists — skipping.")
+
+    # ── Model-specific entity_aliases collection ──────────────────────────────
+    # Each embedding model gets its own entity_aliases collection (different
+    # vector space). Always drop and recreate so embeddings stay fresh.
+    if entity_aliases_collection in existing_cols:
+        logger.info(f"Dropping model-specific collection: {entity_aliases_collection}")
+        db.drop_collection(entity_aliases_collection)
 
     db.create_collection(entity_aliases_collection)
-    db.create_collection(initial_triplets_collection)
-    db.create_collection(filtered_triplets_collection)
-    db.create_collection(ontology_filtered_triplets_collection)
-    db.create_collection(triplets_collection)
+    logger.info(f"Created model-specific collection: {entity_aliases_collection}")
 
-    logger.info("Collections created successfully")
-    db.entity_aliases.create_index([("entity_type", 1), ("sample_id", 1)])
-    db.entity_aliases.create_index([("label", 1)])
-
-    db.triplets.create_index([("sample_id", 1)])
-    db.initial_triplets.create_index([("sample_id", 1)])
-    db.filtered_triplets.create_index([("sample_id", 1)])
-    db.ontology_filtered_triplets.create_index([("sample_id", 1)])
+    db.get_collection(entity_aliases_collection).create_index(
+        [("entity_type", 1), ("sample_id", 1)]
+    )
+    db.get_collection(entity_aliases_collection).create_index([("label", 1)])
     logger.info("Indexes created successfully")
 
     create_search_index_for_entities(

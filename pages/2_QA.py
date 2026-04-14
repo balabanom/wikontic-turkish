@@ -53,10 +53,12 @@ effective_profile = (
 def _build_aligner(profile_id: str, ontology_db_name: str, triplets_db_name: str, embedding_model_name: str):
 	ontology_db = mongo_client.get_database(ontology_db_name)
 	triplets_db = mongo_client.get_database(triplets_db_name)
+	profile = st.session_state.get("active_runtime_profile", DEFAULT_RUNTIME_PROFILE)
 	return Aligner(
 		ontology_db=ontology_db,
 		triplets_db=triplets_db,
 		embedding_model_name=embedding_model_name,
+		runtime_profile=profile,
 	)
 
 

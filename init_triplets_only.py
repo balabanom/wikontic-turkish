@@ -41,7 +41,7 @@ def main():
 
     required_collections = {
         "triplets",
-        "entity_aliases",
+        profile.entity_aliases_collection_name,
         "initial_triplets",
         "filtered_triplets",
         "ontology_filtered_triplets",
@@ -51,16 +51,19 @@ def main():
 
     print(f"Profile: {profile.profile_id}")
     print(f"Triplets DB: {profile.triplets_db_name}")
+    print(f"Entity aliases collection: {profile.entity_aliases_collection_name}")
     print(f"Embedding model: {profile.embedding_model_name}")
     print(f"Embedding dimension: {profile.embedding_dimension}")
 
     if not args.drop_triplets and required_collections.issubset(existing):
-        print("Triplets DB already initialized. Skipping collection creation.")
+        print("Triplets DB already initialized for this profile. Skipping collection creation.")
     else:
         try:
             create_ontological_triplets_database(
                 mongo_uri=mongo_uri,
                 db_name=profile.triplets_db_name,
+                entity_aliases_collection=profile.entity_aliases_collection_name,
+                entity_aliases_index=profile.entity_aliases_vector_index_name,
                 drop_collections=args.drop_triplets,
                 embedding_dimension=profile.embedding_dimension,
             )

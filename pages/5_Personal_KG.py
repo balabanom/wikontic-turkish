@@ -54,10 +54,13 @@ triplets_db = mongo_client.get_database(effective_profile.triplets_db_name)
 
 @st.cache_resource
 def _build_aligner(profile_id: str, ontology_db_name: str, triplets_db_name: str, embedding_model_name: str):
+	from src.wikontic.profiles import resolve_runtime_profile, ONTOLOGY_PROFILES, EMBEDDING_PROFILES
+	profile = st.session_state.get("active_runtime_profile", DEFAULT_RUNTIME_PROFILE)
 	return Aligner(
 		ontology_db=mongo_client.get_database(ontology_db_name),
 		triplets_db=mongo_client.get_database(triplets_db_name),
 		embedding_model_name=embedding_model_name,
+		runtime_profile=profile,
 	)
 
 

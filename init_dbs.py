@@ -111,6 +111,10 @@ def main():
         drop_collections=True,
         model_name=profile.embedding_model_name,
         embedding_dimension=profile.embedding_dimension,
+        entity_type_aliases_collection=profile.entity_type_aliases_collection_name,
+        property_aliases_collection=profile.property_aliases_collection_name,
+        entity_types_index=profile.entity_type_vector_index_name,
+        property_aliases_index=profile.property_vector_index_name,
         profile_metadata=profile_metadata,
     )
     print(f"✅ Ontology DB '{profile.ontology_db_name}' ready.\n")
@@ -119,9 +123,11 @@ def main():
     print(f"[2/2] Setting up triplets DB: {profile.triplets_db_name} ...")
 
     triplets_db = client[profile.triplets_db_name]
+    # The shared triplets DB is ready when all shared collections AND this
+    # profile's model-specific entity_aliases collection exist.
     required_collections = {
         "triplets",
-        "entity_aliases",
+        profile.entity_aliases_collection_name,
         "initial_triplets",
         "filtered_triplets",
         "ontology_filtered_triplets",
@@ -131,13 +137,16 @@ def main():
     if not args.drop_triplets and required_collections.issubset(existing):
         print(
             f"✅ Triplets DB '{profile.triplets_db_name}' already has all required "
-            f"collections. Skipping init (user KG data preserved).\n"
+            f"collections for profile '{profile.profile_id}'. "
+            f"Skipping init (user KG data preserved).\n"
         )
     else:
         try:
             create_ontological_triplets_database(
                 mongo_uri=mongo_uri,
                 db_name=profile.triplets_db_name,
+                entity_aliases_collection=profile.entity_aliases_collection_name,
+                entity_aliases_index=profile.entity_aliases_vector_index_name,
                 drop_collections=args.drop_triplets,
                 embedding_dimension=profile.embedding_dimension,
             )

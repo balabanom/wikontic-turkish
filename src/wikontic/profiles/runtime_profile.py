@@ -9,18 +9,23 @@ class RuntimeProfile:
     """
     Fully resolved execution context for a given ontology + embedding combination.
 
-    Each unique combination maps to its own ontology DB and triplets DB so that
-    different embedding models never silently share the same vector workspace.
+    Ontology DBs are shared per language; triplets DB is a single shared DB.
+    Embedding-model-specific collections are namespaced by embedding_key so that
+    different models never share the same vector workspace within a DB.
 
-    DB naming convention (deterministic by runtime_key + embedding_key):
-        ontology_db_name = "ontology__{runtime_key}__{embedding_key}"
-        triplets_db_name = "triplets__{runtime_key}__{embedding_key}"
-    Ontology profile may override ontology_db_name for legacy compatibility.
+    DB naming convention:
+        ontology_db_name = "ontology__{language}"          (one per language)
+        triplets_db_name = "triplets"                      (single shared DB)
 
-    Examples:
-        en + contriever  →  ontology__en__contriever  /  triplets__en__contriever
-        en_legacy + contriever → wikidata_ontology / demo
-        tr + turkish_e5  →  ontology__tr__turkish_e5_large  /  triplets__tr__turkish_e5_large
+    Collection naming convention (model-namespaced):
+        entity_type_aliases__{embedding_key}
+        property_aliases__{embedding_key}
+        entity_aliases__{embedding_key}
+
+    Legacy override (en_legacy + contriever only):
+        ontology_db_name = "wikidata_ontology"
+        triplets_db_name = "demo"
+        collections keep their original un-suffixed names
     """
 
     profile_id: str
@@ -32,6 +37,11 @@ class RuntimeProfile:
     embedding_model_name: str
     embedding_dimension: int
     requires_system_profile_metadata: bool
+    # Model-namespaced collection names (differ per embedding model in shared DBs)
+    entity_type_aliases_collection_name: str
+    property_aliases_collection_name: str
+    entity_aliases_collection_name: str
+    # Vector index names (by convention equal to their collection names)
     entity_type_vector_index_name: str
     property_vector_index_name: str
     entity_aliases_vector_index_name: str
@@ -79,19 +89,24 @@ def resolve_runtime_profile(
     is_legacy_contriever = (
         ontology.profile_id == "ontology_en_legacy_v1" and emb_key == "contriever"
     )
-    ontology_db_name = (
-        ontology.ontology_db_name_override
-        if (ontology.ontology_db_name_override and is_legacy_contriever)
-        else f"ontology__{runtime_key}__{emb_key}"
-    )
-    triplets_db_name = (
-        ontology.triplets_db_name_override
-        if (ontology.triplets_db_name_override and is_legacy_contriever)
-        else f"triplets__{runtime_key}__{emb_key}"
-    )
-    requires_system_profile_metadata = (
-        ontology.requires_system_profile_metadata if is_legacy_contriever else True
-    )
+
+    if is_legacy_contriever:
+        # Legacy deployments keep their original hardcoded DB and collection names.
+        ontology_db_name = ontology.ontology_db_name_override or f"ontology__{lang}"
+        triplets_db_name = ontology.triplets_db_name_override or "triplets"
+        requires_system_profile_metadata = ontology.requires_system_profile_metadata
+        entity_type_aliases_col = "entity_type_aliases"
+        property_aliases_col = "property_aliases"
+        entity_aliases_col = "entity_aliases"
+    else:
+        # Standard: one ontology DB per language, one shared triplets DB.
+        # Alias collections are namespaced by embedding key within each shared DB.
+        ontology_db_name = f"ontology__{lang}"
+        triplets_db_name = "triplets"
+        requires_system_profile_metadata = True
+        entity_type_aliases_col = f"entity_type_aliases__{emb_key}"
+        property_aliases_col = f"property_aliases__{emb_key}"
+        entity_aliases_col = f"entity_aliases__{emb_key}"
 
     return RuntimeProfile(
         profile_id=profile_id,
@@ -103,9 +118,12 @@ def resolve_runtime_profile(
         embedding_model_name=embedding.model_name,
         embedding_dimension=embedding.dimension,
         requires_system_profile_metadata=requires_system_profile_metadata,
-        entity_type_vector_index_name="entity_type_aliases",
-        property_vector_index_name="property_aliases",
-        entity_aliases_vector_index_name="entity_aliases",
+        entity_type_aliases_collection_name=entity_type_aliases_col,
+        property_aliases_collection_name=property_aliases_col,
+        entity_aliases_collection_name=entity_aliases_col,
+        entity_type_vector_index_name=entity_type_aliases_col,
+        property_vector_index_name=property_aliases_col,
+        entity_aliases_vector_index_name=entity_aliases_col,
         display_name=f"{ontology.display_name} + {embedding.display_name}",
     )
 

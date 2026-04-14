@@ -236,7 +236,7 @@ with st.sidebar:
     triplets_db_options = [current_profile.triplets_db_name]
     triplets_db_options.extend(
         db for db in available_db_names
-        if (db.startswith("triplets__") or db == "demo") and db not in triplets_db_options
+        if (db == "triplets" or db.startswith("triplets__") or db == "demo") and db not in triplets_db_options
     )
     stored_triplets_override = st.session_state.get("triplets_db_override_name")
     default_triplets_db = stored_triplets_override or current_profile.triplets_db_name
@@ -309,10 +309,12 @@ def _build_aligner(profile_id: str, ontology_db_name: str, triplets_db_name: str
     """Cache aligner per profile_id. Rebuilt automatically when profile changes."""
     od = mongo_client.get_database(ontology_db_name)
     td = mongo_client.get_database(triplets_db_name)
+    profile = st.session_state.get("active_runtime_profile", DEFAULT_RUNTIME_PROFILE)
     return Aligner(
         ontology_db=od,
         triplets_db=td,
         embedding_model_name=embedding_model_name,
+        runtime_profile=profile,
     )
 
 

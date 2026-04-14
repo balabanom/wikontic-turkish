@@ -147,7 +147,7 @@ def check_profile_readiness(
     """
     issues: list[str] = []
     required_triplets_cols = {
-        "entity_aliases",
+        profile.entity_aliases_collection_name,
         "triplets",
         "initial_triplets",
         "filtered_triplets",
@@ -187,9 +187,9 @@ def check_profile_readiness(
 
     required_ontology_cols = {
         "entity_types",
-        "entity_type_aliases",
+        profile.entity_type_aliases_collection_name,
         "properties",
-        "property_aliases",
+        profile.property_aliases_collection_name,
     }
     if profile.requires_system_profile_metadata and not relax_ontology_metadata:
         required_ontology_cols.add("system_profile_metadata")
@@ -291,48 +291,52 @@ def check_profile_readiness(
 
     # Validate required vector indexes for embedding-based retrieval.
     if profile.requires_system_profile_metadata:
+        eta_col = profile.entity_type_aliases_collection_name
+        pa_col = profile.property_aliases_collection_name
+        ea_col = profile.entity_aliases_collection_name
+
         _validate_vector_index_exists(
             issues=issues,
             db_name=ontology_db_name,
-            collection=ontology_db["entity_type_aliases"],
-            collection_name="entity_type_aliases",
+            collection=ontology_db[eta_col],
+            collection_name=eta_col,
             index_name=profile.entity_type_vector_index_name,
         )
         _validate_vector_index_dimension(
             issues=issues,
             db_name=ontology_db_name,
-            collection=ontology_db["entity_type_aliases"],
-            collection_name="entity_type_aliases",
+            collection=ontology_db[eta_col],
+            collection_name=eta_col,
             index_name=profile.entity_type_vector_index_name,
             expected_dimension=profile.embedding_dimension,
         )
         _validate_vector_index_exists(
             issues=issues,
             db_name=ontology_db_name,
-            collection=ontology_db["property_aliases"],
-            collection_name="property_aliases",
+            collection=ontology_db[pa_col],
+            collection_name=pa_col,
             index_name=profile.property_vector_index_name,
         )
         _validate_vector_index_dimension(
             issues=issues,
             db_name=ontology_db_name,
-            collection=ontology_db["property_aliases"],
-            collection_name="property_aliases",
+            collection=ontology_db[pa_col],
+            collection_name=pa_col,
             index_name=profile.property_vector_index_name,
             expected_dimension=profile.embedding_dimension,
         )
         _validate_vector_index_exists(
             issues=issues,
             db_name=triplets_db_name,
-            collection=triplets_db["entity_aliases"],
-            collection_name="entity_aliases",
+            collection=triplets_db[ea_col],
+            collection_name=ea_col,
             index_name=profile.entity_aliases_vector_index_name,
         )
         _validate_vector_index_dimension(
             issues=issues,
             db_name=triplets_db_name,
-            collection=triplets_db["entity_aliases"],
-            collection_name="entity_aliases",
+            collection=triplets_db[ea_col],
+            collection_name=ea_col,
             index_name=profile.entity_aliases_vector_index_name,
             expected_dimension=profile.embedding_dimension,
         )

@@ -9,7 +9,7 @@ from ..profiles.runtime_profile import DEFAULT_RUNTIME_PROFILE
 _client: Optional[MongoClient] = None
 _db_cache: dict = {}
 
-_DEFAULT_DB_NAME = DEFAULT_RUNTIME_PROFILE.triplets_db_name  # "triplets__en__contriever"
+_DEFAULT_DB_NAME = DEFAULT_RUNTIME_PROFILE.triplets_db_name  # "triplets"
 
 
 def _get_db(db_name: str):

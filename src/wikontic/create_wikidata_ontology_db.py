@@ -348,17 +348,17 @@ def create_search_index_for_properties(
         logger.error(f"Error creating new vector search index {index_name}: {str(e)}")
 
 
-def create_indexes(db):
+def create_indexes(db, entity_type_aliases_collection: str = "entity_type_aliases"):
     logger.info("Creating indexes for entity_types collection...")
-    db.entity_types.create_index([("entity_type_id", 1)])
-    db.entity_types.create_index([("label", 1)])
+    db.get_collection("entity_types").create_index([("entity_type_id", 1)])
+    db.get_collection("entity_types").create_index([("label", 1)])
 
-    logger.info("Creating indexes for entity_type_aliases collection...")
-    db.entity_type_aliases.create_index([("entity_type_id", 1)])
-    db.entity_type_aliases.create_index([("alias_label", 1)])
+    logger.info(f"Creating indexes for {entity_type_aliases_collection} collection...")
+    db.get_collection(entity_type_aliases_collection).create_index([("entity_type_id", 1)])
+    db.get_collection(entity_type_aliases_collection).create_index([("alias_label", 1)])
 
     logger.info("Creating indexes for properties collection...")
-    db.properties.create_index([("property_id", 1)])
+    db.get_collection("properties").create_index([("property_id", 1)])
 
     logger.info("All ontology indexes created successfully")
 
@@ -455,24 +455,48 @@ def create_wikidata_ontology_database(
     # Connect to MongoDB
     mongo_client = get_mongo_client(mongo_uri)
     db = mongo_client.get_database(database)
+    existing_cols = set(db.list_collection_names())
 
-    # Drop all existing collections
-    if drop_collections:
-        logger.info("Dropping existing collections...")
-        for collection_name in db.list_collection_names():
-            logger.info(f"Dropping collection: {collection_name}")
-            db.drop_collection(collection_name)
-        logger.info("Successfully dropped all existing collections")
+    # ── Shared collections (entity_types, properties) ────────────────────────
+    # The ontology DB is shared across embedding models for the same language.
+    # Shared collections hold the same data regardless of embedding model, so we
+    # only repopulate them when they are absent OR when a full rebuild is requested.
+    if drop_collections or entity_types_collection not in existing_cols:
+        if entity_types_collection in existing_cols:
+            logger.info(f"Dropping shared collection: {entity_types_collection}")
+            db.drop_collection(entity_types_collection)
+        populate_entity_types(
+            ENTITY_2_LABEL,
+            ENTITY_2_HIERARCHY,
+            subj2prop_constraints,
+            obj2prop_constraints,
+            db,
+            collection_name=entity_types_collection,
+        )
+    else:
+        logger.info(
+            f"Shared collection '{entity_types_collection}' already exists — skipping."
+        )
 
-    # Populate collections
-    populate_entity_types(
-        ENTITY_2_LABEL,
-        ENTITY_2_HIERARCHY,
-        subj2prop_constraints,
-        obj2prop_constraints,
-        db,
-        collection_name=entity_types_collection,
-    )
+    if drop_collections or properties_collection not in existing_cols:
+        if properties_collection in existing_cols:
+            logger.info(f"Dropping shared collection: {properties_collection}")
+            db.drop_collection(properties_collection)
+        populate_properties(
+            PROP_2_LABEL, PROP_2_CONSTRAINT, db, collection_name=properties_collection
+        )
+    else:
+        logger.info(
+            f"Shared collection '{properties_collection}' already exists — skipping."
+        )
+
+    # ── Model-specific alias collections ─────────────────────────────────────
+    # Each embedding model gets its own alias collections (different vector space).
+    # Always drop and rebuild so embeddings stay in sync with the model.
+    for col in [entity_type_aliases_collection, property_aliases_collection]:
+        if col in existing_cols:
+            logger.info(f"Dropping model-specific collection: {col}")
+            db.drop_collection(col)
 
     populate_entity_type_aliases(
         ENTITY_2_LABEL,
@@ -480,10 +504,6 @@ def create_wikidata_ontology_database(
         db,
         get_embedding=get_embedding,
         collection_name=entity_type_aliases_collection,
-    )
-
-    populate_properties(
-        PROP_2_LABEL, PROP_2_CONSTRAINT, db, collection_name=properties_collection
     )
 
     populate_property_aliases(
@@ -509,7 +529,7 @@ def create_wikidata_ontology_database(
     )
 
     # Create standard indexes
-    create_indexes(db)
+    create_indexes(db, entity_type_aliases_collection=entity_type_aliases_collection)
 
     # Write system_profile_metadata so readiness checks can validate this DB
     if profile_metadata:
@@ -554,7 +574,7 @@ if __name__ == "__main__":
         "--database",
         type=str,
         required=True,
-        help="MongoDB database name (e.g. ontology__en__contriever)",
+        help="MongoDB database name (e.g. ontology__en)",
     )
     parser.add_argument(
         "--model_name",
