@@ -161,14 +161,17 @@ def populate_entity_type_aliases(
     db,
     get_embedding: Callable,
     collection_name="entity_type_aliases",
+    batch_size: int = 500,
 ):
     logger.info(f"Starting to populate {collection_name} collection")
-    entity_types_list = []
+    collection = db.get_collection(collection_name)
+    batch = []
     id_count = 0
+    total_inserted = 0
 
     for e, aliases in tqdm(ENTITY_2_ALIASES.items()):
         alias_embedding = get_embedding(ENTITY_2_LABEL[e])
-        entity_types_list.append(
+        batch.append(
             {
                 "_id": id_count,
                 "entity_type_id": e,
@@ -180,7 +183,7 @@ def populate_entity_type_aliases(
 
         for alias in aliases:
             alias_embedding = get_embedding(alias)
-            entity_types_list.append(
+            batch.append(
                 {
                     "_id": id_count,
                     "entity_type_id": e,
@@ -189,16 +192,27 @@ def populate_entity_type_aliases(
                 }
             )
             id_count += 1
-    try:
-        records = [
-            EntityTypeAlias(**record).model_dump() for record in entity_types_list
-        ]
-    except ValidationError as e:
-        logger.error(f"Validation error while populating {collection_name}: {e}")
 
-    collection = db.get_collection(collection_name)
-    collection.insert_many(records)
-    logger.info(f"Successfully populated {collection_name} with {len(records)} records")
+        if len(batch) >= batch_size:
+            try:
+                records = [EntityTypeAlias(**r).model_dump() for r in batch]
+            except ValidationError as e:
+                logger.error(f"Validation error while populating {collection_name}: {e}")
+                raise
+            collection.insert_many(records)
+            total_inserted += len(records)
+            batch = []
+
+    if batch:
+        try:
+            records = [EntityTypeAlias(**r).model_dump() for r in batch]
+        except ValidationError as e:
+            logger.error(f"Validation error while populating {collection_name}: {e}")
+            raise
+        collection.insert_many(records)
+        total_inserted += len(records)
+
+    logger.info(f"Successfully populated {collection_name} with {total_inserted} records")
 
 
 def populate_properties(
@@ -238,14 +252,17 @@ def populate_property_aliases(
     db,
     get_embedding: Callable,
     collection_name="property_aliases",
+    batch_size: int = 500,
 ):
     logger.info(f"Starting to populate {collection_name} collection")
-    relation_alias_id_pairs = []
+    collection = db.get_collection(collection_name)
+    batch = []
     id_count = 0
+    total_inserted = 0
 
     for r, aliases in tqdm(PROP_2_ALIASES.items()):
         alias_embedding = get_embedding(PROP_2_LABEL[r])
-        relation_alias_id_pairs.append(
+        batch.append(
             {
                 "_id": id_count,
                 "relation_id": r,
@@ -257,7 +274,7 @@ def populate_property_aliases(
 
         for alias in aliases:
             alias_embedding = get_embedding(alias)
-            relation_alias_id_pairs.append(
+            batch.append(
                 {
                     "_id": id_count,
                     "relation_id": r,
@@ -266,16 +283,27 @@ def populate_property_aliases(
                 }
             )
             id_count += 1
-    try:
-        records = [
-            PropertyAlias(**record).model_dump() for record in relation_alias_id_pairs
-        ]
-    except ValidationError as e:
-        logger.error(f"Validation error while populating {collection_name}: {e}")
 
-    collection = db.get_collection(collection_name)
-    collection.insert_many(records)
-    logger.info(f"Successfully populated {collection_name} with {len(records)} records")
+        if len(batch) >= batch_size:
+            try:
+                records = [PropertyAlias(**record).model_dump() for record in batch]
+            except ValidationError as e:
+                logger.error(f"Validation error while populating {collection_name}: {e}")
+                raise
+            collection.insert_many(records)
+            total_inserted += len(records)
+            batch = []
+
+    if batch:
+        try:
+            records = [PropertyAlias(**record).model_dump() for record in batch]
+        except ValidationError as e:
+            logger.error(f"Validation error while populating {collection_name}: {e}")
+            raise
+        collection.insert_many(records)
+        total_inserted += len(records)
+
+    logger.info(f"Successfully populated {collection_name} with {total_inserted} records")
 
 
 def create_search_index_for_entity_types(
@@ -377,6 +405,7 @@ def create_wikidata_ontology_database(
     model_name: Optional[str] = None,
     embedding_dimension: Optional[int] = None,
     profile_metadata: Optional[dict] = None,
+    resume: bool = False,
 ):
     """
     Populate MongoDB with Wikidata ontology data.
@@ -492,27 +521,44 @@ def create_wikidata_ontology_database(
 
     # ── Model-specific alias collections ─────────────────────────────────────
     # Each embedding model gets its own alias collections (different vector space).
-    # Always drop and rebuild so embeddings stay in sync with the model.
+    # Drop and rebuild unless --resume is set, in which case skip collections that
+    # already have data (allows recovering from a mid-run failure without recomputing
+    # completed embeddings).
+    def _should_skip(col_name):
+        return (
+            resume
+            and col_name in existing_cols
+            and db.get_collection(col_name).count_documents({}) > 0
+        )
+
     for col in [entity_type_aliases_collection, property_aliases_collection]:
-        if col in existing_cols:
+        if _should_skip(col):
+            logger.info(f"Resuming: collection '{col}' already has data — skipping rebuild.")
+        elif col in existing_cols:
             logger.info(f"Dropping model-specific collection: {col}")
             db.drop_collection(col)
 
-    populate_entity_type_aliases(
-        ENTITY_2_LABEL,
-        ENTITY_2_ALIASES,
-        db,
-        get_embedding=get_embedding,
-        collection_name=entity_type_aliases_collection,
-    )
+    if _should_skip(entity_type_aliases_collection):
+        logger.info("Resuming: skipping entity_type_aliases population.")
+    else:
+        populate_entity_type_aliases(
+            ENTITY_2_LABEL,
+            ENTITY_2_ALIASES,
+            db,
+            get_embedding=get_embedding,
+            collection_name=entity_type_aliases_collection,
+        )
 
-    populate_property_aliases(
-        PROP_2_LABEL,
-        PROP_2_ALIASES,
-        db,
-        get_embedding=get_embedding,
-        collection_name=property_aliases_collection,
-    )
+    if _should_skip(property_aliases_collection):
+        logger.info("Resuming: skipping property_aliases population.")
+    else:
+        populate_property_aliases(
+            PROP_2_LABEL,
+            PROP_2_ALIASES,
+            db,
+            get_embedding=get_embedding,
+            collection_name=property_aliases_collection,
+        )
 
     # Create vector search indexes with correct dimension
     create_search_index_for_entity_types(

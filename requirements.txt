@@ -1,4 +1,7 @@
 streamlit
+fastapi
+uvicorn[standard]
+requests
 numpy
 pyvis
 python-dotenv

@@ -709,7 +709,52 @@ with col2:
     )
     st.session_state.input_text = input_text
 
-trigger = st.button("Extract and Visualize")
+btn_col_a, btn_col_b = st.columns([1, 1])
+trigger          = btn_col_a.button("Extract and Visualize", use_container_width=True)
+trigger_no_db    = btn_col_b.button("Extract (without DB)", use_container_width=True)
+
+if trigger_no_db:
+    if not input_text:
+        st.warning("Please enter a text to extract KG.")
+    else:
+        import requests as _requests
+        _api_url = os.getenv("WIKONTIC_API_URL", "http://localhost:8000") + "/extract"
+        _payload = {
+            "text":            input_text,
+            "embedding_model": effective_profile.embedding_model_name.split("/")[-1].lower().replace("-", "_").replace(".", "_"),
+            "llm_model":       selected_model,
+        }
+        # Map full model name to embedding_key via profile
+        _payload["embedding_model"] = next(
+            (ep.embedding_key for ep in __import__(
+                "src.wikontic.profiles", fromlist=["EMBEDDING_PROFILES"]
+            ).EMBEDDING_PROFILES.values()
+             if ep.model_name == effective_profile.embedding_model_name),
+            "contriever",
+        )
+        with st.spinner("Extracting (no DB write)..."):
+            try:
+                _resp = _requests.post(_api_url, json=_payload, timeout=180)
+                _resp.raise_for_status()
+                _data = _resp.json()
+                _triplets = _data.get("triplets", [])
+                st.success(f"✅ {_data.get('count', len(_triplets))} triplets extracted (not saved to DB).")
+                if _triplets:
+                    import pandas as _pd
+                    st.dataframe(
+                        _pd.DataFrame(_triplets)[
+                            ["subject", "subject_type", "relation", "object", "object_type"]
+                        ],
+                        use_container_width=True,
+                        hide_index=True,
+                    )
+            except _requests.exceptions.ConnectionError:
+                st.error(
+                    "Cannot reach Wikontic API. Start it with:\n"
+                    "```\nuvicorn api:app --host 0.0.0.0 --port 8000\n```"
+                )
+            except Exception as _e:
+                st.error(f"API call failed: {_e}")
 
 if trigger:
     if not input_text:

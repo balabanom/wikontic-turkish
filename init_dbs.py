@@ -72,6 +72,12 @@ def main():
         default=False,
         help="Drop and recreate the triplets DB (WARNING: deletes user KG data)",
     )
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        default=False,
+        help="Skip alias collections that already have data (recover from a mid-run failure)",
+    )
     args = parser.parse_args()
 
     profile = _resolve_profile(args.profile)
@@ -108,7 +114,7 @@ def main():
     create_wikidata_ontology_database(
         mongo_uri=mongo_uri,
         database=profile.ontology_db_name,
-        drop_collections=True,
+        drop_collections=not args.resume,
         model_name=profile.embedding_model_name,
         embedding_dimension=profile.embedding_dimension,
         entity_type_aliases_collection=profile.entity_type_aliases_collection_name,
@@ -116,6 +122,7 @@ def main():
         entity_types_index=profile.entity_type_vector_index_name,
         property_aliases_index=profile.property_vector_index_name,
         profile_metadata=profile_metadata,
+        resume=args.resume,
     )
     print(f"✅ Ontology DB '{profile.ontology_db_name}' ready.\n")
 
