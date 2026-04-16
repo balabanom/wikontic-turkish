@@ -65,7 +65,7 @@ def create_search_index_for_entities(
 
 
 def create_ontological_triplets_database(
-    mongo_uri: str = "mongodb://localhost:27018/?directConnection=true",
+    mongo_uri: str = None,
     db_name: str = "triplets_db",
     entity_aliases_collection: str = "entity_aliases",
     triplets_collection: str = "triplets",
@@ -93,6 +93,7 @@ def create_ontological_triplets_database(
     Returns:
         Database object
     """
+    mongo_uri = mongo_uri or os.getenv("MONGO_URI")
     mongo_client = get_mongo_client(mongo_uri)
     db = mongo_client.get_database(db_name)
     if embedding_dimension is None:
@@ -159,7 +160,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--mongo_uri",
         type=str,
-        default="mongodb://localhost:27018/?directConnection=true",
+        default=os.getenv("MONGO_URI"),
     )
     parser.add_argument("--db_name", type=str, default="triplets_db")
     parser.add_argument(

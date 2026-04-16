@@ -58,7 +58,7 @@ def get_args():
     parser.add_argument(
         "--mongo_uri",
         type=str,
-        default="mongodb://localhost:27018/?directConnection=true",
+        default=os.getenv("MONGO_URI"),
     )
     parser.add_argument("--ontology_db_name", type=str, default="wikidata_ontology")
     parser.add_argument("--triplets_db_name", type=str, default="triplets_db")

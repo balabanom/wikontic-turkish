@@ -12,7 +12,7 @@ from src.wikontic.profiles import ONTOLOGY_PROFILES, EMBEDDING_PROFILES, resolve
 from src.wikontic.create_ontological_triplets_db import create_ontological_triplets_database
 
 load_dotenv(find_dotenv())
-mongo_uri = os.getenv("MONGO_URI", "mongodb://localhost:27018/?directConnection=true")
+mongo_uri = os.getenv("MONGO_URI")
 
 
 def resolve_profile_from_runtime_id(profile_id: str):

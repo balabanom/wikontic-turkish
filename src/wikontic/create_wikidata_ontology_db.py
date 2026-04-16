@@ -392,7 +392,7 @@ def create_indexes(db, entity_type_aliases_collection: str = "entity_type_aliase
 
 
 def create_wikidata_ontology_database(
-    mongo_uri: str = "mongodb://localhost:27018/?directConnection=true",
+    mongo_uri: str = None,
     database: str = None,
     mappings_dir: str = None,
     entity_types_collection: str = "entity_types",
@@ -431,6 +431,7 @@ def create_wikidata_ontology_database(
     Returns:
         Database object
     """
+    mongo_uri = mongo_uri or os.getenv("MONGO_URI")
     if database is None:
         raise ValueError(
             "database name must be provided. Use resolve_runtime_profile() to derive it."
@@ -613,7 +614,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--mongo_uri",
         type=str,
-        default="mongodb://localhost:27018/?directConnection=true",
+        default=os.getenv("MONGO_URI"),
         help="MongoDB connection URI",
     )
     parser.add_argument(

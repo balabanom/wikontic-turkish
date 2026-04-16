@@ -28,7 +28,7 @@ from pymongo.errors import CollectionInvalid
 
 load_dotenv(find_dotenv())
 
-mongo_uri = os.getenv("MONGO_URI", "mongodb://localhost:27018/?directConnection=true")
+mongo_uri = os.getenv("MONGO_URI")
 
 
 def _resolve_profile(profile_id: str):
