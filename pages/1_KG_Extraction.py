@@ -495,7 +495,7 @@ def render_transparency_panel(selected_run_id: str):
                 cols     = ["subject", "relation", "object", "sentence_id", "sentence_preview"]
                 existing = [c for c in cols if c in pd.DataFrame(triplets).columns]
                 st.dataframe(pd.DataFrame(triplets)[existing],
-                             use_container_width=True, hide_index=True)
+                             width="stretch", hide_index=True)
                 _show_sentence_detail(triplets, key_prefix=f"parsed_{selected_run_id}")
             else:
                 st.info("Parse edilmiş triplet bulunamadı.")
@@ -512,7 +512,7 @@ def render_transparency_panel(selected_run_id: str):
                 st.caption(f"**{len(merges)} entity** merge edildi")
                 df = pd.DataFrame(merges)
                 existing = [c for c in ["from", "to", "entity_type", "method"] if c in df.columns]
-                st.dataframe(df[existing], use_container_width=True, hide_index=True)
+                st.dataframe(df[existing], width="stretch", hide_index=True)
 
     with tab3:
         art = get_artifact(selected_run_id, "filtered_out", db_name=current_profile.triplets_db_name)
@@ -536,7 +536,7 @@ def render_transparency_panel(selected_run_id: str):
                             "filter_stage", "sentence_id", "sentence_preview", "exception_text"]
                 df       = pd.DataFrame(triplets)
                 existing = [c for c in cols if c in df.columns]
-                st.dataframe(df[existing], use_container_width=True, hide_index=True)
+                st.dataframe(df[existing], width="stretch", hide_index=True)
                 _show_sentence_detail(triplets, key_prefix=f"filtered_{selected_run_id}")
 
     with tab4:
@@ -558,7 +558,7 @@ def render_transparency_panel(selected_run_id: str):
                             "sentence_id", "sentence_preview"]
                 df       = pd.DataFrame(triplets)
                 existing = [c for c in cols if c in df.columns]
-                st.dataframe(df[existing], use_container_width=True, hide_index=True)
+                st.dataframe(df[existing], width="stretch", hide_index=True)
                 _show_sentence_detail(triplets, key_prefix=f"final_{selected_run_id}")
             else:
                 st.info("Final triplet bulunamadı.")
@@ -611,7 +611,7 @@ def render_ontology_neighborhood_panel(selected_run_id: str):
             if parents:
                 df = pd.DataFrame(parents)[["label", "id"]]
                 df.columns = ["Label", "Wikidata ID"]
-                st.dataframe(df, use_container_width=True, hide_index=True)
+                st.dataframe(df, width="stretch", hide_index=True)
             else:
                 st.info("Parent type bulunamadı.")
         with dc2:
@@ -619,7 +619,7 @@ def render_ontology_neighborhood_panel(selected_run_id: str):
             if properties:
                 df = pd.DataFrame(properties)[["label", "id", "direction"]]
                 df.columns = ["Label", "Wikidata ID", "Direction"]
-                st.dataframe(df, use_container_width=True, hide_index=True)
+                st.dataframe(df, width="stretch", hide_index=True)
             else:
                 st.info("Property bulunamadı.")
 
@@ -710,8 +710,8 @@ with col2:
     st.session_state.input_text = input_text
 
 btn_col_a, btn_col_b = st.columns([1, 1])
-trigger          = btn_col_a.button("Extract and Visualize", use_container_width=True)
-trigger_no_db    = btn_col_b.button("Extract (without DB)", use_container_width=True)
+trigger          = btn_col_a.button("Extract and Visualize", width="stretch")
+trigger_no_db    = btn_col_b.button("Extract (without DB)", width="stretch")
 
 if trigger_no_db:
     if not input_text:
@@ -745,7 +745,7 @@ if trigger_no_db:
                         _pd.DataFrame(_triplets)[
                             ["subject", "subject_type", "relation", "object", "object_type"]
                         ],
-                        use_container_width=True,
+                        width="stretch",
                         hide_index=True,
                     )
             except _requests.exceptions.ConnectionError:

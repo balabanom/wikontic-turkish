@@ -41,6 +41,9 @@ class Aligner:
 
         profile = runtime_profile or DEFAULT_RUNTIME_PROFILE
 
+        self.embedding_profile_id = profile.embedding_profile_id
+        self.embedding_model_name = profile.embedding_model_name
+
         self.entity_type_collection_name = "entity_types"
         self.entity_type_aliases_collection_name = profile.entity_type_aliases_collection_name
         self.property_collection_name = "properties"
@@ -444,6 +447,8 @@ class Aligner:
             sample_id = "all"
         for triple in triplets_list:
             triple["sample_id"] = sample_id
+            triple["embedding_profile_id"] = self.embedding_profile_id
+            triple["embedding_model_name"] = self.embedding_model_name
             filter_query = {
                 "subject": triple["subject"],
                 "relation": triple["relation"],
@@ -469,6 +474,8 @@ class Aligner:
             sample_id = "all"
         for triple in triplets_list:
             triple["sample_id"] = sample_id
+            triple["embedding_profile_id"] = self.embedding_profile_id
+            triple["embedding_model_name"] = self.embedding_model_name
             filter_query = {
                 "subject": triple["subject"],
                 "relation": triple["relation"],
@@ -494,6 +501,8 @@ class Aligner:
             sample_id = "all"
         for triple in triplets_list:
             triple["sample_id"] = sample_id
+            triple["embedding_profile_id"] = self.embedding_profile_id
+            triple["embedding_model_name"] = self.embedding_model_name
             filter_query = {
                 "subject": triple["subject"],
                 "relation": triple["relation"],
@@ -518,6 +527,8 @@ class Aligner:
         operations = []
         for triple in triplets_list:
             triple["sample_id"] = sample_id
+            triple["embedding_profile_id"] = self.embedding_profile_id
+            triple["embedding_model_name"] = self.embedding_model_name
             filter_query = {
                 "subject": triple["subject"],
                 "relation": triple["relation"],

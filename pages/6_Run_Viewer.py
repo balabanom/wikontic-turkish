@@ -115,7 +115,7 @@ def _render_performance_card(run_meta: dict):
             rows.append({"Stage": stage, "Süre": _fmt_ms(ms), "%": pct})
         if rows:
             st.markdown("**Stage breakdown**")
-            st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+            st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
         total_tokens = stats.get("total_tokens")
         if total_tokens is not None:
             tc = st.columns(3)
@@ -185,7 +185,7 @@ def _render_stage_tabs(run_id: str, db_name: str):
             df = _triplet_df(triplets,
                              extra_cols=["sentence_id", "sentence_preview"])
             if df is not None:
-                st.dataframe(df, use_container_width=True, hide_index=True)
+                st.dataframe(df, width="stretch", hide_index=True)
                 _show_sentence_detail(triplets, key_prefix=f"rv_parsed_{run_id}")
             else:
                 st.info("Triplet bulunamadı.")
@@ -203,7 +203,7 @@ def _render_stage_tabs(run_id: str, db_name: str):
                 st.caption(f"**{len(merges)} entity** merge edildi")
                 df = pd.DataFrame(merges)
                 existing = [c for c in ["from", "to", "entity_type", "method"] if c in df.columns]
-                st.dataframe(df[existing], use_container_width=True, hide_index=True)
+                st.dataframe(df[existing], width="stretch", hide_index=True)
 
     # ── Tab 4: Filtered Out ───────────────────────────────────────────────────
     with tabs[4]:
@@ -224,7 +224,7 @@ def _render_stage_tabs(run_id: str, db_name: str):
                         "filter_stage", "sentence_id", "sentence_preview", "exception_text"]
                 df   = pd.DataFrame(triplets)
                 st.dataframe(df[[c for c in cols if c in df.columns]],
-                             use_container_width=True, hide_index=True)
+                             width="stretch", hide_index=True)
                 _show_sentence_detail(triplets, key_prefix=f"rv_filtered_{run_id}")
 
     # ── Tab 5: Final Triplets ─────────────────────────────────────────────────
@@ -245,7 +245,7 @@ def _render_stage_tabs(run_id: str, db_name: str):
                              extra_cols=["subject_type", "object_type",
                                          "sentence_id", "sentence_preview"])
             if df is not None:
-                st.dataframe(df, use_container_width=True, hide_index=True)
+                st.dataframe(df, width="stretch", hide_index=True)
                 _show_sentence_detail(triplets, key_prefix=f"rv_final_{run_id}")
             else:
                 st.info("Final triplet bulunamadı.")
@@ -300,7 +300,7 @@ def _render_telemetry_compare(tele: dict):
         })
         for col in ["A (ms)", "B (ms)", "Δ ms"]:
             df[col] = pd.to_numeric(df[col], errors="coerce")
-        st.dataframe(df, use_container_width=True, hide_index=True)
+        st.dataframe(df, width="stretch", hide_index=True)
     else:
         st.info("Stage telemetrisi bulunamadı.")
 
@@ -362,7 +362,7 @@ def _render_compare_panel(run_id_a: str, runs: list, db_name: str):
             if fd["added_edges"]:
                 df = pd.DataFrame(fd["added_edges"])
                 st.dataframe(df[[c for c in ["subject","relation","object"] if c in df.columns]].head(200),
-                             use_container_width=True, hide_index=True)
+                             width="stretch", hide_index=True)
                 if len(fd["added_edges"]) > 200:
                     st.caption(f"İlk 200, toplam {len(fd['added_edges'])}")
             else:
@@ -371,7 +371,7 @@ def _render_compare_panel(run_id_a: str, runs: list, db_name: str):
             if fd["removed_edges"]:
                 df = pd.DataFrame(fd["removed_edges"])
                 st.dataframe(df[[c for c in ["subject","relation","object"] if c in df.columns]].head(200),
-                             use_container_width=True, hide_index=True)
+                             width="stretch", hide_index=True)
             else:
                 st.info("Yok.")
 
@@ -383,11 +383,11 @@ def _render_compare_panel(run_id_a: str, runs: list, db_name: str):
         mc[2].metric("Δ", md["count_b"] - md["count_a"])
         with st.expander(f"B'de eklenen ({len(md['added'])})", expanded=len(md["added"]) > 0):
             st.dataframe(pd.DataFrame(md["added"]),
-                         use_container_width=True, hide_index=True) if md["added"] else st.info("Yok.")
+                         width="stretch", hide_index=True) if md["added"] else st.info("Yok.")
         with st.expander(f"A'da olup B'de olmayan ({len(md['removed'])})",
                          expanded=len(md["removed"]) > 0):
             st.dataframe(pd.DataFrame(md["removed"]),
-                         use_container_width=True, hide_index=True) if md["removed"] else st.info("Yok.")
+                         width="stretch", hide_index=True) if md["removed"] else st.info("Yok.")
 
     with ct3:
         reasons = report["filter_reason_diff"]["reasons"]
@@ -399,7 +399,7 @@ def _render_compare_panel(run_id_a: str, runs: list, db_name: str):
                     "reason": "Reason Code", "count_a": "Count A",
                     "count_b": "Count B",    "delta":   "Δ (B-A)",
                 }),
-                use_container_width=True, hide_index=True,
+                width="stretch", hide_index=True,
             )
 
     with ct4:
@@ -495,7 +495,7 @@ with left_col:
             if st.button(
                 f"{_status_badge(r['status'])}  {r['created_at']}\n{r['model']}",
                 key=f"run_btn_{r['run_id']}",
-                use_container_width=True,
+                width="stretch",
                 type="primary" if is_sel else "secondary",
                 help=r.get("input_preview", "")[:80],
             ):

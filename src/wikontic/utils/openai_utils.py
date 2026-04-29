@@ -101,18 +101,23 @@ class LLMTripletExtractor:
 
     def extract_json(self, text: str) -> Union[dict, list, str]:
         """Extract JSON from text, handling both code blocks and inline JSON."""
-        patterns = [
-            r"```json\s*(\{.*?\}|\[.*?\])\s*```",  # JSON in code blocks
-            r"(\{.*?\}|\[.*?\])",                   # Inline JSON
-        ]
-
+        # Direct parse
         try:
             return json.loads(text)
         except json.JSONDecodeError:
             pass
 
-        for pattern in patterns:
-            match = re.search(pattern, text, re.DOTALL)
+        # Strip markdown code-block fences (```json ... ``` or ``` ... ```)
+        stripped = re.sub(r"^```(?:json)?\s*\n?", "", text.strip(), flags=re.IGNORECASE)
+        stripped = re.sub(r"\n?```$", "", stripped.strip())
+        try:
+            return json.loads(stripped)
+        except json.JSONDecodeError:
+            pass
+
+        # Greedy extraction: first { ... } or [ ... ] block in the text
+        for pattern in [r"(\{[\s\S]*\})", r"(\[[\s\S]*\])"]:
+            match = re.search(pattern, text)
             if match:
                 try:
                     return json.loads(match.group(1))
