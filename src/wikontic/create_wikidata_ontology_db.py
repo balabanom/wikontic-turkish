@@ -395,6 +395,7 @@ def create_wikidata_ontology_database(
     mongo_uri: str = None,
     database: str = None,
     mappings_dir: str = None,
+    language: str = "en",
     entity_types_collection: str = "entity_types",
     entity_type_aliases_collection: str = "entity_type_aliases",
     properties_collection: str = "properties",
@@ -452,27 +453,42 @@ def create_wikidata_ontology_database(
         if not os.path.exists(mappings_dir):
             mappings_dir = "utils/ontology_mappings/"
 
+    # Language-specific mappings (labels/aliases) live in a per-language subdir;
+    # English keeps the legacy root-level layout to preserve backward compatibility.
+    if language == "en":
+        lang_dir = mappings_dir
+    else:
+        lang_dir = os.path.join(mappings_dir, language)
+        if not os.path.isdir(lang_dir):
+            raise FileNotFoundError(
+                f"Language-specific mappings dir not found: {lang_dir}. "
+                f"Run `python scripts/fetch_turkish_ontology.py` (or the equivalent "
+                f"for language={language!r}) to generate it."
+            )
+
     logger.info("Starting database population process")
     logger.info(f"Using database: {database}")
     logger.info(f"Using embedding model: {model_name} (dim={embedding_dimension})")
-    logger.info(f"Loading mapping files from: {mappings_dir}")
+    logger.info(f"Loading mapping files from: {mappings_dir} (language={language})")
 
-    # Load mapping files
+    # Shared mapping files (constraints + hierarchy — language-independent)
     with open(os.path.join(mappings_dir, "subj_constraint2prop.json"), "r") as f:
         subj2prop_constraints = json.load(f)
     with open(os.path.join(mappings_dir, "obj_constraint2prop.json"), "r") as f:
         obj2prop_constraints = json.load(f)
-    with open(os.path.join(mappings_dir, "entity_type2label.json"), "r") as f:
-        ENTITY_2_LABEL = json.load(f)
     with open(os.path.join(mappings_dir, "entity_type2hierarchy.json"), "r") as f:
         ENTITY_2_HIERARCHY = json.load(f)
-    with open(os.path.join(mappings_dir, "entity_type2aliases.json"), "r") as f:
-        ENTITY_2_ALIASES = json.load(f)
     with open(os.path.join(mappings_dir, "prop2constraints.json"), "r") as f:
         PROP_2_CONSTRAINT = json.load(f)
-    with open(os.path.join(mappings_dir, "prop2label.json"), "r") as f:
+
+    # Language-specific mapping files (labels/aliases)
+    with open(os.path.join(lang_dir, "entity_type2label.json"), "r") as f:
+        ENTITY_2_LABEL = json.load(f)
+    with open(os.path.join(lang_dir, "entity_type2aliases.json"), "r") as f:
+        ENTITY_2_ALIASES = json.load(f)
+    with open(os.path.join(lang_dir, "prop2label.json"), "r") as f:
         PROP_2_LABEL = json.load(f)
-    with open(os.path.join(mappings_dir, "prop2aliases.json"), "r") as f:
+    with open(os.path.join(lang_dir, "prop2aliases.json"), "r") as f:
         PROP_2_ALIASES = json.load(f)
 
     logger.info("Successfully loaded all mapping files")

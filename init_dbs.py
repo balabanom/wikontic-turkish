@@ -114,6 +114,7 @@ def main():
     create_wikidata_ontology_database(
         mongo_uri=mongo_uri,
         database=profile.ontology_db_name,
+        language=profile.ontology_language,
         drop_collections=not args.resume,
         model_name=profile.embedding_model_name,
         embedding_dimension=profile.embedding_dimension,

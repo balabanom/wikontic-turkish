@@ -45,11 +45,12 @@ ONTOLOGY_PROFILES: dict[str, OntologyProfile] = {
         runtime_key="tr",
         display_name="Turkish Ontology",
         alias_source_version="tr_aliases_v1",
-        available=False,
+        available=True,
         notes=(
-            "Turkish ontology data not yet available. "
-            "Set available=True and run `python init_dbs.py --profile tr__turkish_e5_large` "
-            "when data is ready."
+            "TR labels/aliases sourced from Wikidata SPARQL via "
+            "`scripts/fetch_turkish_ontology.py`. Coverage: ~63% entity types, "
+            "~74% properties; missing TR labels fall back to EN (see "
+            "`src/wikontic/utils/ontology_mappings/tr/_coverage_report.json`)."
         ),
     ),
 }
