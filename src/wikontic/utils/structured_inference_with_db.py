@@ -69,6 +69,7 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
         self.aligner = aligner
         self.triplets_db = triplets_db
         self.runtime_profile = runtime_profile or DEFAULT_RUNTIME_PROFILE
+        self._apply_language_prompt_overrides()
 
         self.extract_triplets_with_ontology_filtering_tool = tool(
             self.extract_triplets_with_ontology_filtering
@@ -86,6 +87,63 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
             self.get_1_hop_supporting_triplets
         )
         self.answer_question_with_llm_tool = tool(self.answer_question_with_llm)
+
+    def _apply_language_prompt_overrides(self) -> None:
+        if self.runtime_profile.ontology_language != "tr":
+            return
+        if not hasattr(self.extractor, "prompts"):
+            return
+        if getattr(self.extractor, "_wikontic_tr_prompt_overrides_applied", False):
+            return
+
+        tr_extraction_instruction = """
+
+### Turkish ontology mode
+The ontology labels and aliases are Turkish. For Turkish input text, output
+"relation", "subject_type", and "object_type" using Turkish ontology-style
+labels whenever possible. Keep named entities as they appear in the text. Do
+not translate Turkish factual objects into English when the object is a common
+label, occupation, nationality, place type, or concept.
+
+Examples of preferred Turkish labels:
+- human -> insan
+- city -> şehir
+- writer -> yazar
+- profession -> meslek
+- place of birth -> doğum yeri
+- country/nationality/citizenship should use the closest Turkish wording
+  supported by the sentence.
+"""
+
+        tr_candidate_instruction = """
+
+### Turkish ontology mode
+Candidate labels come from a Turkish ontology. Select exact candidate strings
+from the provided candidate list/triplets. Do not invent English labels when
+Turkish candidates are present. Return only valid JSON.
+"""
+
+        prompt_suffixes = {
+            "triplet_extraction": tr_extraction_instruction,
+            "relation_entity_types_ranker": tr_candidate_instruction,
+            "relation_ranker": tr_candidate_instruction,
+            "entity_types_ranker": tr_candidate_instruction,
+            "relation_ranker_wo_entity_types": tr_candidate_instruction,
+            "subject_ranker": tr_candidate_instruction,
+            "object_ranker": tr_candidate_instruction,
+            "quailfier_object_ranker": tr_candidate_instruction,
+        }
+        for key, suffix in prompt_suffixes.items():
+            if key in self.extractor.prompts and suffix not in self.extractor.prompts[key]:
+                self.extractor.prompts[key] += suffix
+
+        self.extractor._wikontic_tr_prompt_overrides_applied = True
+
+    def _normalize_entity_name(self, name: str) -> str:
+        # TR modunda diakritikleri korur; diğer dillerde mevcut unidecode davranışı.
+        if getattr(self.runtime_profile, "ontology_language", None) == "tr":
+            return name
+        return unidecode(name)
 
     def _get_model_name(self) -> str:
         for attr in ("model_name", "model", "llm_model", "model_id"):
@@ -299,11 +357,11 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
 
         self.extractor.reset_error_state()
         if is_object:
-            entity = unidecode(triplet["object"])
+            entity = self._normalize_entity_name(triplet["object"])
             entity_type = triplet["object_type"]
             entity_hierarchy = self.aligner.retrieve_entity_type_hierarchy(entity_type)
         else:
-            entity = unidecode(triplet["subject"])
+            entity = self._normalize_entity_name(triplet["subject"])
             entity_type = triplet["subject_type"]
             entity_hierarchy = []
 
@@ -323,7 +381,7 @@ class StructuredInferenceWithDB(BaseInferenceWithDB):
                         candidates=list(similar_entities.values()),
                         is_object=is_object,
                     )
-                    updated_entity = unidecode(updated_entity)
+                    updated_entity = self._normalize_entity_name(updated_entity)
                     if re.sub(r"[^\w\s]", "", updated_entity) == "None":
                         updated_entity = entity
             else:
