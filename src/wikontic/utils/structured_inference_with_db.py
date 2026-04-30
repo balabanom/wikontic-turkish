@@ -331,11 +331,11 @@ Turkish candidates are present. Return only valid JSON.
         if exception_msg != "":
             return False, exception_msg
         else:
-            subject_type_hierarchy = self.aligner.retrieve_entity_type_hierarchy(
-                refined_subject_type
+            subject_type_hierarchy = self.aligner.retrieve_entity_type_hierarchy_by_id(
+                refined_subject_type_id
             )
-            object_type_hierarchy = self.aligner.retrieve_entity_type_hierarchy(
-                refined_object_type
+            object_type_hierarchy = self.aligner.retrieve_entity_type_hierarchy_by_id(
+                refined_object_type_id
             )
 
             if valid_subject_type_ids == ["ANY"]:

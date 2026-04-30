@@ -591,7 +591,23 @@ def render_ontology_neighborhood_panel(selected_run_id: str):
             neighborhood = aligner.get_ontology_neighborhood(selected_type)
 
         if neighborhood is None:
-            st.warning(f"'{selected_type}' için ontoloji verisi bulunamadı.")
+            ontology_db_name = getattr(aligner.ontology_db, "name", "?")
+            et_collection = aligner.entity_type_collection_name
+            try:
+                total = aligner.ontology_db.get_collection(et_collection).count_documents({})
+                exact = aligner.ontology_db.get_collection(et_collection).count_documents(
+                    {"label": selected_type}
+                )
+            except Exception as e:
+                total, exact = -1, f"err: {e}"
+            st.warning(
+                f"'{selected_type}' için ontoloji verisi bulunamadı.\n\n"
+                f"- Sorgulanan DB: `{ontology_db_name}`\n"
+                f"- `{et_collection}` toplam doc: `{total}`\n"
+                f"- `label == \"{selected_type}\"` eşleşme: `{exact}`\n\n"
+                f"Eğer DB adı beklediğinizden farklıysa, sidebar'daki "
+                f"**Ontology DB** seçicisini kontrol edin."
+            )
             return
 
         center     = neighborhood["center"]

@@ -4,12 +4,15 @@ from dataclasses import dataclass
 from pydantic import BaseModel, ValidationError
 from pymongo import MongoClient, UpdateOne
 import torch
+import logging
 from dotenv import load_dotenv, find_dotenv
 import os
 from pathlib import Path
 from ..profiles.runtime_profile import DEFAULT_RUNTIME_PROFILE, RuntimeProfile
 
 _ = load_dotenv(find_dotenv())
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -362,6 +365,18 @@ class Aligner:
             ]
         return extended_types
 
+    def retrieve_entity_type_hierarchy_by_id(self, entity_type_id: str) -> List[str]:
+        collection = self.ontology_db.get_collection(self.entity_type_collection_name)
+        entity_id_parent_types = collection.find_one(
+            {"entity_type_id": entity_type_id},
+            {"entity_type_id": 1, "parent_type_ids": 1, "_id": 0},
+        )
+        if not entity_id_parent_types:
+            return []
+        return [entity_id_parent_types["entity_type_id"]] + entity_id_parent_types.get(
+            "parent_type_ids", []
+        )
+
     def retrieve_entity_by_type(self, entity_name, entity_type, sample_id, k=10):
         collection = self.ontology_db.get_collection(self.entity_type_collection_name)
         entity_id_parent_types = collection.find_one(
@@ -618,12 +633,16 @@ class Aligner:
                 self.entity_type_collection_name
             )
 
-            center_doc = et_collection.find_one(
-                {"label": entity_type_label},
-                {"entity_type_id": 1, "label": 1, "parent_type_ids": 1,
-                 "valid_subject_property_ids": 1, "valid_object_property_ids": 1,
-                 "_id": 0},
-            )
+            projection = {"entity_type_id": 1, "label": 1, "parent_type_ids": 1,
+                          "valid_subject_property_ids": 1, "valid_object_property_ids": 1,
+                          "_id": 0}
+            center_doc = et_collection.find_one({"label": entity_type_label}, projection)
+            # Fallback: if the caller passed a Wikidata ID (e.g. "Q5") rather than a label
+            # — happens when a run was produced before TR labels were available.
+            if not center_doc and entity_type_label and entity_type_label[:1] in ("Q", "P"):
+                center_doc = et_collection.find_one(
+                    {"entity_type_id": entity_type_label}, projection
+                )
             if not center_doc:
                 return None
 
@@ -682,10 +701,15 @@ class Aligner:
                     })
 
             return {
-                "center": {"id": center_id, "label": entity_type_label},
+                "center": {"id": center_id, "label": center_doc.get("label", entity_type_label)},
                 "parents": parents,
                 "properties": properties,
             }
 
         except Exception:
+            logger.exception(
+                "get_ontology_neighborhood failed for label=%r in db=%r",
+                entity_type_label,
+                getattr(self.ontology_db, "name", None),
+            )
             return None
