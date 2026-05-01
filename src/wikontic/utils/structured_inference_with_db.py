@@ -1,4 +1,5 @@
 from unidecode import unidecode
+import json
 import re
 import warnings
 from typing import Dict, List, Tuple
@@ -144,6 +145,57 @@ Turkish candidates are present. Return only valid JSON.
         if getattr(self.runtime_profile, "ontology_language", None) == "tr":
             return name
         return unidecode(name)
+
+    def _sanitize_refine_output(self, raw_output, is_object: bool = False) -> str:
+        """
+        LLM bazen `refine_entity` cevabını tırnakla sarıyor ya da prompt'taki JSON
+        yapısını taklit ediyor (`{"subject": "..."}`, `["..."]`). Bu helper en iyi
+        çabayla düz bir entity ismi çıkarır; çıkaramazsa boş string döner ve
+        çağıran taraf orijinal isme fallback eder.
+        """
+        if raw_output is None:
+            return ""
+        if not isinstance(raw_output, str):
+            try:
+                raw_output = str(raw_output)
+            except Exception:
+                return ""
+
+        text = raw_output.strip()
+        if not text:
+            return ""
+
+        if text[0] in "{[":
+            try:
+                parsed = json.loads(text)
+            except (ValueError, TypeError):
+                parsed = None
+
+            if isinstance(parsed, dict):
+                preferred_key = "object" if is_object else "subject"
+                picked = ""
+                for k in (preferred_key, "entity", "name", "label"):
+                    val = parsed.get(k)
+                    if isinstance(val, str) and val.strip():
+                        picked = val
+                        break
+                if not picked:
+                    return ""
+                text = picked.strip()
+            elif isinstance(parsed, list):
+                if parsed and isinstance(parsed[0], str):
+                    text = parsed[0].strip()
+                else:
+                    return ""
+            elif parsed is None:
+                pass
+            else:
+                return ""
+
+        if len(text) >= 2 and text[0] == text[-1] and text[0] in ('"', "'"):
+            text = text[1:-1].strip()
+
+        return text
 
     def _get_model_name(self) -> str:
         for attr in ("model_name", "model", "llm_model", "model_id"):
@@ -308,6 +360,31 @@ Turkish candidates are present. Return only valid JSON.
             prop_object_type_ids,
         )
 
+    def _retrieve_entity_type_hierarchy_by_id(self, entity_type_id: str) -> List[str]:
+        """Return type id plus parent ids, with a fallback for cached older aligners."""
+        hierarchy_fn = getattr(self.aligner, "retrieve_entity_type_hierarchy_by_id", None)
+        if callable(hierarchy_fn):
+            return hierarchy_fn(entity_type_id)
+
+        ontology_db = getattr(self.aligner, "ontology_db", None)
+        collection_name = getattr(self.aligner, "entity_type_collection_name", "entity_types")
+        if ontology_db is None:
+            raise AttributeError(
+                "Aligner object has no retrieve_entity_type_hierarchy_by_id method "
+                "and no ontology_db fallback"
+            )
+
+        collection = ontology_db.get_collection(collection_name)
+        entity_id_parent_types = collection.find_one(
+            {"entity_type_id": entity_type_id},
+            {"entity_type_id": 1, "parent_type_ids": 1, "_id": 0},
+        )
+        if not entity_id_parent_types:
+            return []
+        return [entity_id_parent_types["entity_type_id"]] + entity_id_parent_types.get(
+            "parent_type_ids", []
+        )
+
     def _validate_backbone(
         self,
         refined_subject_type: str,
@@ -331,10 +408,10 @@ Turkish candidates are present. Return only valid JSON.
         if exception_msg != "":
             return False, exception_msg
         else:
-            subject_type_hierarchy = self.aligner.retrieve_entity_type_hierarchy_by_id(
+            subject_type_hierarchy = self._retrieve_entity_type_hierarchy_by_id(
                 refined_subject_type_id
             )
-            object_type_hierarchy = self.aligner.retrieve_entity_type_hierarchy_by_id(
+            object_type_hierarchy = self._retrieve_entity_type_hierarchy_by_id(
                 refined_object_type_id
             )
 
@@ -375,15 +452,31 @@ Turkish candidates are present. Return only valid JSON.
                 if entity in similar_entities:
                     updated_entity = similar_entities[entity]
                 else:
-                    updated_entity = self.extractor.refine_entity(
+                    candidate_values = list(similar_entities.values())
+                    raw_output = self.extractor.refine_entity(
                         text=text,
                         triplet=triplet,
-                        candidates=list(similar_entities.values()),
+                        candidates=candidate_values,
                         is_object=is_object,
                     )
-                    updated_entity = self._normalize_entity_name(updated_entity)
-                    if re.sub(r"[^\w\s]", "", updated_entity) == "None":
+                    sanitized = self._sanitize_refine_output(
+                        raw_output, is_object=is_object
+                    )
+                    if sanitized:
+                        sanitized = self._normalize_entity_name(sanitized)
+
+                    # LLM kontratı: cevap ya adaylardan biri ya da "None" olmalı.
+                    # Sözleşme dışı her çıktı (boş, JSON kalıntısı, uyduruk isim)
+                    # orijinal entity'ye fallback eder.
+                    candidate_set = set(candidate_values)
+                    if (
+                        not sanitized
+                        or re.sub(r"[^\w\s]", "", sanitized) == "None"
+                        or sanitized not in candidate_set
+                    ):
                         updated_entity = entity
+                    else:
+                        updated_entity = sanitized
             else:
                 updated_entity = entity
 

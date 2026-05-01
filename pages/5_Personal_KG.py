@@ -25,6 +25,8 @@ logging.basicConfig(stream=sys.stderr)
 logger = logging.getLogger("PersonalKG")
 logger.setLevel(logging.INFO)
 
+ALIGNER_INTERFACE_VERSION = "structured-aligner-hierarchy-by-id-v1"
+
 
 st.set_page_config(
 	page_title="Wikontic", page_icon="media/wikotic-wo-text.png", layout="wide"
@@ -53,7 +55,13 @@ triplets_db = mongo_client.get_database(effective_profile.triplets_db_name)
 
 
 @st.cache_resource
-def _build_aligner(profile_id: str, ontology_db_name: str, triplets_db_name: str, embedding_model_name: str):
+def _build_aligner(
+	profile_id: str,
+	ontology_db_name: str,
+	triplets_db_name: str,
+	embedding_model_name: str,
+	interface_version: str,
+):
 	from src.wikontic.profiles import resolve_runtime_profile, ONTOLOGY_PROFILES, EMBEDDING_PROFILES
 	profile = st.session_state.get("active_runtime_profile", DEFAULT_RUNTIME_PROFILE)
 	return Aligner(
@@ -69,6 +77,7 @@ aligner = _build_aligner(
 	effective_profile.ontology_db_name,
 	effective_profile.triplets_db_name,
 	effective_profile.embedding_model_name,
+	ALIGNER_INTERFACE_VERSION,
 )
 
 def fetch_wikipedia_summary(name: str) -> str:

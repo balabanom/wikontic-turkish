@@ -20,6 +20,8 @@ logging.basicConfig(stream=sys.stderr)
 logger = logging.getLogger("QA")
 logger.setLevel(logging.ERROR)
 
+ALIGNER_INTERFACE_VERSION = "structured-aligner-hierarchy-by-id-v1"
+
 
 # Persist user_id across pages via session state.
 if "user_id" not in st.session_state:
@@ -50,7 +52,13 @@ effective_profile = (
 
 
 @st.cache_resource
-def _build_aligner(profile_id: str, ontology_db_name: str, triplets_db_name: str, embedding_model_name: str):
+def _build_aligner(
+	profile_id: str,
+	ontology_db_name: str,
+	triplets_db_name: str,
+	embedding_model_name: str,
+	interface_version: str,
+):
 	ontology_db = mongo_client.get_database(ontology_db_name)
 	triplets_db = mongo_client.get_database(triplets_db_name)
 	profile = st.session_state.get("active_runtime_profile", DEFAULT_RUNTIME_PROFILE)
@@ -67,6 +75,7 @@ aligner = _build_aligner(
 	effective_profile.ontology_db_name,
 	effective_profile.triplets_db_name,
 	effective_profile.embedding_model_name,
+	ALIGNER_INTERFACE_VERSION,
 )
 triplets_db = mongo_client.get_database(effective_profile.triplets_db_name)
 

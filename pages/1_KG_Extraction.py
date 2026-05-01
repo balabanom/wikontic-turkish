@@ -28,6 +28,8 @@ logging.basicConfig(stream=sys.stderr)
 logger = logging.getLogger("KGExtraction")
 logger.setLevel(logging.INFO)
 
+ALIGNER_INTERFACE_VERSION = "structured-aligner-hierarchy-by-id-v1"
+
 st.set_page_config(
     page_title="Wikontic", page_icon="media/wikotic-wo-text.png", layout="wide"
 )
@@ -305,7 +307,13 @@ _profile_ready = readiness is not None and readiness.ready
 
 # ── Aligner / DB — rebuilt per profile, cached in session state ───────────────
 @st.cache_resource(show_spinner="Loading embedding model...")
-def _build_aligner(profile_id: str, ontology_db_name: str, triplets_db_name: str, embedding_model_name: str):
+def _build_aligner(
+    profile_id: str,
+    ontology_db_name: str,
+    triplets_db_name: str,
+    embedding_model_name: str,
+    interface_version: str,
+):
     """Cache aligner per profile_id. Rebuilt automatically when profile changes."""
     od = mongo_client.get_database(ontology_db_name)
     td = mongo_client.get_database(triplets_db_name)
@@ -324,6 +332,7 @@ if _profile_ready:
         effective_profile.ontology_db_name,
         effective_profile.triplets_db_name,
         effective_profile.embedding_model_name,
+        ALIGNER_INTERFACE_VERSION,
     )
     triplets_db = mongo_client.get_database(effective_profile.triplets_db_name)
 else:

@@ -15,3 +15,10 @@ Select the most contextually appropriate object name from the Candidate Object l
 - If an exact or semantically appropriate match for object name is found, return the corresponding name exactly as it appears in the list.
 - If no suitable match for object exists, return the string "None".
 - Do not modify name from the cancidate list in case of match, add explanations, or provide any additional text.
+
+### Output format (strict)
+- Return ONLY the raw entity name as plain text.
+- Do NOT wrap your answer in quotes, backticks, or any delimiter.
+- Do NOT return JSON, dictionary, list, code block, or any structured format.
+- Do NOT echo the triplet structure (no "subject"/"relation"/"object" keys).
+- Your entire response must be either an exact match of one item from the Candidate Objects list, or the literal word: None
