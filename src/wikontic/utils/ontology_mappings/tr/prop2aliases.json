@@ -1,5 +1,9 @@
 {
-  "P1000": [],
+  "P1000": [
+    "sahip olunan rekor",
+    "kırılan rekor",
+    "elde edilen rekor"
+  ],
   "P1001": [
     "geçerli olduğu alan",
     "sorumlu olduğu alan",
@@ -10,13 +14,24 @@
     "yetkilerinin geçerli olduğu alan",
     "yetkilerinin geçerli olduğu yer"
   ],
-  "P10019": [],
+  "P10019": [
+    "üst rütbe takson karşılığı",
+    "üst düzey takson eşdeğeri"
+  ],
   "P1002": [
     "motor biçimi",
     "motor silindirlerinin konfigürasyonu"
   ],
-  "P10067": [],
-  "P10091": [],
+  "P10067": [
+    "istasyon melodisi",
+    "tren kalkış melodisi",
+    "peron melodisi"
+  ],
+  "P10091": [
+    "mortalite oranı",
+    "mortalite hızı",
+    "ölüm hızı"
+  ],
   "P101": [
     "disiplin",
     "akademik disiplini",
@@ -27,14 +42,14 @@
     "disiplini",
     "iş alanı",
     "iş sahası",
-    "konusu",
     "mütehassaslığı",
     "uzmanlığı"
   ],
-  "P10107": [],
+  "P10107": [
+    "özgül itki"
+  ],
   "P1011": [
     "bölümü için geçerli değil",
-    "dışında",
     "hariç",
     "haricinde",
     "içermez",
@@ -46,9 +61,12 @@
     "kapsadığı",
     "kapsar"
   ],
-  "P10129": [],
+  "P10129": [
+    "gizlilik işareti",
+    "güvenlik işareti",
+    "güvenlik damgası"
+  ],
   "P1013": [
-    "göre",
     "esas",
     "sırasıyla",
     "tarafından",
@@ -56,21 +74,36 @@
     "temel olarak",
     "ya da referans olarak"
   ],
-  "P10135": [],
-  "P1016": [],
-  "P10176": [],
+  "P10135": [
+    "kayıt yapılma tarihi",
+    "kayıt günü"
+  ],
+  "P1016": [
+    "asteroit sınıflandırması"
+  ],
+  "P10176": [
+    "tip konakçı",
+    "tip konak türü"
+  ],
   "P1018": [
     "dil düzenleyici kurum",
     "düzenleyici kurum"
   ],
   "P102": [
-    "partisi",
-    "siyasi partisi",
-    "üyeliği"
+    "partisi"
   ],
-  "P10209": [],
-  "P10228": [],
-  "P10229": [],
+  "P10209": [
+    "üçlü adedi",
+    "toplam üçlü sayısı"
+  ],
+  "P10228": [
+    "taşıdığı madde",
+    "taşınan madde"
+  ],
+  "P10229": [
+    "hiyerarşideki alt düzey",
+    "bir sonraki hiyerarşi düzeyi"
+  ],
   "P10241": [
     "takson için örnek",
     "taksona örnek bitki",
@@ -88,19 +121,30 @@
     "tez",
     "yüksek lisans tezi"
   ],
-  "P10263": [],
-  "P1027": [],
-  "P10273": [],
+  "P10263": [
+    "kabul kabul oranı",
+    "yerleşme oranı"
+  ],
+  "P1027": [
+    "veren",
+    "ödülü veren",
+    "tevcih eden"
+  ],
+  "P10273": [
+    "YAE",
+    "CPI",
+    "yolsuzluk algısı endeksi"
+  ],
   "P1028": [
     "bağışlayan",
     "bahşeden",
-    "hediye eden",
-    "veren"
+    "hediye eden"
   ],
-  "P10280": [],
+  "P10280": [
+    "fahri hemşehriler kategorisi"
+  ],
   "P1029": [
-    "mürettebat üyeleri",
-    "mürettebat üyesi"
+    "mürettebat üyeleri"
   ],
   "P10290": [
     "otele verilen yıldız",
@@ -115,18 +159,38 @@
     "yerel dili",
     "yerli dili"
   ],
-  "P10300": [],
-  "P10308": [],
-  "P10316": [],
+  "P10300": [
+    "orijinal ölçü için DPI",
+    "orijinal boyut çözünürlüğü"
+  ],
+  "P10308": [
+    "yayın müdürü",
+    "yayın sorumlusu",
+    "sorumlu yayın yönetmeni"
+  ],
+  "P10316": [
+    "a4 çözünürlük",
+    "a4 baskı çözünürlüğü"
+  ],
   "P1032": [
     "Dijital Haklar Yönetim sistemi",
     "DRM mekanizması",
     "DRM sistemi",
     "kopya koruma mekanizması"
   ],
-  "P10322": [],
-  "P1033": [],
-  "P10339": [],
+  "P10322": [
+    "kesede kalma süresi",
+    "torbada geçirilen süre",
+    "kesede kalış süresi"
+  ],
+  "P1033": [
+    "ghs uyarı kelimesi",
+    "ghs işaret kelimesi"
+  ],
+  "P10339": [
+    "anlamsal cins",
+    "semantik cinsiyet"
+  ],
   "P1034": [
     "aldığı gıda",
     "besin kaynağı",
@@ -142,13 +206,19 @@
     "onurlandırma eki",
     "saygınlık için son adı"
   ],
-  "P10367": [],
+  "P10367": [
+    "yol şeridi sayısı",
+    "şerit adedi"
+  ],
   "P1037": [
     "müdür",
-    "sanat yönetmeni",
     "yönetici"
   ],
-  "P10374": [],
+  "P10374": [
+    "hesaplamalı karmaşıklık",
+    "algoritmik karmaşıklık",
+    "işlem karmaşıklığı"
+  ],
   "P1038": [
     "aile üyeleri",
     "aile üyesi"
@@ -158,15 +228,21 @@
     "akrabalık ilişkisi"
   ],
   "P1040": [
-    "düzenleyen",
-    "editör"
+    "düzenleyen"
   ],
-  "P10408": [],
+  "P10408": [
+    "sırasında oluşturuldu",
+    "esnasında yaratıldı",
+    "sırasında üretildi"
+  ],
   "P1041": [
     "cpu soketi",
     "cpu yuvası"
   ],
-  "P10449": [],
+  "P10449": [
+    "çalıştırıcısı",
+    "antrenörü"
+  ],
   "P1046": [
     "bulunma şekli",
     "keşfedilme şekli",
@@ -174,7 +250,10 @@
     "nasıl keşfedildiği",
     "saptama yöntemi"
   ],
-  "P10476": [],
+  "P10476": [
+    "ayırt ediyor",
+    "tanımlayıcısıdır"
+  ],
   "P1049": [
     "tanrısı"
   ],
@@ -191,87 +270,212 @@
     "sağlık problemi",
     "tıbbi durumu"
   ],
-  "P10527": [],
+  "P10527": [
+    "belgelerin saklandığı yer",
+    "belge arşivi",
+    "dokümanların bulunduğu kurum"
+  ],
   "P1056": [
     "malzeme",
-    "üreticisi",
     "üretilir",
     "üretir",
     "ürettiği malzeme",
     "ürünler",
     "ürünleri"
   ],
-  "P10568": [],
+  "P10568": [
+    "bağlantı koruduğu",
+    "bağlantı sağladığı"
+  ],
   "P1057": [
     "kromozom"
   ],
-  "P10588": [],
-  "P10594": [],
+  "P10588": [
+    "akademik takvim sistemi",
+    "öğretim takvimi türü"
+  ],
+  "P10594": [
+    "taksonomik muamele",
+    "taksonomik ele alış"
+  ],
   "P106": [
     "becerisi",
     "hobisi",
-    "işi",
     "kariyeri",
     "profesyonelliği",
     "uğraşı",
-    "uzmanlığı",
     "zanaatı"
   ],
   "P1060": [
     "patojen bulaşma süreci"
   ],
-  "P10601": [],
-  "P10602": [],
-  "P10604": [],
-  "P10606": [],
-  "P10607": [],
-  "P10610": [],
-  "P10611": [],
-  "P10612": [],
-  "P10614": [],
-  "P10622": [],
-  "P10623": [],
-  "P10624": [],
-  "P10627": [],
-  "P10630": [],
-  "P10636": [],
+  "P10601": [
+    "ortak başvuran",
+    "ortak başvuru sahibi"
+  ],
+  "P10602": [
+    "başvurucu",
+    "başvuran kişi"
+  ],
+  "P10604": [
+    "alman sicil türü",
+    "almanya sicil tipi"
+  ],
+  "P10606": [
+    "önemli rol",
+    "meşhur rol",
+    "bilinen rol",
+    "ikonik rol"
+  ],
+  "P10607": [
+    "okul atletizm programı",
+    "spor programı"
+  ],
+  "P10610": [
+    "öğretmen mevcudu",
+    "okuldaki öğretmen sayısı"
+  ],
+  "P10611": [
+    "sertifikası var",
+    "sertifikalandırma",
+    "belgelendirme"
+  ],
+  "P10612": [
+    "koreografi eseri",
+    "koreografisi yapıldığı eser"
+  ],
+  "P10614": [
+    "yüzeyi",
+    "dış yüzeyi"
+  ],
+  "P10622": [
+    "kişi başı gelir",
+    "fert başına gelir",
+    "kişi başına ortalama gelir",
+    "kişi başı ortalama gelir"
+  ],
+  "P10623": [
+    "bağışçı sayısı",
+    "kan verici sayısı"
+  ],
+  "P10624": [
+    "gözlemci statüsü veren örgüt",
+    "gözlemci üyelik veren kuruluş"
+  ],
+  "P10627": [
+    "web arayüzü yazılımı",
+    "web ön yüz yazılımı"
+  ],
+  "P10630": [
+    "tıbbi endikasyon",
+    "endikasyon",
+    "kullanım endikasyonu"
+  ],
+  "P10636": [
+    "konferans adedi",
+    "düzenlenen konferans sayısı"
+  ],
   "P1064": [
     "hat açıklığı"
   ],
-  "P10640": [],
-  "P10642": [],
-  "P10645": [],
-  "P10648": [],
-  "P10649": [],
-  "P10650": [],
-  "P10651": [],
-  "P10654": [],
-  "P10659": [],
+  "P10640": [
+    "pole sayısı",
+    "ilk sıra sayısı",
+    "pole pozisyon adedi"
+  ],
+  "P10642": [
+    "kayboluş yeri",
+    "ortadan kaybolma yeri"
+  ],
+  "P10645": [
+    "bağlı olduğu makam",
+    "rapor verdiği pozisyon",
+    "üst pozisyon"
+  ],
+  "P10648": [
+    "kürsü sayısı",
+    "podyum sayısı"
+  ],
+  "P10649": [
+    "beğeni",
+    "favori sayısı",
+    "olumlu oy sayısı",
+    "yıldız sayısı"
+  ],
+  "P10650": [
+    "beğenmeme"
+  ],
+  "P10651": [
+    "yorumların sayısı"
+  ],
+  "P10654": [
+    "dişli çark sistemi",
+    "kremayer sistemi"
+  ],
+  "P10659": [
+    "kazanılan madalya sayısı",
+    "madalya adedi"
+  ],
   "P1066": [
     "akademik danışmanı",
     "akıl hocası",
     "eğitmeni",
-    "gözetmeni",
     "hocası",
     "öğreten kişi",
     "öğretmeni",
     "özel öğretmeni",
     "profesörü"
   ],
-  "P10661": [],
-  "P10663": [],
-  "P10664": [],
-  "P10672": [],
-  "P10673": [],
-  "P10676": [],
+  "P10661": [
+    "sergilenen eser sanatçısı",
+    "sergi eseri yaratıcısı"
+  ],
+  "P10663": [
+    "geçerli olduğu eser",
+    "ilgili eser"
+  ],
+  "P10664": [
+    "film müzikleri",
+    "soundtrack parçaları",
+    "yer alan şarkılar"
+  ],
+  "P10672": [
+    "işlenen ham madde",
+    "kullanılan hammadde",
+    "girdi maddesi"
+  ],
+  "P10673": [
+    "debüt tarihi",
+    "çıkış tarihi",
+    "ilk sahne tarihi"
+  ],
+  "P10676": [
+    "referans sayısı",
+    "atıf sayısı",
+    "kaynakça sayısı"
+  ],
   "P1068": [
     "ISA",
     "Mimari"
   ],
-  "P10680": [],
-  "P10681": [],
-  "P10685": [],
-  "P10695": [],
+  "P10680": [
+    "imtiyaz veren",
+    "franchise veren",
+    "bayilik veren"
+  ],
+  "P10681": [
+    "borç/GSYİH oranı",
+    "kamu borcu GSYİH oranı",
+    "devlet borcunun GSYH'ye oranı"
+  ],
+  "P10685": [
+    "iyon yarıçapı"
+  ],
+  "P10695": [
+    "ilk tanıtıldığı eser",
+    "ilk kez yer aldığı eser",
+    "ilk geçtiği eser"
+  ],
   "P1071": [
     "en son yapıldığı yer",
     "son kurgu konumu",
@@ -281,13 +485,24 @@
     "son monte edildiği yer",
     "son monte yeri"
   ],
-  "P10714": [],
+  "P10714": [
+    "VikiProje önem sıralaması",
+    "VikiProje önem puanı",
+    "proje önem derecesi"
+  ],
   "P1072": [
     "dosya formatını okur",
     "okuyabilir"
   ],
-  "P10726": [],
-  "P10729": [],
+  "P10726": [
+    "öge dışı değer sınıfı",
+    "öge olmayan değerin sınıfı"
+  ],
+  "P10729": [
+    "bitirici hamle",
+    "bitirici hareket",
+    "finisher hareketi"
+  ],
   "P1073": [
     "dosya formatını yazar",
     "yazabilir"
@@ -296,31 +511,66 @@
     "kurgusal benzeri",
     "kurgusal sürümü"
   ],
-  "P10741": [],
-  "P1075": [],
-  "P10751": [],
-  "P10752": [],
-  "P10754": [],
-  "P10756": [],
-  "P10764": [],
-  "P10768": [],
+  "P10741": [
+    "dans türü",
+    "dans biçimi"
+  ],
+  "P1075": [
+    "rektör"
+  ],
+  "P10751": [
+    "dik açıklık özdevinim bileşeni",
+    "sapma özdevinim bileşeni"
+  ],
+  "P10752": [
+    "sağ açıklık özdevinim bileşeni",
+    "RA özdevinim bileşeni"
+  ],
+  "P10754": [
+    "dağıtım noktası",
+    "dağıtım kaynağı"
+  ],
+  "P10756": [
+    "yeniden paylaşım miktarı",
+    "repost sayısı",
+    "retweet sayısı",
+    "paylaşım sayısı"
+  ],
+  "P10764": [
+    "yük numarası",
+    "elektrik yük sayısı"
+  ],
+  "P10768": [
+    "Similarweb sırası",
+    "Similarweb küresel sıralaması"
+  ],
   "P1078": [
     "valvetrain konfigürasyonu"
   ],
-  "P10786": [],
-  "P10788": [],
+  "P10786": [
+    "kuruluş tescil tarihi",
+    "şirket tescil tarihi",
+    "tüzel kişilik kazanma tarihi"
+  ],
+  "P10788": [
+    "çalıştığı hat",
+    "sefer yaptığı hat",
+    "hizmet hattı"
+  ],
   "P1079": [
     "fırlatma kuruluşu",
     "fırlatma kurumu"
   ],
-  "P10795": [],
+  "P10795": [
+    "bağ sayısı",
+    "ligand sayısı"
+  ],
   "P108": [
     "işyeri",
     "çalıştı",
     "çalıştığı yer",
     "için çalışıyor",
     "iş sahibi",
-    "iş yeri",
     "işyeri sahibi"
   ],
   "P1080": [
@@ -331,69 +581,149 @@
     "hikayenin geçtiği evren",
     "varlığın geldiği kurgusal evren"
   ],
-  "P10806": [],
-  "P10808": [],
-  "P10809": [],
+  "P10806": [
+    "orkestra düzenlemecisi",
+    "orkestra düzenleyicisi",
+    "düzenleyici"
+  ],
+  "P10808": [
+    "bir önceki istasyon",
+    "bir önceki durak"
+  ],
+  "P10809": [
+    "bir sonraki istasyon",
+    "bir sonraki durak"
+  ],
   "P1081": [
     "İGE",
     "İnsani Gelişim İndeksi"
   ],
-  "P10814": [],
-  "P10818": [],
+  "P10814": [
+    "mesken sayısı"
+  ],
+  "P10818": [
+    "son kabul saati",
+    "son giriş zamanı",
+    "kapanış öncesi son giriş"
+  ],
   "P1082": [
     "popülasyon",
     "sakinleri",
     "toplam sayı"
   ],
-  "P10823": [],
+  "P10823": [
+    "en hızlı tur sayısı",
+    "en iyi tur sayısı"
+  ],
   "P1083": [
-    "koltuk sayısı",
     "oturma kapasitesi"
   ],
-  "P10836": [],
-  "P10837": [],
+  "P10836": [
+    "mürekkep sanatçısı",
+    "çini sanatçısı",
+    "mürekkep çizeri"
+  ],
+  "P10837": [
+    "kurşun kalem sanatçısı",
+    "karakalem çizeri",
+    "eskiz sanatçısı",
+    "çizim sanatçısı"
+  ],
   "P1086": [
     "atomik numara",
     "proton numarası",
     "proton sayısı",
     "Z"
   ],
-  "P1087": [],
+  "P1087": [
+    "elo puanı",
+    "elo derecesi",
+    "elo katsayısı"
+  ],
   "P1088": [
     "mineral sertliği",
-    "sertliği",
-    "sertlik"
+    "sertliği"
   ],
-  "P10888": [],
-  "P10893": [],
-  "P10894": [],
-  "P1090": [],
-  "P10906": [],
-  "P1092": [],
-  "P10927": [],
+  "P10888": [
+    "alt istatistiki bölge",
+    "içerdiği istatistiki bölge",
+    "istatistiki alt birim"
+  ],
+  "P10893": [
+    "kayıt eden",
+    "ses kayıtçısı",
+    "kaydı yapan kişi"
+  ],
+  "P10894": [
+    "ses sahibi"
+  ],
+  "P1090": [
+    "kırmızıya kayma",
+    "redshift",
+    "z değeri"
+  ],
+  "P10906": [
+    "yaprak tipi",
+    "yapraklanma türü",
+    "yaprak dökme tipi"
+  ],
+  "P1092": [
+    "üretim miktarı",
+    "üretilen miktar",
+    "toplam üretim miktarı"
+  ],
+  "P10927": [
+    "sayılan örnekler",
+    "saydığı birimler"
+  ],
   "P1093": [
     "gemi gros tonajı",
     "gros tonajı"
   ],
-  "P10946": [],
+  "P10946": [
+    "kontrendikasyon",
+    "sakıncalı durum",
+    "kullanımı sakıncalı durum"
+  ],
   "P1096": [
     "eksantriklik"
   ],
-  "P10960": [],
-  "P1097": [],
+  "P10960": [
+    "hasat edilen türler",
+    "avlanan organizmalar",
+    "toplanan organizmalar"
+  ],
+  "P1097": [
+    "g çarpanı",
+    "landé faktörü",
+    "landé çarpanı"
+  ],
   "P1098": [
     "dili konuşanlar",
     "konuşmacı sayısı"
   ],
-  "P1099": [],
-  "P10994": [],
+  "P1099": [
+    "direk adedi",
+    "gemi direği sayısı"
+  ],
+  "P10994": [
+    "kenya film sınıflandırması",
+    "kfcb derecelendirmesi"
+  ],
   "P110": [
     "çizeri",
     "resim çizeri",
     "tarafından çizildi"
   ],
-  "P1100": [],
-  "P1101": [],
+  "P1100": [
+    "silindir adedi",
+    "motor silindir sayısı"
+  ],
+  "P1101": [
+    "yer üstü kat sayısı",
+    "zemin üstü kat sayısı",
+    "zemin üzeri katlar"
+  ],
   "P1102": [
     "basıklık",
     "elips şekli"
@@ -401,16 +731,27 @@
   "P1103": [
     "raylar"
   ],
-  "P11035": [],
-  "P1104": [],
+  "P11035": [
+    "çaprazlama sayısı",
+    "düğüm çaprazlama sayısı"
+  ],
+  "P1104": [
+    "sayfa adedi",
+    "toplam sayfa sayısı"
+  ],
   "P11053": [
     "gramatik kişi"
   ],
-  "P11054": [],
-  "P1106": [],
+  "P11054": [
+    "dilbilgisel sayı",
+    "sayı kategorisi"
+  ],
+  "P1106": [
+    "miktar deneme alanı",
+    "nicelik deneme tahtası"
+  ],
   "P1107": [
     "%",
-    "bölümü",
     "nispeti",
     "orantısı",
     "payı",
@@ -420,29 +761,44 @@
     "uyumu",
     "yüzdesi"
   ],
-  "P1108": [],
-  "P11081": [],
+  "P1108": [
+    "elektron çekme eğilimi"
+  ],
+  "P11081": [
+    "alınan setler",
+    "kazanılan set sayısı"
+  ],
   "P1109": [
     "sapma indisi"
   ],
   "P111": [
-    "miktarı",
-    "fiziksel niceliği",
-    "niteliği",
-    "ölçüsü"
+    "fiziksel niceliği"
   ],
   "P1110": [
     "katılan(ların) sayısı",
-    "katılım",
-    "katılım sayısı",
     "katılımcı sayısı",
     "seyirci sayısı",
     "seyirciler"
   ],
-  "P11105": [],
-  "P11106": [],
-  "P11108": [],
-  "P1111": [],
+  "P11105": [
+    "açıklamacı",
+    "şerh yazarı",
+    "notlandıran"
+  ],
+  "P11106": [
+    "abecesel dizin",
+    "alfabetik fihrist",
+    "harf dizini"
+  ],
+  "P11108": [
+    "kayda alınan katılımcı",
+    "kayıtlı iştirakçi"
+  ],
+  "P1111": [
+    "alınan oy",
+    "oy sayısı",
+    "aldığı oy sayısı"
+  ],
   "P1113": [
     "bölümler"
   ],
@@ -454,13 +810,25 @@
     "toplam sayısı",
     "tutarı"
   ],
-  "P11140": [],
-  "P11146": [],
+  "P11140": [
+    "ambargo süresi",
+    "erişim ambargosu",
+    "ambargo tarihi"
+  ],
+  "P11146": [
+    "koleksiyon barındıran kurum",
+    "eserlerin bulunduğu kurum",
+    "koleksiyonun saklandığı yer"
+  ],
   "P1117": [
     "asit ayrışma sabiti",
     "pKa"
   ],
-  "P11197": [],
+  "P11197": [
+    "yapılandırma sistemi",
+    "inşa sistemi",
+    "derleme aracı"
+  ],
   "P112": [
     "kuranlar",
     "kurucuları",
@@ -486,19 +854,36 @@
     "spin (fizik)",
     "spin (kuantum mekaniği)"
   ],
-  "P11220": [],
+  "P11220": [
+    "meyvenin rengi"
+  ],
   "P1123": [
     "parite"
   ],
-  "P11231": [],
+  "P11231": [
+    "biyolojik taşıyıcısı",
+    "hastalık vektörü",
+    "taşıyıcı canlı"
+  ],
   "P1125": [
     "Gini dağılımı ölçüsü",
     "Gini ortak etmeni"
   ],
-  "P1126": [],
-  "P11260": [],
-  "P1127": [],
-  "P11279": [],
+  "P1126": [
+    "izospin sayısı"
+  ],
+  "P11260": [
+    "liste elemanı",
+    "liste ögesi"
+  ],
+  "P1127": [
+    "izospin z bileşeni kuantum sayısı"
+  ],
+  "P11279": [
+    "miktarını gösterir",
+    "sayısını gösterir",
+    "adedini belirtir"
+  ],
   "P1128": [
     "çalışan miktarı",
     "çalışanı",
@@ -525,15 +910,31 @@
   "P1135": [
     "nomenklatural durum"
   ],
-  "P11356": [],
+  "P11356": [
+    "notlandırma sistemi",
+    "değerlendirme sistemi",
+    "puanlama sistemi",
+    "not verme sistemi"
+  ],
   "P1136": [
     "çözen kişi",
     "çözümleyen",
     "tarafından çözüldü"
   ],
-  "P1137": [],
-  "P11385": [],
-  "P11387": [],
+  "P1137": [
+    "bulunan fosiller",
+    "fosil kalıntıları"
+  ],
+  "P11385": [
+    "objektif",
+    "lens",
+    "fotoğraf objektifi"
+  ],
+  "P11387": [
+    "görüntü işleme çipi",
+    "görüntü işlem birimi",
+    "resim işlemcisi"
+  ],
   "P1139": [
     "bodrum katları",
     "yer altı katları",
@@ -548,9 +949,20 @@
     "CPU çekirdekleri",
     "işlemci çekirdekleri"
   ],
-  "P11412": [],
-  "P11413": [],
-  "P11415": [],
+  "P11412": [
+    "minimum odak mesafesi",
+    "asgari odaklama mesafesi",
+    "en kısa odak mesafesi"
+  ],
+  "P11413": [
+    "örnekleme frekansı",
+    "örnekleme oranı"
+  ],
+  "P11415": [
+    "titreşim önleyici",
+    "sarsıntı önleyici",
+    "görüntü stabilizatörü"
+  ],
   "P1142": [
     "desteklediği ideoloji",
     "ideolojisi",
@@ -562,18 +974,33 @@
     "sahip olduğu politik ideoloji",
     "siyasal görüşü",
     "siyasal ideolojisi",
-    "siyasi görüşü",
     "siyasi ideolojisi"
   ],
-  "P11424": [],
+  "P11424": [
+    "servis türü",
+    "hizmet seçenekleri",
+    "sunum seçenekleri"
+  ],
   "P1145": [
     "kütüphane noktası",
     "L noktası"
   ],
-  "P11463": [],
-  "P1148": [],
-  "P11484": [],
-  "P11491": [],
+  "P11463": [
+    "seyahat uyarı seviyesi",
+    "seyahat tavsiyesi kategorisi"
+  ],
+  "P1148": [
+    "nötron sayısı"
+  ],
+  "P11484": [
+    "kullanılmaz",
+    "kullanmadığı"
+  ],
+  "P11491": [
+    "Roma tribusu",
+    "mensup olduğu Roma kabilesi",
+    "Roma tribusu üyeliği"
+  ],
   "P115": [
     "arenası",
     "basketbol sahası",
@@ -591,31 +1018,94 @@
     "ana portali",
     "portal"
   ],
-  "P11547": [],
-  "P11558": [],
+  "P11547": [
+    "mutlu gezegen indeksi",
+    "HPI puanı"
+  ],
+  "P11558": [
+    "dijital eşdeğeri",
+    "sayısal karşılığı",
+    "sayısal eşdeğeri"
+  ],
   "P1158": [
     "uzay aracı iniş yeri",
     "uzay gemisi iniş yeri"
   ],
-  "P11590": [],
-  "P11593": [],
-  "P11603": [],
-  "P11611": [],
-  "P11633": [],
-  "P1164": [],
+  "P11590": [
+    "pul delikleri",
+    "pul perforasyonu",
+    "tırtıl"
+  ],
+  "P11593": [
+    "eşitsizliğe göre düzeltilmiş İGE",
+    "EGİGE",
+    "IHDI"
+  ],
+  "P11603": [
+    "istinsah kâtibi",
+    "müstensih",
+    "kopya eden"
+  ],
+  "P11611": [
+    "norveç yaş sınırlaması",
+    "norveç film derecelendirmesi"
+  ],
+  "P11633": [
+    "birlikte düzenlenen",
+    "eş konumlu etkinlik",
+    "aynı yerde düzenlenen"
+  ],
+  "P1164": [
+    "grubun mertebesi",
+    "grup mertebesi",
+    "grup eleman sayısı"
+  ],
   "P1165": [
     "gezegen"
   ],
-  "P11698": [],
-  "P1170": [],
-  "P1171": [],
-  "P11738": [],
-  "P1174": [],
-  "P11747": [],
-  "P11785": [],
-  "P11796": [],
-  "P11797": [],
-  "P11799": [],
+  "P11698": [
+    "öğrenci tutma oranı",
+    "öğrenci devam oranı"
+  ],
+  "P1170": [
+    "yayılan sinyal türü",
+    "gönderilen sinyal tipi"
+  ],
+  "P1171": [
+    "yaklaşıklama algoritması",
+    "yaklaşık değer algoritması"
+  ],
+  "P11738": [
+    "ele alan",
+    "hafifleten",
+    "çözüm yolu"
+  ],
+  "P1174": [
+    "yıllık ziyaretçi sayısı",
+    "yılda gelen ziyaretçi",
+    "yıllık ziyaret sayısı"
+  ],
+  "P11747": [
+    "diplomatik pasaport verildiği ülke",
+    "diplomatik pasaport ülkesi"
+  ],
+  "P11785": [
+    "ikonik gönderme",
+    "ikonik olarak gönderdiği",
+    "ikonik temsil"
+  ],
+  "P11796": [
+    "günberi zamanı",
+    "periapsis geçiş zamanı"
+  ],
+  "P11797": [
+    "kimlik eşleşme kaynağı"
+  ],
+  "P11799": [
+    "paralel evren karşılığı",
+    "alternatif evrendeki hâli",
+    "paralel evren muadili"
+  ],
   "P118": [
     "lig",
     "bölümü",
@@ -629,27 +1119,69 @@
     "takım ligi",
     "takımının ligi"
   ],
-  "P11801": [],
+  "P11801": [
+    "ziyaretçi canlılar",
+    "bitkiyi ziyaret eden",
+    "ziyaretçi türler"
+  ],
   "P1181": [
     "değer",
     "sayısal ölçeği"
   ],
-  "P11811": [],
-  "P11812": [],
-  "P11813": [],
-  "P11814": [],
-  "P11821": [],
-  "P11849": [],
-  "P11851": [],
-  "P11868": [],
-  "P11889": [],
-  "P11899": [],
+  "P11811": [
+    "eski sahibi",
+    "bir önceki sahibi",
+    "önceki maliki"
+  ],
+  "P11812": [
+    "yeni sahibi",
+    "bir sonraki sahibi",
+    "sonraki maliki"
+  ],
+  "P11813": [
+    "çözünürlük çarpımı",
+    "Ksp",
+    "çözünürlük dengesi sabiti"
+  ],
+  "P11814": [
+    "finansman hibesi",
+    "destekleyen hibe",
+    "fon sağlayan hibe"
+  ],
+  "P11821": [
+    "sürecin ürettiği nitelik",
+    "sürecin sonucu",
+    "süreç çıktısı niteliği"
+  ],
+  "P11849": [
+    "ilk seslendiren",
+    "eseri ilk yorumlayan",
+    "ilk yorumcu",
+    "eserin ilk icracısı"
+  ],
+  "P11851": [
+    "kaydını tuttuğu",
+    "belgesi olduğu",
+    "kaydettiği olay"
+  ],
+  "P11868": [
+    "arşiv belge türü",
+    "saklanan belge türü"
+  ],
+  "P11889": [
+    "otomatik tamamlama değeri",
+    "öneri değeri",
+    "otomatik öneri"
+  ],
+  "P11899": [
+    "medyan hane geliri",
+    "ortanca hane geliri",
+    "hane geliri ortancası"
+  ],
   "P119": [
     "dinlenme yeri",
     "gömüldüğü yer",
     "istirahatgâhı",
-    "mezar yeri",
-    "mezarı",
     "mezarlığı"
   ],
   "P1191": [
@@ -658,45 +1190,109 @@
   "P1192": [
     "bağlantı hizmeti"
   ],
-  "P11922": [],
-  "P1193": [],
-  "P1194": [],
-  "P11950": [],
-  "P11951": [],
+  "P11922": [
+    "mahkeme kararı",
+    "yargı kararı"
+  ],
+  "P1193": [
+    "prevalans",
+    "hastalık yaygınlığı"
+  ],
+  "P1194": [
+    "aldığı sinyal türü",
+    "alınan sinyal"
+  ],
+  "P11950": [
+    "bu fonolojik özellikten önce gelir",
+    "ardından gelen sesbilimsel özellik"
+  ],
+  "P11951": [
+    "bu fonolojik özellikten sonra gelir",
+    "öncesinde gelen sesbilimsel özellik"
+  ],
   "P1196": [
     "ölüm tipi",
     "ölüm türü"
   ],
-  "P11964": [],
-  "P1198": [],
-  "P1199": [],
+  "P11964": [
+    "müsabaka türü",
+    "yarışma türü",
+    "turnuva kategorisi"
+  ],
+  "P1198": [
+    "işsizlik haddi",
+    "işsizlik yüzdesi"
+  ],
+  "P1199": [
+    "kalıtım şekli",
+    "kalıtım biçimi",
+    "aktarım şekli",
+    "soydan geçiş biçimi"
+  ],
   "P1200": [
     "havzasına ait kategori"
   ],
-  "P12002": [],
-  "P12004": [],
-  "P12006": [],
+  "P12002": [
+    "mirasçısı",
+    "varisi",
+    "mirasçıları"
+  ],
+  "P12004": [
+    "çekme kapasitesi",
+    "römork çekme kapasitesi",
+    "çekiş gücü"
+  ],
+  "P12006": [
+    "öğrenme çıktısı",
+    "öğrenim kazanımı",
+    "eğitim kazanımı"
+  ],
   "P1201": [
     "yük dağıtıcısı"
   ],
-  "P12011": [],
+  "P12011": [
+    "aşiret",
+    "boy",
+    "kavim"
+  ],
   "P1202": [
     "bilimsel aletler",
     "ölçüm ekipmanı",
     "ölçüm ekipmanları"
   ],
-  "P12020": [],
-  "P1204": [],
-  "P12041": [],
-  "P12044": [],
+  "P12020": [
+    "aktarım durumu",
+    "iletilme durumu"
+  ],
+  "P1204": [
+    "Wikimedia portali ana konusu",
+    "portal ana konusu"
+  ],
+  "P12041": [
+    "müzik notasyonu türü",
+    "nota yazım türü",
+    "nota sistemi"
+  ],
+  "P12044": [
+    "kronolojik tarihlendirme",
+    "kronolojik tarih",
+    "zamansal gösterim"
+  ],
   "P12050": [
     "neyin deneme sürümü"
   ],
-  "P12081": [],
+  "P12081": [
+    "DSÖ Aware kategorisi",
+    "WHO Aware sınıflandırması"
+  ],
   "P12095": [
     "fon"
   ],
-  "P12099": [],
+  "P12099": [
+    "ana form",
+    "etkin madde ana yapısı",
+    "ana kimyasal form"
+  ],
   "P121": [
     "çalıştırdıkları",
     "filoda bulunan araçlar",
@@ -716,13 +1312,23 @@
   "P1210": [
     "turbo şarj cihazı"
   ],
-  "P12105": [],
-  "P1211": [],
-  "P12132": [],
+  "P12105": [
+    "Güney Afrika Bitkileri Kırmızı Liste durumu"
+  ],
+  "P1211": [
+    "yakıt besleme sistemi",
+    "yakıt ikmal sistemi"
+  ],
+  "P12132": [
+    "kaynağa göre aktaran"
+  ],
   "P1215": [
     "görünür büyüklüğü"
   ],
-  "P12168": [],
+  "P12168": [
+    "torino skalası",
+    "torino derecesi"
+  ],
   "P122": [
     "devlet biçimi",
     "devlet şekli",
@@ -736,8 +1342,15 @@
     "hükûmet türü",
     "yönetim şekli"
   ],
-  "P12208": [],
-  "P1221": [],
+  "P12208": [
+    "aksi örnek",
+    "karşı örnek"
+  ],
+  "P1221": [
+    "sıkıştırıcı tipi",
+    "kompresör türü",
+    "sıkıştırıcı türü"
+  ],
   "P12221": [
     "batarya ömrü"
   ],
@@ -752,11 +1365,13 @@
     "yayım evi",
     "yayımevi",
     "yayın evi",
-    "yayıncı",
     "yayınevi",
     "yazılım yayımcısı"
   ],
-  "P12322": [],
+  "P12322": [
+    "altta yatan yapı",
+    "temel yapı"
+  ],
   "P12323": [
     "bellek tipi"
   ],
@@ -773,37 +1388,131 @@
     "öykünür",
     "taklit eder"
   ],
-  "P12330": [],
-  "P12363": [],
-  "P12413": [],
-  "P12417": [],
-  "P12432": [],
-  "P12439": [],
-  "P12443": [],
-  "P12446": [],
-  "P12452": [],
-  "P12456": [],
-  "P12457": [],
-  "P12469": [],
-  "P1247": [],
-  "P12470": [],
-  "P12471": [],
-  "P12475": [],
-  "P12476": [],
-  "P12484": [],
+  "P12330": [
+    "filipin göbek adı",
+    "filipinli orta ad"
+  ],
+  "P12363": [
+    "katipliğini yaptığı",
+    "hakim katipliği"
+  ],
+  "P12413": [
+    "müracaat tarihi",
+    "başvuru günü"
+  ],
+  "P12417": [
+    "çevresel performans indeksi",
+    "EPI",
+    "EPI endeksi"
+  ],
+  "P12432": [
+    "üreme olgunluğu yaşı",
+    "eşeysel olgunluk yaşı",
+    "cinsel olgunluk yaşı"
+  ],
+  "P12439": [
+    "mülki rütbe",
+    "sivil unvan"
+  ],
+  "P12443": [
+    "bakanlar kurulu",
+    "hükümeti",
+    "kabine"
+  ],
+  "P12446": [
+    "ISCED eğitim alanı",
+    "ISCED sınıflandırma alanı"
+  ],
+  "P12452": [
+    "üst mahkeme",
+    "itiraz mercii",
+    "temyiz makamı"
+  ],
+  "P12456": [
+    "fonogram telif hakkı sahibi",
+    "ses kaydı telif hakkı sahibi"
+  ],
+  "P12457": [
+    "altında değişmez",
+    "etkilenmeyen",
+    "değişmeden kalır"
+  ],
+  "P12469": [
+    "mezun olma oranı",
+    "mezun oranı"
+  ],
+  "P1247": [
+    "motor sıkıştırma oranı",
+    "silindir sıkıştırma oranı"
+  ],
+  "P12470": [
+    "standart mezuniyet süresi",
+    "normal öğrenim süresi",
+    "beklenen mezuniyet süresi"
+  ],
+  "P12471": [
+    "mezuniyet süresi katsayısı",
+    "normal öğrenim süresi çarpanı"
+  ],
+  "P12475": [
+    "en çok gol atan",
+    "gol lideri",
+    "krallık"
+  ],
+  "P12476": [
+    "filial kilise",
+    "bağlı şapel",
+    "tali kilise"
+  ],
+  "P12484": [
+    "yarışma jürisi",
+    "televizyon jüri üyesi",
+    "tv jürisi"
+  ],
   "P1249": [
     "hakkındaki ilk yazılı kayıt tarihi",
     "yazılı olarak ilk bahsedildiği zaman"
   ],
-  "P12503": [],
-  "P12504": [],
-  "P12505": [],
-  "P12506": [],
-  "P12516": [],
-  "P12526": [],
-  "P12548": [],
-  "P12549": [],
-  "P12571": [],
+  "P12503": [
+    "tezaurus ana konusu",
+    "tezaurusun asıl konusu"
+  ],
+  "P12504": [
+    "tezaurusun birleştirdiği konular",
+    "tezaurus kesişim konuları"
+  ],
+  "P12505": [
+    "konunun temel tezaurusu",
+    "ana tezaurus"
+  ],
+  "P12506": [
+    "en son bitiş tarihi",
+    "olası en geç bitiş",
+    "nihai bitiş tarihi"
+  ],
+  "P12516": [
+    "kilim stili",
+    "halı tarzı",
+    "kilim tarzı"
+  ],
+  "P12526": [
+    "uygulayıcı kuruluş",
+    "yürütücü kuruluş",
+    "icracı kurum"
+  ],
+  "P12548": [
+    "ortam modalitesi",
+    "medya biçimi",
+    "ortam biçimi"
+  ],
+  "P12549": [
+    "harflerin yüksekliği",
+    "yazı yüksekliği"
+  ],
+  "P12571": [
+    "temel birim kaynağı",
+    "türetildiği birim"
+  ],
   "P126": [
     "bakımcı",
     "geçindiren",
@@ -815,73 +1524,188 @@
     "yöneticisi",
     "yönetimi"
   ],
-  "P12616": [],
-  "P12617": [],
-  "P12621": [],
+  "P12616": [
+    "yaprak biçimi",
+    "yaprak şekli",
+    "yaprak yapısı"
+  ],
+  "P12617": [
+    "yaratıcı yönetmen",
+    "kreatif yönetmen",
+    "yaratıcı direktör"
+  ],
+  "P12621": [
+    "nihai faydalanıcı",
+    "asıl sahip",
+    "nihai sahip",
+    "gerçek sahip"
+  ],
   "P1264": [
     "geçerlilik dönemi",
     "tarih süresi",
     "uygulama süresi",
-    "uygulanabilirlik süresi",
-    "zamanı"
+    "uygulanabilirlik süresi"
   ],
-  "P12642": [],
-  "P12643": [],
-  "P12649": [],
-  "P12650": [],
-  "P12651": [],
-  "P12655": [],
-  "P12657": [],
-  "P12663": [],
+  "P12642": [
+    "faiz vergi amortisman öncesi kâr",
+    "faiz amortisman ve vergi öncesi kâr"
+  ],
+  "P12643": [
+    "yaygınlaşma tarihi",
+    "tanınma tarihi",
+    "bilinirlik tarihi"
+  ],
+  "P12649": [
+    "kabul edilen bildiri sayısı",
+    "onaylanan katkı sayısı",
+    "kabul edilen sunum sayısı"
+  ],
+  "P12650": [
+    "oy pusulası sembolü",
+    "parti sembolü",
+    "seçim amblemi"
+  ],
+  "P12651": [
+    "yetkilendirilmiş sermaye",
+    "izinli sermaye",
+    "tescilli sermaye"
+  ],
+  "P12655": [
+    "gönderilen bildiri sayısı",
+    "sunulan bildiri sayısı",
+    "başvuru adedi"
+  ],
+  "P12657": [
+    "yazım kalıbı",
+    "imla örüntüsü",
+    "yazım kuralı"
+  ],
+  "P12663": [
+    "biyogüvenlik risk grubu",
+    "tehlike grubu"
+  ],
   "P1268": [
     "organizasyon temsilcisi"
   ],
-  "P12680": [],
-  "P12686": [],
-  "P12687": [],
+  "P12680": [
+    "yıpranma",
+    "bozunma",
+    "hasar türü",
+    "tahribat"
+  ],
+  "P12686": [
+    "bu dönemde doğanlar kategorisi",
+    "dönem doğumları kategorisi"
+  ],
+  "P12687": [
+    "bu dönemde ölenler kategorisi",
+    "dönem ölüm kategorisi"
+  ],
   "P1269": [
     "alt konu",
     "alt ögesi",
     "ana konu",
     "görünümü",
-    "görünüşü",
     "gösterildiği yer",
-    "tarafı",
-    "yönü",
-    "yüzü",
-    "konusu"
+    "yüzü"
   ],
-  "P12692": [],
-  "P12693": [],
-  "P12694": [],
+  "P12692": [
+    "gösterim türü",
+    "tasvir türü"
+  ],
+  "P12693": [
+    "aktarım kaynak varlığı",
+    "transfer kaynağı",
+    "kaynak varlık"
+  ],
+  "P12694": [
+    "aktarım hedef varlığı",
+    "transfer hedefi",
+    "hedef varlık"
+  ],
   "P127": [
     "ait",
     "aittir",
     "hissedarı",
     "hissedarları",
-    "kaynağı",
     "kaynakları",
     "sahipleri"
   ],
-  "P12712": [],
-  "P12714": [],
-  "P12763": [],
-  "P12764": [],
-  "P12765": [],
-  "P12766": [],
-  "P1279": [],
-  "P12795": [],
-  "P128": [],
-  "P1283": [],
-  "P12830": [],
-  "P12853": [],
-  "P12876": [],
-  "P12878": [],
-  "P12895": [],
+  "P12712": [
+    "ana diline göre nüfus",
+    "anadil nüfusu",
+    "anadile göre nüfus"
+  ],
+  "P12714": [
+    "tartan",
+    "ekose deseni",
+    "iskoç ekosesi"
+  ],
+  "P12763": [
+    "takson eş anlamlısı",
+    "sinonim olduğu takson",
+    "taksonun sinonimi"
+  ],
+  "P12764": [
+    "yerine geçilen sinonim",
+    "ikame edilen eş anlamlı"
+  ],
+  "P12765": [
+    "özgün ad",
+    "orijinal ad",
+    "protonym"
+  ],
+  "P12766": [
+    "basionym",
+    "özgün botanik ad",
+    "temel ad"
+  ],
+  "P1279": [
+    "enflasyon",
+    "fiyat artış oranı",
+    "tüfe değişim oranı"
+  ],
+  "P12795": [
+    "dizi yöneticisi",
+    "dizi sorumlusu",
+    "yapım sorumlusu"
+  ],
+  "P128": [
+    "düzenlediği süreç",
+    "regüle ettiği süreç",
+    "moleküler düzenleyici"
+  ],
+  "P1283": [
+    "film listesi",
+    "filmografi",
+    "sinema kariyeri"
+  ],
+  "P12830": [
+    "müzik duygusu",
+    "parça ruh hali",
+    "şarkı ruh hali",
+    "müzikal ruh hali"
+  ],
+  "P12853": [
+    "ozon inceltme potansiyeli",
+    "ozon delme potansiyeli"
+  ],
+  "P12876": [
+    "yazı tekniği",
+    "yazım yöntemi"
+  ],
+  "P12878": [
+    "son görüldüğü eser",
+    "en son yer aldığı eser",
+    "son ortaya çıkışı"
+  ],
+  "P12895": [
+    "indeksleyici",
+    "dizin hazırlayan",
+    "indeks hazırlayıcısı"
+  ],
   "P129": [
-    "etkileşimi",
     "etkileşimindeki",
-    "etkileştiği",
     "fiziksel etkileşimindeki"
   ],
   "P1290": [
@@ -891,38 +1715,95 @@
   "P12912": [
     "eylemin hedefi"
   ],
-  "P12913": [],
-  "P12919": [],
-  "P12933": [],
-  "P12949": [],
+  "P12913": [
+    "olayın nesne kategorisi",
+    "olay nesne sınıfı"
+  ],
+  "P12919": [
+    "kamu finansmanı",
+    "kamu fonlaması",
+    "kamu desteği"
+  ],
+  "P12933": [
+    "sdg ilişkisi",
+    "sürdürülebilir kalkınma amacıyla ilgisi"
+  ],
+  "P12949": [
+    "para birimi değeri",
+    "banknot değeri",
+    "tedavül değeri"
+  ],
   "P1295": [
     "emisyon"
   ],
-  "P12956": [],
-  "P12969": [],
+  "P12956": [
+    "taban birim üssü",
+    "temel birimin üssü"
+  ],
+  "P12969": [
+    "oyun tasarımı yapan",
+    "video oyunu tasarımcısı"
+  ],
   "P1299": [
     "resmedildiği",
     "tasvir edildiği"
   ],
-  "P12992": [],
-  "P12993": [],
-  "P12994": [],
-  "P12995": [],
+  "P12992": [
+    "nesnelerin üstlendiği rol",
+    "olaydaki nesnelerin rolü"
+  ],
+  "P12993": [
+    "failin rolü",
+    "aktörün rolü",
+    "eylemdeki failin rolü"
+  ],
+  "P12994": [
+    "fail sınıfı",
+    "aktör sınıfı",
+    "eylem failleri sınıfı"
+  ],
+  "P12995": [
+    "eylemin faili",
+    "eylem aktörü"
+  ],
   "P1301": [
     "adet asansör",
     "asansörler",
     "asansörlerin miktarı",
     "asansörlerin sayısı"
   ],
-  "P1302": [],
+  "P1302": [
+    "hizmet verilen başlıca şehirler",
+    "ana duraklar",
+    "başlıca varış noktaları",
+    "ana güzergâh şehirleri"
+  ],
   "P1303": [
     "müzikal enstrümanı"
   ],
-  "P1304": [],
-  "P13044": [],
-  "P13046": [],
-  "P13047": [],
-  "P13048": [],
+  "P1304": [
+    "ülke merkez bankası",
+    "milli banka"
+  ],
+  "P13044": [
+    "niteliğidir",
+    "özelliği"
+  ],
+  "P13046": [
+    "yayın türü",
+    "bilimsel yayın türü",
+    "akademik yayın tipi"
+  ],
+  "P13047": [
+    "kiracı",
+    "kiralayan kişi",
+    "kira sahibi"
+  ],
+  "P13048": [
+    "şarjör hacmi",
+    "fişek kapasitesi",
+    "mermi kapasitesi"
+  ],
   "P1308": [
     "devlet memuru",
     "görevlisi",
@@ -967,9 +1848,19 @@
   "P1317": [
     "parlak dönemi"
   ],
-  "P13171": [],
-  "P13176": [],
-  "P13177": [],
+  "P13171": [
+    "bağış geliri",
+    "miras geliri",
+    "vasiyet yoluyla gelir"
+  ],
+  "P13176": [
+    "bu halk adıyla anılan takson",
+    "yaygın adın taksonu"
+  ],
+  "P13177": [
+    "homonim takson",
+    "adaş takson"
+  ],
   "P1318": [
     "kanıtın yazarı",
     "tarafından kanıtlandı",
@@ -996,12 +1887,24 @@
     "luogo d'origine",
     "menşe komünü (İsviçre)"
   ],
-  "P13210": [],
+  "P13210": [
+    "vergi statüsü",
+    "vergilendirme durumu",
+    "kurumsal vergi statüsü"
+  ],
   "P1322": [
     "çifti"
   ],
-  "P13238": [],
-  "P13251": [],
+  "P13238": [
+    "basamak yüksekliği",
+    "kapı eşiği yüksekliği",
+    "binme yüksekliği"
+  ],
+  "P13251": [
+    "gölgeleyici sayısı",
+    "shader sayısı",
+    "gölgelendirici sayısı"
+  ],
   "P1326": [
     "bu tarihten önce",
     "bundan daha önce",
@@ -1010,8 +1913,14 @@
     "muhtemel son tarihi",
     "terminus ante quem"
   ],
-  "P13260": [],
-  "P13269": [],
+  "P13260": [
+    "romantik çekim yönelimi",
+    "duygusal yönelim"
+  ],
+  "P13269": [
+    "yönlendirilen belge",
+    "okuyucu yönlendirmesi"
+  ],
   "P1327": [
     "çalışma arkadaşı",
     "iş ortağı",
@@ -1021,11 +1930,32 @@
     "spor partneri",
     "takım arkadaşı"
   ],
-  "P13296": [],
-  "P13308": [],
-  "P13318": [],
-  "P13338": [],
-  "P13359": [],
+  "P13296": [
+    "ön çalışma",
+    "hazırlık eskizi",
+    "taslak çalışma",
+    "ön eskiz"
+  ],
+  "P13308": [
+    "kullanılan yazılım",
+    "üretim yazılımı",
+    "oluşturma yazılımı"
+  ],
+  "P13318": [
+    "üreme şekli",
+    "çoğalma biçimi",
+    "üreme yöntemi",
+    "çoğalma şekli"
+  ],
+  "P13338": [
+    "tez için sunulan derece",
+    "başvurulan akademik derece"
+  ],
+  "P13359": [
+    "sınıflandırılan ögeler",
+    "sınıflanan nesneler",
+    "sınıflandırılan öğeler"
+  ],
   "P1336": [
     "bölgesel hak iddiası",
     "egemen olduğu iddia eden",
@@ -1033,28 +1963,55 @@
     "kontrol iddiası",
     "talep eden"
   ],
-  "P13360": [],
-  "P13361": [],
+  "P13360": [
+    "sunulan yapıtlar",
+    "sergilenen eserler",
+    "sergilenen yapıtlar",
+    "sunulan çalışmalar"
+  ],
+  "P13361": [
+    "penaltılarda atılan gol sayısı",
+    "penaltı atışlarındaki gol sayısı",
+    "penaltı golü sayısı"
+  ],
   "P1339": [
     "ölümcül olmayan yaralanmalar",
     "yaralılar"
   ],
-  "P13391": [],
-  "P1340": [],
-  "P13413": [],
-  "P13414": [],
+  "P13391": [
+    "veri analiz yöntemi",
+    "veri çözümleme yöntemi",
+    "veri inceleme yöntemi"
+  ],
+  "P1340": [
+    "iris rengi",
+    "gözlerin rengi"
+  ],
+  "P13413": [
+    "ışın enerjisi",
+    "parçacık demeti enerjisi",
+    "huzme enerjisi"
+  ],
+  "P13414": [
+    "indirilme sayısı",
+    "yüklenme sayısı",
+    "indirme miktarı"
+  ],
   "P1342": [
     "koltuk sayısı (üye)",
     "koltuklar (üyeler)",
-    "koltukların sayısı",
-    "üye sayısı"
+    "koltukların sayısı"
   ],
   "P1343": [
     "diğer ansiklopedilerde",
     "diğer sözlüklerde",
     "kaynakça bağlantıları"
   ],
-  "P13430": [],
+  "P13430": [
+    "doku haritalama birimi sayısı",
+    "tmu sayısı",
+    "doku eşleme ünitesi sayısı"
+  ],
   "P1344": [
     "katıldı",
     "maçına katıldı",
@@ -1067,36 +2024,59 @@
   "P1345": [
     "katilin kurbanlarının sayısı",
     "katilin öldürdüğü masum sayısı",
-    "katlettiği kişi sayısı",
     "kurbanlarının sayısı",
     "öldürdüğü kişi sayısı"
   ],
-  "P13459": [],
+  "P13459": [
+    "katkı sağlayan araştırma projesi",
+    "katkıda bulunan proje"
+  ],
   "P1346": [
     "1. ödülünü kazanan",
     "birincilik ödülünü kazanan",
     "en iyi köpek",
-    "galip",
     "muzaffer",
     "önder",
     "şampiyon"
   ],
-  "P13464": [],
+  "P13464": [
+    "son anadil konuşucusu",
+    "dilin son konuşucusu",
+    "son akıcı konuşmacı"
+  ],
   "P1347": [
     "kaza sınıflandırması",
     "kaza türü",
     "kurbanların askeri sınıflandırması"
   ],
-  "P13478": [],
-  "P1349": [],
-  "P13497": [],
+  "P13478": [
+    "adlandırma türü",
+    "isimlendirme tipi",
+    "nomenklatural tip"
+  ],
+  "P1349": [
+    "kromozom takımı sayısı",
+    "ploidi düzeyi"
+  ],
+  "P13497": [
+    "iç tasarımcı",
+    "iç mekan tasarımcısı",
+    "iç dekorasyoncu"
+  ],
   "P135": [
     "işi",
     "hareketi",
     "yer aldığı hareket"
   ],
-  "P1350": [],
-  "P13504": [],
+  "P1350": [
+    "maç sayısı",
+    "oynanan maç",
+    "karşılaşma sayısı"
+  ],
+  "P13504": [
+    "kigo",
+    "haiku mevsim sözcüğü"
+  ],
   "P1351": [
     "attığı gol",
     "gol sayısı",
@@ -1104,14 +2084,26 @@
     "ligteki gol sayısı",
     "puan sayısı"
   ],
-  "P13518": [],
-  "P13519": [],
+  "P13518": [
+    "karakterin sevdikleri",
+    "sevdiği şeyler",
+    "hoşlandığı şeyler"
+  ],
+  "P13519": [
+    "karakterin sevmedikleri",
+    "sevmediği şeyler",
+    "hoşlanmadığı şeyler",
+    "nefret ettikleri"
+  ],
   "P1352": [
     "konumunda",
     "sıralamada",
     "sıralamasında"
   ],
-  "P13522": [],
+  "P13522": [
+    "ROP sayısı",
+    "render birimi sayısı"
+  ],
   "P13525": [
     "RAM"
   ],
@@ -1119,17 +2111,26 @@
     "kısaca anlattıkları",
     "niteledikleri"
   ],
-  "P13549": [],
+  "P13549": [
+    "türün koruma durumu",
+    "koruma statüsü"
+  ],
   "P1355": [
     "kazandığı maç sayısı",
     "kazandığı maçlar",
     "kazandığı maçların sayısı",
     "kazandığı oyun",
-    "kazanılan oyun",
-    "kazanılan oyunlar"
+    "kazanılan oyun"
   ],
-  "P13551": [],
-  "P13552": [],
+  "P13551": [
+    "ülkeler sıralaması",
+    "uluslar klasmanı",
+    "ana ulus sıralaması"
+  ],
+  "P13552": [
+    "genç uluslar sıralaması",
+    "U23 ulus sıralaması"
+  ],
   "P1356": [
     "kaybedilen",
     "kaybedilen maç sayısı",
@@ -1137,20 +2138,36 @@
     "kaybettiği maçlar",
     "yenilgiler"
   ],
-  "P13564": [],
+  "P13564": [
+    "üçüncü cinsiyetli nüfus",
+    "üçüncü cins nüfus"
+  ],
   "P1357": [
     "eşitlik sayısı"
   ],
   "P13571": [
     "bağlam uzunluğu"
   ],
-  "P13574": [],
-  "P1358": [],
-  "P13589": [],
+  "P13574": [
+    "en büyük şehir",
+    "en kalabalık şehir",
+    "en kalabalık yerleşim"
+  ],
+  "P1358": [
+    "lehine puan",
+    "toplanan puan"
+  ],
+  "P13589": [
+    "değersizlik nedeni",
+    "boş değer nedeni"
+  ],
   "P1359": [
     "karşı hedefler"
   ],
-  "P13593": [],
+  "P13593": [
+    "cosplay karakteri",
+    "canlandırılan karakter"
+  ],
   "P136": [
     "çeşidi",
     "edebi türü",
@@ -1161,59 +2178,95 @@
     "tarzı",
     "yazınsal türü"
   ],
-  "P13602": [],
-  "P13612": [],
+  "P13602": [
+    "single'ın alındığı albüm",
+    "ait olduğu albüm",
+    "çıktığı albüm"
+  ],
+  "P13612": [
+    "ırkın taksonu",
+    "ait olduğu tür"
+  ],
   "P1363": [
     "aldığı puan",
     "aldığı sayı",
-    "attığı gol",
     "tarafından atılan puanlar"
   ],
-  "P13633": [],
-  "P13635": [],
-  "P13638": [],
+  "P13633": [
+    "takıldığı yer",
+    "giyilen bölge",
+    "vücut bölgesi"
+  ],
+  "P13635": [
+    "garanti dönemi",
+    "garanti müddeti"
+  ],
+  "P13638": [
+    "yerleşim tipi",
+    "yerleşim türü",
+    "yerleşim kategorisi"
+  ],
   "P1365": [
     "değiştirdiği",
     "gelmeyi başardığı",
     "hükümsüz kıldığı",
     "önceki iş sahibi",
-    "önceli",
-    "öncesinde",
-    "öncülü",
     "yerini aldığı"
   ],
   "P1366": [
     "halef",
     "halefi",
-    "sonraki sahibi",
     "varis",
     "yerine geçen"
   ],
-  "P13668": [],
+  "P13668": [
+    "işletim maliyeti",
+    "çalıştırma maliyeti",
+    "kullanım maliyeti"
+  ],
   "P137": [
     "çalıştıran",
     "işleten",
     "işleticisi",
     "öge operatörü",
-    "operatörü",
     "servis operatörü",
     "tesis operatörü",
     "yöneten"
   ],
-  "P13713": [],
-  "P13718": [],
+  "P13713": [
+    "ödülün verildiği tür",
+    "ödüllendirilen eser türü"
+  ],
+  "P13718": [
+    "önerilen nesne türü",
+    "teklif edilen varlık türü"
+  ],
   "P1372": [
     "bağlayıcı",
     "yazılım kitaplığı bağlayıcı"
   ],
-  "P13723": [],
+  "P13723": [
+    "modern tapınak sıralaması",
+    "şinto tapınağı mertebesi"
+  ],
   "P1373": [
     "günlük yolcu sayısı",
     "günlük ziyaretçi sayısı"
   ],
-  "P13745": [],
-  "P13749": [],
-  "P1376": [],
+  "P13745": [
+    "alan başına parça sayısı",
+    "metrekare başına parça"
+  ],
+  "P13749": [
+    "ekran köşegeni",
+    "ekran çapı",
+    "diyagonal ekran boyutu"
+  ],
+  "P1376": [
+    "başkenti olduğu",
+    "idari merkezi olduğu yer",
+    "yönetim merkezi olduğu"
+  ],
   "P138": [
     "etimoloji",
     "adaşı",
@@ -1241,12 +2294,17 @@
     "siyasi uyum",
     "siyasi yön"
   ],
-  "P1389": [],
+  "P1389": [
+    "ürün belgelendirmesi",
+    "ürün belgesi"
+  ],
   "P1390": [
     "maçtaki olay zamanı",
     "olayın maç saati (dakika)"
   ],
-  "P1393": [],
+  "P1393": [
+    "vekil kişi"
+  ],
   "P1398": [
     "yerine yapıldığı (bina)",
     "yerine yapıldığı (yapı)"
@@ -1270,16 +2328,18 @@
   "P1408": [
     "yayıncı tarafından hizmet verilen alan"
   ],
-  "P141": [
-    "koruma statüsü"
-  ],
+  "P141": [],
   "P1410": [
     "bir organizasyondaki/yasama organındaki veya seçimlerdeki kazanılan temsilcilerin sayısı",
     "organizasyondaki koltuk sayısı",
     "sahip olduğu koltuk sayısı",
     "yasama meclisindeki koltuk sayısı"
   ],
-  "P1411": [],
+  "P1411": [
+    "aday gösterildiği ödüller",
+    "ödül adaylığı",
+    "aday olunan ödüller"
+  ],
   "P1412": [
     "bildiği diller",
     "dili",
@@ -1307,10 +2367,25 @@
     "varsayılan kullanıcı arayüzü",
     "widget araç seti"
   ],
-  "P1416": [],
-  "P1418": [],
-  "P1419": [],
-  "P1420": [],
+  "P1416": [
+    "bağlı olduğu kuruluş",
+    "mensubiyet",
+    "bağlı bulunduğu kurum"
+  ],
+  "P1418": [
+    "tamamlanan yörünge sayısı",
+    "yapılan yörünge sayısı"
+  ],
+  "P1419": [
+    "biçim",
+    "geometrik şekil",
+    "form"
+  ],
+  "P1420": [
+    "takson sinonimi",
+    "sinonim takson",
+    "eş anlamlı takson"
+  ],
   "P1423": [
     "ana şablonun konusu",
     "bilgi kutusunun ana konusu"
@@ -1323,7 +2398,6 @@
     "ekolojik bölge (Dünya Doğayı Koruma Vakfı)"
   ],
   "P1427": [
-    "başlangıç noktası",
     "fırlatma rampası",
     "hareket alanı",
     "hareket yeri",
@@ -1336,16 +2410,11 @@
     "yetiştirdiği evcil hayvan"
   ],
   "P143": [
-    "kaynağı",
     "referansı"
   ],
-  "P1431": [
-    "dizi sorumlusu"
-  ],
+  "P1431": [],
   "P1433": [
     "dergi",
-    "yayın yeri",
-    "eser",
     "çalışma"
   ],
   "P1434": [
@@ -1355,14 +2424,21 @@
     "şu kurgusal evrende gerçekleşir",
     "tanımlanan evren"
   ],
-  "P1435": [],
+  "P1435": [
+    "miras statüsü",
+    "tescil durumu",
+    "kültürel miras statüsü"
+  ],
   "P1436": [
-    "eser sayısı",
     "koleksiyondaki nesne sayısı",
     "nesne sayısı",
     "sergideki nesne sayısı"
   ],
-  "P1437": [],
+  "P1437": [
+    "iddia",
+    "savunma beyanı",
+    "suç ikrarı"
+  ],
   "P144": [
     "temalı",
     "üretildiği eser",
@@ -1374,7 +2450,6 @@
     "kopyası"
   ],
   "P1441": [
-    "konusu",
     "anlatılan",
     "bu işte öne çıkan",
     "görünen",
@@ -1383,12 +2458,10 @@
   ],
   "P1443": [
     "puan yöntemi",
-    "puanlama metodu",
-    "puanlama yöntemi"
+    "puanlama metodu"
   ],
   "P1444": [
     "bitiş",
-    "bitiş noktası",
     "durma noktası",
     "son nokta",
     "varış",
@@ -1412,11 +2485,19 @@
   ],
   "P1455": [
     "bibliyografisi",
-    "eser kataloğu",
-    "eserlerin listesi"
+    "eser kataloğu"
   ],
-  "P1456": [],
-  "P1457": [],
+  "P1456": [
+    "anıtlar listesi",
+    "tarihi eserler listesi",
+    "miras listesi"
+  ],
+  "P1457": [
+    "salt parlaklık",
+    "mutlak parlaklık",
+    "salt kadir",
+    "mutlak kadir"
+  ],
   "P1458": [
     "renk indeksi"
   ],
@@ -1441,7 +2522,6 @@
   ],
   "P1479": [
     "dolaylı neden",
-    "dolaylı olarak neden olduğu",
     "katkı faktörü",
     "katkı sağlayan faktör",
     "önemli katkıda bulunan faktör",
@@ -1477,7 +2557,11 @@
     "semtleri",
     "yerel yönetimleri"
   ],
-  "P1531": [],
+  "P1531": [
+    "melez ebeveyni",
+    "hibrit ebeveyni",
+    "melez kökeni"
+  ],
   "P1532": [
     "spor uyruğu",
     "spor vatanı",
@@ -1536,14 +2620,14 @@
     "nesne yazılımı",
     "yazılım çerçevesi"
   ],
-  "P1548": [],
+  "P1548": [
+    "en yüksek Strahler sayısı",
+    "azami Strahler sayısı"
+  ],
   "P155": [
-    "eskiden",
-    "geçmişte",
     "önceki",
     "önceli",
-    "öncülü",
-    "tarihte"
+    "öncülü"
   ],
   "P1552": [
     "doğal varlığı",
@@ -1551,7 +2635,6 @@
     "kalitesi",
     "karakterize edildiği",
     "karakterize edilmesi",
-    "niteliği",
     "tanınma özelliği"
   ],
   "P1557": [
@@ -1559,8 +2642,6 @@
     "göründüğü"
   ],
   "P1558": [
-    "müzikal tempo",
-    "tempo",
     "tempo işaretlemesi"
   ],
   "P156": [
@@ -1571,8 +2652,7 @@
     "ilerlediğinde",
     "paralelinde",
     "sıradaki",
-    "sonrası",
-    "takip eden"
+    "sonrası"
   ],
   "P1560": [
     "bu erkek adının kadın versiyonu",
@@ -1593,13 +2673,16 @@
     "katleden",
     "kiralık katili",
     "öldürdü",
-    "öldüren kişi",
-    "suikastçi"
+    "öldüren kişi"
   ],
   "P1571": [
     "aralık"
   ],
-  "P1574": [],
+  "P1574": [
+    "nüsha",
+    "kopya",
+    "örnek nüsha"
+  ],
   "P1576": [
     "hayat biçimi",
     "hayat stili",
@@ -1609,8 +2692,7 @@
   ],
   "P1582": [
     "geldiği",
-    "meyvesi (takson)",
-    "üreten"
+    "meyvesi (takson)"
   ],
   "P1589": [
     "en alçak nokta"
@@ -1639,7 +2721,10 @@
     "müdafi",
     "zanlı"
   ],
-  "P1592": [],
+  "P1592": [
+    "iddia makamı",
+    "kovuşturma temsilcisi"
+  ],
   "P1593": [
     "avukat",
     "sanık temsilcisi"
@@ -1682,19 +2767,24 @@
     "rapor edilen sayı",
     "toplam vaka sayısı"
   ],
-  "P1604": [],
-  "P1605": [],
+  "P1604": [
+    "biyolojik güvenlik düzeyi",
+    "BSL",
+    "biyogüvenlik düzeyi"
+  ],
+  "P1605": [
+    "doğal konak",
+    "rezervuar tür",
+    "konak tür"
+  ],
   "P1606": [
     "doğal rezervuarı"
   ],
   "P161": [
-    "oyuncu",
-    "aktör",
     "aktris",
     "başrol oyuncusu",
     "başrolde",
     "kast",
-    "oyuncular",
     "rol yapan",
     "yıldız oyuncu"
   ],
@@ -1708,12 +2798,10 @@
   "P162": [
     "dizi yapımcısı",
     "film üreticisi",
-    "film yapımcısı",
-    "müzik yapımcısı"
+    "film yapımcısı"
   ],
   "P1620": [
     "dava açan",
-    "hak iddia eden",
     "takip eden"
   ],
   "P1622": [
@@ -1758,13 +2846,28 @@
     "ağ bağlantı noktası",
     "internet bağlantı noktası"
   ],
-  "P1642": [],
+  "P1642": [
+    "transfer türü",
+    "transfer şekli",
+    "geçiş işlemi"
+  ],
   "P1643": [
     "ayrılış işlemi"
   ],
-  "P1652": [],
-  "P1654": [],
-  "P1656": [],
+  "P1652": [
+    "maç hakemi",
+    "orta hakem",
+    "müsabaka hakemi"
+  ],
+  "P1654": [
+    "kanat düzeni",
+    "kanat yapısı",
+    "kanat tasarımı"
+  ],
+  "P1656": [
+    "açılışını yapan kişi",
+    "perdesini açan"
+  ],
   "P1657": [
     "Motion Picture Association of America film derecelendirmesi"
   ],
@@ -1778,7 +2881,6 @@
     "madalyası",
     "onurları",
     "takdirleri",
-    "verilen ödül",
     "verilen ödüller"
   ],
   "P1660": [
@@ -1787,13 +2889,15 @@
     "ilk hasta",
     "sıfır numaralı hasta"
   ],
-  "P1661": [],
+  "P1661": [
+    "alexa derecesi",
+    "alexa site sıralaması"
+  ],
   "P167": [
     "eski yapı",
     "eskiden",
     "geçmişte",
     "geçmişteki yapı",
-    "öncesinde",
     "tarihte"
   ],
   "P1672": [
@@ -1824,11 +2928,14 @@
     "katkısı",
     "ödülün verilme nedeni"
   ],
-  "P1689": [],
+  "P1689": [
+    "gsyih'ye oranla kamu borcu",
+    "merkezi hükümet borcunun gsyih'ye oranı",
+    "devlet borcunun gsyih'ye oranı"
+  ],
   "P169": [
     "baş yönetici",
     "ceo",
-    "CEO",
     "müdür yöneticisi",
     "SİO",
     "siyo",
@@ -1855,17 +2962,26 @@
     "yaratan",
     "yaratımcı"
   ],
-  "P1703": [],
-  "P1704": [],
+  "P1703": [
+    "tozlayıcısı",
+    "polenleyicisi",
+    "tozlaştıran"
+  ],
+  "P1704": [
+    "tozlaştırdığı",
+    "polenlediği bitki"
+  ],
   "P1706": [
     "ile paylaştı",
-    "ile",
-    "birlikte"
+    "ile"
   ],
   "P171": [
     "ebeveyn takson"
   ],
-  "P1716": [],
+  "P1716": [
+    "ticari marka",
+    "markası"
+  ],
   "P172": [
     "etnik kökeni",
     "ırkı",
@@ -1879,13 +2995,15 @@
     "müzikal tempo",
     "tempo"
   ],
-  "P1731": [],
+  "P1731": [
+    "fach sınıflandırması",
+    "fach sistemi"
+  ],
   "P1734": [
     "mesleki yemin",
     "mesleki yemin tarihi"
   ],
   "P1740": [
-    "çekildiği yer",
     "filmin yeri"
   ],
   "P175": [
@@ -1899,7 +3017,10 @@
     "sergileyen",
     "söyleyen"
   ],
-  "P1750": [],
+  "P1750": [
+    "ad günü",
+    "isim yortusu"
+  ],
   "P1752": [
     "ölçek oranı"
   ],
@@ -1925,25 +3046,43 @@
   "P1774": [
     "stüdyosu"
   ],
-  "P1775": [],
+  "P1775": [
+    "izleyicisi",
+    "ardılı sanatçı"
+  ],
   "P1776": [
     "dairesi",
     "muhiti"
   ],
-  "P1777": [],
-  "P1778": [],
+  "P1777": [
+    "üslubunda",
+    "tarzını izleyen"
+  ],
+  "P1778": [
+    "taklidi",
+    "sahte eseri"
+  ],
   "P1779": [
     "yaratıcı (olası)"
   ],
   "P178": [
     "hazırlayan",
-    "oluşturan",
-    "tarafından geliştirilmiş",
-    "yaratan"
+    "tarafından geliştirilmiş"
   ],
-  "P1780": [],
-  "P1789": [],
-  "P179": [],
+  "P1780": [
+    "okulundan",
+    "ekolünden"
+  ],
+  "P1789": [
+    "operasyon müdürü",
+    "icra direktörü",
+    "baş operasyon sorumlusu"
+  ],
+  "P179": [
+    "dizinin parçası",
+    "ait olduğu seri",
+    "serinin parçası"
+  ],
   "P1791": [
     "buraya gömülen insanlar için kategori",
     "mezar yeri kategorisi",
@@ -1965,39 +3104,57 @@
     "manzarası",
     "motifi",
     "tasvir edilen",
-    "temsil eden",
-    "temsili"
+    "temsil eden"
   ],
-  "P1809": [],
-  "P1811": [],
+  "P1809": [
+    "dans düzenlemecisi",
+    "koreografi yapan"
+  ],
+  "P1811": [
+    "bölümler listesi",
+    "bölüm dizini"
+  ],
   "P1817": [
     "alan kimse",
     "to:",
     "alan"
   ],
-  "P183": [],
+  "P183": [
+    "yerel tür",
+    "endemik tür"
+  ],
   "P1830": [
-    "hissedarı",
     "sahibi olduğu",
     "sahibi olduğu mülk",
     "sahibi olduğu varlık",
     "sahip olduğu"
   ],
-  "P1831": [],
+  "P1831": [
+    "seçmen kütüğü"
+  ],
   "P1833": [
     "katkıda bulunanların sayısı",
     "kayıtlı kullanıcı sayısı",
-    "kullanıcı sayısı",
-    "kullanıcılar"
+    "kullanıcı sayısı"
   ],
   "P184": [
     "danışman",
     "doktora sorumlusu",
     "sorumlu"
   ],
-  "P1840": [],
-  "P185": [],
-  "P1851": [],
+  "P1840": [
+    "soruşturan",
+    "soruşturan kişi",
+    "soruşturan kurum"
+  ],
+  "P185": [
+    "doktora tezi öğrencisi",
+    "tez öğrencisi",
+    "doktora danışmanlığı öğrencisi"
+  ],
+  "P1851": [
+    "girdi alanı"
+  ],
   "P1853": [
     "kan tipi"
   ],
@@ -2015,14 +3172,12 @@
     "hazırlandığı",
     "imal edildiği",
     "imal edilmiştir",
-    "kaynağı",
     "kaynak maddesi",
     "kaynak materyali",
     "kullanılan malzeme",
     "kullanılan materyal",
     "maddesi",
     "malzemeleri",
-    "oluşturan",
     "üretildiği gereç",
     "üretildiği madde"
   ],
@@ -2044,17 +3199,30 @@
     "en fazla oynayabilecek oyuncu sayısı",
     "en fazla oyunca sayısı"
   ],
-  "P1875": [
-    "temsil eden"
+  "P1875": [],
+  "P1876": [
+    "araç",
+    "tekne",
+    "deniz aracı"
   ],
-  "P1876": [],
-  "P1877": [],
-  "P1878": [],
-  "P1879": [],
-  "P1880": [
-    "ölçümü"
+  "P1877": [
+    "esinlenilen sanatçı",
+    "uyarlandığı sanatçı",
+    "özgün eser sahibi"
   ],
-  "P1881": [],
+  "P1878": [
+    "Vox-ATypI",
+    "Vox sınıflandırması"
+  ],
+  "P1879": [
+    "Filipinler gelir sınıflandırması",
+    "gelir derecesi"
+  ],
+  "P1880": [],
+  "P1881": [
+    "karakterler listesi",
+    "kişiler listesi"
+  ],
   "P1884": [
     "saçının rengi"
   ],
@@ -2062,7 +3230,10 @@
     "katedrali",
     "piskoposluk katedrali"
   ],
-  "P1887": [],
+  "P1887": [
+    "yardımcı kontluk",
+    "biyolojik kayıt bölgesi"
+  ],
   "P1889": [
     "değil",
     "farklı",
@@ -2070,7 +3241,6 @@
     "karıştırılmamalıdır"
   ],
   "P189": [
-    "bulunduğu yer",
     "buluntu yeri",
     "keşfedildiği konum",
     "keşfedildiği yer",
@@ -2081,41 +3251,77 @@
   "P1891": [
     "imzacılar"
   ],
-  "P1897": [],
-  "P1898": [],
+  "P1897": [
+    "en tiz nota",
+    "en yüksek perde",
+    "tavan nota"
+  ],
+  "P1898": [
+    "en pes nota",
+    "en düşük perde",
+    "taban nota"
+  ],
   "P19": [
     "doğduğu yer",
     "doğum konumu"
   ],
-  "P190": [],
-  "P1903": [],
-  "P1906": [],
-  "P1909": [],
+  "P190": [
+    "kardeş kent",
+    "ikiz şehir",
+    "eş şehir",
+    "kardeş belediye"
+  ],
+  "P1903": [
+    "VEI",
+    "patlayıcılık indeksi"
+  ],
+  "P1906": [
+    "devlet başkanı makamı",
+    "devlet başkanlığı görevi"
+  ],
+  "P1909": [
+    "istenmeyen etki",
+    "ilaç yan etkisi",
+    "advers etki"
+  ],
   "P1910": [
     "azalmış ekspresyon"
   ],
   "P1911": [
     "artan ifade edilişi"
   ],
-  "P1912": [],
+  "P1912": [
+    "gen silinmesi ilişkisi",
+    "delesyon ilişkisi"
+  ],
   "P1913": [
     "ilişkili gen duplikasyonu"
   ],
   "P1914": [
     "ilişkili gen ekleme"
   ],
-  "P1915": [],
+  "P1915": [
+    "inversiyon ilişkisi",
+    "gen ters dönme ilişkisi"
+  ],
   "P1916": [
     "ilişkili gen yer değişikliği"
   ],
   "P1917": [
     "translasyonel modifikasyon ile ilişkisi"
   ],
-  "P1918": [],
+  "P1918": [
+    "düzenleme değişikliği sonucu",
+    "gen düzenlemesi değişikliği ilişkisi"
+  ],
   "P1923": [
     "takımlar"
   ],
-  "P1924": [],
+  "P1924": [
+    "aşı hedefi",
+    "koruduğu hastalık",
+    "aşının hedef hastalığı"
+  ],
   "P193": [
     "tarafından yapıldı",
     "yapı şirketi",
@@ -2126,7 +3332,11 @@
     "müteahhit",
     "tarafından inşa edildi"
   ],
-  "P194": [],
+  "P194": [
+    "yasama meclisi",
+    "parlamento",
+    "meclis"
+  ],
   "P195": [
     "bütünü",
     "derlem",
@@ -2139,7 +3349,10 @@
     "özel yatırımcı",
     "yatırımcılar"
   ],
-  "P1956": [],
+  "P1956": [
+    "kalkış iniş tipi",
+    "kalkış iniş türü"
+  ],
   "P196": [
     "asteroid grubu"
   ],
@@ -2147,15 +3360,16 @@
     "bitişik durak",
     "komşu durak",
     "komşu istasyon",
-    "önceki durak",
     "önceki istasyon",
-    "sonraki durak",
     "sonraki istasyon"
   ],
   "P1971": [
     "çocuk sayısı"
   ],
-  "P1981": [],
+  "P1981": [
+    "FSK derecesi",
+    "Almanya film derecesi"
+  ],
   "P199": [
     "bölünmeleri",
     "çalışma alanları",
@@ -2196,7 +3410,6 @@
   ],
   "P200": [
     "göl akışları",
-    "göl girişi",
     "göl girişleri",
     "nehir akışları",
     "nehir girişi"
@@ -2226,9 +3439,6 @@
     "bu kamera ile çekilen resimlere ait kategori"
   ],
   "P2043": [
-    "boyut",
-    "boyutu",
-    "büyüklüğü",
     "mesafesi",
     "ölçüleri"
   ],
@@ -2237,23 +3447,21 @@
     "yükseltisi",
     "zirvesinin denizden yüksekliği"
   ],
-  "P2045": [],
+  "P2045": [
+    "yörünge eğikliği",
+    "yörünge eğimi"
+  ],
   "P2046": [
     "boyut",
-    "boyutu",
     "toplam alanı",
     "yüzölçüm",
-    "yüzölçümü",
-    "alan"
+    "yüzölçümü"
   ],
   "P2047": [
     "çalışma süresi",
     "dönemi",
     "koşu süresi",
-    "uzunluğu",
-    "zaman aralığı",
-    "çağı",
-    "aralık"
+    "çağı"
   ],
   "P2048": [
     "yüksekliği"
@@ -2267,7 +3475,11 @@
   "P205": [
     "havza ülkeleri"
   ],
-  "P2050": [],
+  "P2050": [
+    "kanat genişliği",
+    "kanat uzunluğu",
+    "kanat boyu"
+  ],
   "P2051": [
     "M ⋅ sin i",
     "M x sin i",
@@ -2283,14 +3495,21 @@
   "P2054": [
     "spesifik yer çekimi"
   ],
-  "P2055": [],
+  "P2055": [
+    "elektrik iletkenliği",
+    "özgül iletkenlik"
+  ],
   "P2056": [
     "özgül ısı kapasitesi",
     "özgül ısısı",
     "özısısı",
     "termal kapasitesi"
   ],
-  "P2058": [],
+  "P2058": [
+    "emanetçi",
+    "saklayıcı",
+    "antlaşma tevdi makamı"
+  ],
   "P206": [
     "denizinde",
     "gölünde",
@@ -2298,7 +3517,12 @@
     "nehrinde",
     "okyanusunda"
   ],
-  "P2060": [],
+  "P2060": [
+    "parlaklık",
+    "ışınım gücü",
+    "ışıma gücü",
+    "lüminosite"
+  ],
   "P2061": [
     "çerçeve oranı",
     "en boy oranı",
@@ -2316,8 +3540,15 @@
     "kütlesi",
     "moleküler kütlesi"
   ],
-  "P2068": [],
-  "P2069": [],
+  "P2068": [
+    "ısıl iletkenlik",
+    "ısı iletkenliği",
+    "ısı iletim katsayısı"
+  ],
+  "P2069": [
+    "mıknatıssal moment",
+    "manyetik dipol momenti"
+  ],
   "P2073": [
     "ek yakıt almadan gidebileceği mesafe",
     "maksimum mesafe",
@@ -2326,8 +3557,14 @@
   "P2075": [
     "sesinin hızı"
   ],
-  "P2076": [],
-  "P2077": [],
+  "P2076": [
+    "ısı derecesi",
+    "hararet"
+  ],
+  "P2077": [
+    "basınç altında",
+    "tazyik"
+  ],
   "P2079": [
     "alış yöntemi",
     "büyütme yöntemi",
@@ -2340,7 +3577,12 @@
   "P208": [
     "yönetim bölümü"
   ],
-  "P209": [],
+  "P209": [
+    "yüksek mahkeme",
+    "en yüksek mahkeme",
+    "üst yargı organı",
+    "en üst yargı makamı"
+  ],
   "P2094": [
     "derecelendirme",
     "müsabakanın sınıfı",
@@ -2385,15 +3627,20 @@
     "maç sonunda takım oyuncusu sayısı",
     "maç sonundaki oyuncu sayısı"
   ],
-  "P2107": [],
+  "P2107": [
+    "bozunma noktası",
+    "ayrışma sıcaklığı",
+    "bozunma sıcaklığı"
+  ],
   "P2109": [
     "güç çıkışı",
     "güç kapasitesi",
-    "kapasite",
     "nominal güç",
     "yüklenmiş kapasite"
   ],
-  "P2112": [],
+  "P2112": [
+    "kanat yüzey alanı"
+  ],
   "P2113": [
     "süblimasyon noktası"
   ],
@@ -2414,13 +3661,15 @@
   "P2118": [
     "kinematik akmazlık"
   ],
-  "P2119": [],
+  "P2119": [
+    "buhar basıncı değeri",
+    "doyma basıncı"
+  ],
   "P2120": [
     "çapının yarısı",
     "nısıf kuturu"
   ],
   "P2121": [
-    "ödül",
     "nakit ödül"
   ],
   "P2124": [
@@ -2433,11 +3682,16 @@
   "P2127": [
     "INES"
   ],
-  "P2128": [],
-  "P2129": [],
+  "P2128": [
+    "parlama noktası",
+    "parlama sıcaklığı"
+  ],
+  "P2129": [
+    "IDLH değeri",
+    "yaşam ve sağlık için acil tehlike"
+  ],
   "P2130": [
     "birim maliyet",
-    "bütçe",
     "fiyat"
   ],
   "P2131": [
@@ -2458,7 +3712,11 @@
   "P2133": [
     "borç"
   ],
-  "P2134": [],
+  "P2134": [
+    "toplam döviz rezervi",
+    "uluslararası rezervler",
+    "döviz rezervleri"
+  ],
   "P2135": [
     "ihracat",
     "ihracat hacmi"
@@ -2478,7 +3736,6 @@
     "satış geliri"
   ],
   "P2140": [
-    "doğrudan yabancı yatırım çıkışı",
     "doğrudan yabancı yatırım net çıkışı"
   ],
   "P2141": [
@@ -2537,7 +3794,9 @@
   "P2154": [
     "bağlantı entalpisi"
   ],
-  "P2155": [],
+  "P2155": [
+    "katı eriyik serisi"
+  ],
   "P2156": [
     "sözde kristal şekli"
   ],
@@ -2563,8 +3822,14 @@
     "tedavi için kullanılan",
     "tedavisinde kullanılan"
   ],
-  "P2177": [],
-  "P2178": [],
+  "P2177": [
+    "çözünürlük",
+    "erirlik"
+  ],
+  "P2178": [
+    "çözen madde",
+    "solvent"
+  ],
   "P2184": [
     "başlığın kronolojisi",
     "başlığın tarihçesi",
@@ -2633,11 +3898,12 @@
     "pozisyon açısı"
   ],
   "P2212": [
-    "açısal ayrımı",
-    "açısal mesafesi",
-    "açısı"
+    "açısal ayrımı"
   ],
-  "P2213": [],
+  "P2213": [
+    "çıkan düğüm boylamı",
+    "yükselen düğüm boylamı"
+  ],
   "P2214": [
     "kaçkınlık",
     "paralaks",
@@ -2646,7 +3912,10 @@
   "P2216": [
     "radyal hız"
   ],
-  "P2217": [],
+  "P2217": [
+    "seyir sürati",
+    "yolculuk hızı"
+  ],
   "P2218": [
     "net değer",
     "tahmini net değer"
@@ -2655,9 +3924,19 @@
     "reel gayri safi yurtiçi hasıla büyüme oranı",
     "reel GSYİH büyüme oranı"
   ],
-  "P2220": [],
-  "P2221": [],
-  "P2222": [],
+  "P2220": [
+    "hane halkı serveti",
+    "hanehalkı serveti",
+    "tüketici net serveti"
+  ],
+  "P2221": [
+    "ışınım akısı",
+    "akım yoğunluğu"
+  ],
+  "P2222": [
+    "jiromanyetik sabit",
+    "manyetojirik oran"
+  ],
   "P2223": [
     "çürüme genişliği"
   ],
@@ -2715,7 +3994,10 @@
     "ulusal çiceği",
     "ulusal içkisi"
   ],
-  "P2239": [],
+  "P2239": [
+    "ilk yardım tedbirleri",
+    "acil müdahale önlemleri"
+  ],
   "P2240": [
     "LD50",
     "LD₅₀"
@@ -2730,7 +4012,11 @@
     "apsis",
     "en uzak nokta"
   ],
-  "P2244": [],
+  "P2244": [
+    "enberi",
+    "perihel",
+    "yakın nokta"
+  ],
   "P2248": [
     "yavaşlayan argüman"
   ],
@@ -2769,23 +4055,30 @@
   ],
   "P2283": [
     "kullanma",
-    "faydaları",
-    "kullanılan öge",
-    "kullanımı"
+    "kullanılan öge"
   ],
   "P2284": [
     "alış fiyatı",
     "döviz kuru",
-    "liste fiyatı",
-    "maliyeti"
+    "liste fiyatı"
   ],
-  "P2285": [],
-  "P2286": [],
+  "P2285": [
+    "enberi tarihi",
+    "perihel tarihi"
+  ],
+  "P2286": [
+    "atardamar beslenmesi",
+    "arteriyel besleme",
+    "atardamar kaynağı"
+  ],
   "P2288": [
     "lenf drenajı",
     "lenfli drenaj"
   ],
-  "P2289": [],
+  "P2289": [
+    "toplardamar drenajı",
+    "venöz akaçlama"
+  ],
   "P2291": [
     "gösterildiği müzik grafiği",
     "gösterildiği müzik listesi",
@@ -2794,14 +4087,25 @@
   "P2292": [
     "tüketim"
   ],
-  "P2293": [],
-  "P2294": [],
+  "P2293": [
+    "genetik bağlantı",
+    "hastalık-gen ilişkisi"
+  ],
+  "P2294": [
+    "dış ticaret dengesi",
+    "ticaret dengesi",
+    "ihracat-ithalat dengesi"
+  ],
   "P2295": [
     "kâr",
     "net gelir",
     "net getiri"
   ],
-  "P2296": [],
+  "P2296": [
+    "para stoku",
+    "para mevcudu",
+    "parasal taban"
+  ],
   "P2297": [
     "endüstriye göre istihdam",
     "sektöre göre istihdam"
@@ -2824,9 +4128,15 @@
     "kısıtlamaya ilişkin istisnalar",
     "dışında"
   ],
-  "P2305": [],
+  "P2305": [
+    "özellik kısıtlaması ögesi",
+    "kısıtlama ögesi"
+  ],
   "P2308": [],
-  "P2309": [],
+  "P2309": [
+    "ilişki",
+    "bağıntı"
+  ],
   "P2310": [
     "en erken tarih (özellik kısıtlaması)"
   ],
@@ -2850,8 +4160,16 @@
     "sınırlamanın durumu",
     "zorunlu kısıtlama durumu"
   ],
-  "P2318": [],
-  "P2319": [],
+  "P2318": [
+    "debütan katılımcı",
+    "ilk kez yarışan",
+    "ilk kez katılan kişi"
+  ],
+  "P2319": [
+    "seçici",
+    "seçmen kitlesi",
+    "oy kullanan"
+  ],
   "P2320": [
     "artçı sarsıntı miktarı",
     "artçı sarsıntıların sayısı"
@@ -2862,8 +4180,13 @@
   "P2324": [
     "gömülü olanların sayısı"
   ],
-  "P2325": [],
-  "P2329": [],
+  "P2325": [
+    "ortalama sapma"
+  ],
+  "P2329": [
+    "karşıt kas",
+    "zıt kas"
+  ],
   "P2341": [
     "özgü olduğu yöre",
     "özgü yeri",
@@ -2874,19 +4197,20 @@
     "yöreye özgü"
   ],
   "P2348": [
-    "dönemi",
-    "spor sezonu",
     "tarihi dönemi",
     "tarihsel dönemi",
     "tiyatro sezonu",
-    "yasama dönemi",
-    "çağı"
+    "yasama dönemi"
   ],
   "P2351": [
     "mezar sayısı",
     "toplam mezar sayısı"
   ],
-  "P2352": [],
+  "P2352": [
+    "uygulanan takson",
+    "geçerli olduğu tür",
+    "test edildiği takson"
+  ],
   "P2353": [
     "birim"
   ],
@@ -2895,8 +4219,7 @@
     "bulunduğu liste",
     "ilgili liste",
     "konu listesi",
-    "liste",
-    "yer aldığı liste"
+    "liste"
   ],
   "P2358": [
     "praenomen"
@@ -2926,7 +4249,11 @@
   "P2366": [
     "agnomen"
   ],
-  "P237": [],
+  "P237": [
+    "hanedan arması",
+    "armalar",
+    "blazon"
+  ],
   "P2370": [
     "birimin ana ölçü birimine çevrilmesi"
   ],
@@ -2937,13 +4264,22 @@
     "doğal bolluk",
     "nispi bolluk"
   ],
-  "P2375": [],
-  "P2376": [],
+  "P2375": [
+    "süpersimetrik eşi",
+    "süperpartneri"
+  ],
+  "P2376": [
+    "süpersimetrik eşi olduğu"
+  ],
   "P2377": [],
   "P2378": [
     "yayımcı"
   ],
-  "P2379": [],
+  "P2379": [
+    "kullanımdan kalktığı sürüm",
+    "terk edildiği sürüm",
+    "geçersiz kılındığı sürüm"
+  ],
   "P2384": [
     "açıklayan ifade",
     "formülün açıklaması",
@@ -2977,10 +4313,13 @@
   ],
   "P2396": [
     "görüntüsü",
-    "aralık",
     "fonksiyon görüntüsü"
   ],
-  "P2402": [],
+  "P2402": [
+    "toplam gider",
+    "toplam masraf",
+    "genel harcama"
+  ],
   "P2403": [
     "bilanço toplamı",
     "varlıklar"
@@ -2992,13 +4331,18 @@
   "P2405": [
     "tavan maruziyet limiti"
   ],
-  "P2406": [],
-  "P2407": [],
+  "P2406": [
+    "maksimum zirve maruziyet sınırı",
+    "en yüksek maruziyet limiti"
+  ],
+  "P2407": [
+    "kısa dönem maruziyet sınırı",
+    "STEL",
+    "kısa süreli maruziyet limiti"
+  ],
   "P2408": [
-    "çağı",
     "anlatım dönemi",
     "anlatım zamanı",
-    "dönemi",
     "geçtiği dönem",
     "geçtiği zaman",
     "gerçekleştiği zaman"
@@ -3007,14 +4351,24 @@
     "askeri branşı",
     "formasyonu"
   ],
-  "P2414": [],
+  "P2414": [
+    "enzim substratı",
+    "etki ettiği substrat"
+  ],
   "P2415": [
     "en iyi kaydı",
     "en iyi kayıt",
     "en iyi performansı"
   ],
-  "P2416": [],
-  "P2417": [],
+  "P2416": [
+    "yarışılan spor dalı",
+    "yarıştığı branş",
+    "spor branşı"
+  ],
+  "P2417": [
+    "etap sıralaması",
+    "etap sonuçları"
+  ],
   "P2429": [
     "beklenen tamamlanma düzeyi",
     "beklenen tamamlanma seviyesi",
@@ -3027,7 +4381,10 @@
     "kalkış rulosu",
     "takeoff roll"
   ],
-  "P2433": [],
+  "P2433": [
+    "cins adının cinsiyeti",
+    "bilimsel cins adının cinsiyeti"
+  ],
   "P2436": [
     "elektrik basıncı",
     "elektrik gerilimi",
@@ -3038,16 +4395,35 @@
   "P2437": [
     "sezonlar"
   ],
-  "P2438": [],
+  "P2438": [
+    "anlatıcı",
+    "hikaye anlatıcısı",
+    "ravi"
+  ],
   "P2442": [
     "birim dönüştürme",
     "standart birime dönüştürme"
   ],
-  "P2443": [],
-  "P2444": [],
-  "P2445": [],
-  "P2453": [],
-  "P2462": [],
+  "P2443": [
+    "ulaşılan tur",
+    "erişilen aşama",
+    "varılan aşama"
+  ],
+  "P2444": [
+    "benzer karakter",
+    "görsel ikiz karakter"
+  ],
+  "P2445": [
+    "üst meta sınıfı"
+  ],
+  "P2453": [
+    "aday gösterilen",
+    "adaylık sahibi"
+  ],
+  "P2462": [
+    "dem üyesi",
+    "demos mensubu"
+  ],
   "P248": [
     "açıklandığı yer",
     "açıklayan kişi",
@@ -3065,7 +4441,6 @@
   "P2499": [
     "üst seviye lig",
     "üstündeki lig",
-    "yükseldiği lig",
     "yükselebildiği lig",
     "yükseleceği lig"
   ],
@@ -3077,10 +4452,13 @@
   "P2500": [
     "alt seviye (lig)",
     "altındaki lig seviyesi",
-    "düşeceği küme",
-    "düştüğü küme"
+    "düşeceği küme"
   ],
-  "P2501": [],
+  "P2501": [
+    "yarışma sonuçları",
+    "müsabaka sonuçları",
+    "derece"
+  ],
   "P2502": [
     "bisiklet yarışı klasmanı"
   ],
@@ -3096,8 +4474,15 @@
     "tarafından düzeltildi",
     "yazım hatası"
   ],
-  "P2512": [],
-  "P2515": [],
+  "P2512": [
+    "spin-off eseri",
+    "türev yapım",
+    "yan ürün"
+  ],
+  "P2515": [
+    "kostümcü",
+    "kostüm tasarımı"
+  ],
   "P2517": [
     "ödül alanlar",
     "ödül alanların kategorisi"
@@ -3105,30 +4490,39 @@
   "P2522": [
     "zafer",
     "galibi",
-    "kazanan",
     "kazananı",
     "kazanılan olay",
     "layık görülen",
     "zafer olayı"
   ],
-  "P2527": [],
-  "P2528": [],
+  "P2527": [
+    "moment büyüklüğü",
+    "moment magnitüdü",
+    "Mw ölçeği"
+  ],
+  "P2528": [
+    "Richter büyüklüğü",
+    "Richter magnitüdü",
+    "Richter skalası"
+  ],
   "P2532": [
     "en düşük basınç"
   ],
-  "P2541": [
-    "çalışma alanı",
-    "sorumluluk alanı"
-  ],
+  "P2541": [],
   "P2542": [
     "KGA"
   ],
-  "P2545": [],
-  "P2546": [
-    "arkadaşı",
-    "ortağı"
+  "P2545": [
+    "atış tarzı",
+    "kriket atış stili"
   ],
-  "P2547": [],
+  "P2546": [
+    "arkadaşı"
+  ],
+  "P2547": [
+    "perimetre",
+    "dış çevre uzunluğu"
+  ],
   "P2548": [
     "strand yönelimi"
   ],
@@ -3137,8 +4531,15 @@
     "performansı",
     "yorumu"
   ],
-  "P2551": [],
-  "P2553": [],
+  "P2551": [
+    "şiir vezni",
+    "ölçü",
+    "aruz ölçüsü"
+  ],
+  "P2553": [
+    "aday eser",
+    "ödül eseri"
+  ],
   "P2554": [
     "baş dekoratör"
   ],
@@ -3150,8 +4551,7 @@
     "tek seferlik ücreti"
   ],
   "P2556": [
-    "çap",
-    "çapı"
+    "çap"
   ],
   "P2557": [
     "saat vuruşu",
@@ -3166,7 +4566,10 @@
     "süper gücü",
     "süpergücü"
   ],
-  "P2564": [],
+  "P2564": [
+    "köppen sınıflandırması",
+    "köppen iklim tipi"
+  ],
   "P2565": [
     "sera ısınma potansiyeli"
   ],
@@ -3176,25 +4579,30 @@
   "P2568": [
     "tarafından yürürlükten kaldırıldı"
   ],
-  "P2571": [],
+  "P2571": [
+    "güven düzeyi",
+    "sigma değeri",
+    "standart sapma sayısı"
+  ],
   "P2573": [
     "okul dışı çocuk sayısı",
     "okumayan çocuk sayısı"
   ],
-  "P2575": [],
+  "P2575": [
+    "ölçülen büyüklük",
+    "ölçüm büyüklüğü",
+    "ölçtüğü büyüklük"
+  ],
   "P2577": [
     "mantıksal kuralı"
   ],
   "P2578": [
     "araştırmaları",
-    "çalışmaları",
     "inceleme alanı",
-    "incelemeleri",
-    "çalışma alanı"
+    "incelemeleri"
   ],
   "P2579": [
-    "bilimde, bu çalışmalar",
-    "ilgi alanı"
+    "bilimde, bu çalışmalar"
   ],
   "P2583": [
     "açısal çap mesafesi",
@@ -3208,7 +4616,10 @@
   "P2587": [
     "sesbirimi"
   ],
-  "P2591": [],
+  "P2591": [
+    "dilbilgisi örneği",
+    "gramer örneği"
+  ],
   "P2595": [
     "en fazla eğim derecesi",
     "maksimum gradyan",
@@ -3218,7 +4629,10 @@
     "medeniyet",
     "uygarlık"
   ],
-  "P2597": [],
+  "P2597": [
+    "gram boyaması",
+    "gram testi"
+  ],
   "P2599": [
     "blok uzunluğu"
   ],
@@ -3226,7 +4640,6 @@
     "bağlı olduğu kişi",
     "evlendiği",
     "evliliği",
-    "hayat arkadaşı",
     "karısı",
     "kocası",
     "yaşam arkadaşı"
@@ -3235,7 +4648,10 @@
     "döküm kalınlığı",
     "duvar kalınlığı"
   ],
-  "P2614": [],
+  "P2614": [
+    "unesco dünya mirası kriterleri",
+    "dünya mirası seçim kriterleri"
+  ],
   "P2629": [
     "BBFC sertifikası"
   ],
@@ -3243,10 +4659,8 @@
     "başkanlık konutu",
     "başkanlık sarayı",
     "evi",
-    "ikametgâhı",
     "sarayı",
     "vali konağı",
-    "yaşadığı yer",
     "yönettiği yer"
   ],
   "P2630": [
@@ -3266,14 +4680,15 @@
     "tutuklu bulunduğu cezaevi",
     "tutulduğu cezaevi"
   ],
-  "P2633": [],
+  "P2633": [
+    "konunun coğrafi yapısı"
+  ],
   "P2634": [
     "oturan model",
     "poz veren",
     "pozlanan"
   ],
   "P2635": [
-    "bölüm sayısı",
     "antoloji filmi bölüm sayıs",
     "bölüm miktarı",
     "bu sanat eserinin parça sayısı",
@@ -3286,7 +4701,10 @@
     "sahne sayısı",
     "şarkıların sayısı"
   ],
-  "P2637": [],
+  "P2637": [
+    "rars sınıflandırması",
+    "rus yaş sınıflandırması"
+  ],
   "P264": [
     "kaset yapımcısı",
     "müzik danışmanlığı şirketi",
@@ -3295,21 +4713,29 @@
     "müzik yapımcısı",
     "plak"
   ],
-  "P2643": [],
+  "P2643": [
+    "carnegie sınıflandırması"
+  ],
   "P2645": [
     "ortalama ömür"
   ],
-  "P2647": [],
+  "P2647": [
+    "malzemenin kaynağı",
+    "hammadde kaynağı",
+    "malzeme menşei"
+  ],
   "P2650": [
-    "araştırma alanı",
-    "merakı",
-    "çalışma alanı"
+    "merakı"
   ],
   "P2652": [
     "ile ortaklık",
     "ile ticari ortaklık"
   ],
-  "P2658": [],
+  "P2658": [
+    "scoville derecesi",
+    "scoville birimi",
+    "acılık ölçeği"
+  ],
   "P2659": [
     "topoğrafya yalıtımı",
     "yalıtımı"
@@ -3324,7 +4750,11 @@
   "P2662": [
     "bireysel tüketim oranı"
   ],
-  "P2663": [],
+  "P2663": [
+    "cet1 oranı",
+    "çekirdek sermaye oranı",
+    "ana sermaye yeterlilik oranı"
+  ],
   "P2664": [
     "satılan birim sayısı",
     "satılan birimler",
@@ -3332,7 +4762,12 @@
     "satılan model sayısı",
     "satış"
   ],
-  "P2665": [],
+  "P2665": [
+    "alkol derecesi",
+    "alkol oranı",
+    "hacimsel alkol oranı",
+    "abv"
+  ],
   "P2667": [
     "bunun için kullanılan şablon",
     "özellik şablonu"
@@ -3349,16 +4784,20 @@
   "P2670": [
     "kompozisyonunun parçaları",
     "sınıfındaki örnekleri",
-    "sınıfını oluşturan",
     "sınıfını oluşturan alt parçalar"
   ],
-  "P2673": [],
-  "P2674": [],
+  "P2673": [
+    "yukarı akış sonraki geçit",
+    "bir üst geçit"
+  ],
+  "P2674": [
+    "aşağı akış sonraki geçit",
+    "bir alt geçit"
+  ],
   "P2675": [
     "cevap olarak",
     "tepki",
-    "tepki eseri",
-    "yanıt olarak"
+    "tepki eseri"
   ],
   "P2679": [
     "tanıtım yazarı"
@@ -3377,7 +4816,12 @@
   "P2684": [
     "Kijkwijzer derecesi"
   ],
-  "P2695": [],
+  "P2695": [
+    "tip lokalite",
+    "tip yer",
+    "jeolojik tip lokalite",
+    "tip bölge"
+  ],
   "P27": [
     "uyruğu"
   ],
@@ -3388,26 +4832,38 @@
     "belge biçimi",
     "belge formatı",
     "belge türü",
-    "biçimi",
     "dosya biçimi",
     "dosya türü",
-    "formatı",
     "sıkıştırma biçimi",
     "sıkıştırma formatı",
-    "sıkıştırma türü",
-    "türü"
+    "sıkıştırma türü"
   ],
   "P2702": [
     "dağıtılmış veri kümesi"
   ],
-  "P2710": [],
+  "P2710": [
+    "en düşük öldürücü doz",
+    "minimum letal konsantrasyon",
+    "asgari öldürücü konsantrasyon"
+  ],
   "P2712": [
     "LC50",
     "LC₅₀"
   ],
-  "P2715": [],
-  "P2717": [],
-  "P2718": [],
+  "P2715": [
+    "seçildiği seçim dönemi",
+    "kazandığı seçim"
+  ],
+  "P2717": [
+    "gözlenebilir advers etki görülmeyen düzey",
+    "NOAEL",
+    "etkisiz gözlem düzeyi"
+  ],
+  "P2718": [
+    "gözlenen en düşük etki düzeyi",
+    "LOAEL",
+    "en düşük advers etki düzeyi"
+  ],
   "P272": [
     "prodüksiyon şirketi"
   ],
@@ -3424,18 +4880,30 @@
     "ayrık kombinasyonları",
     "ayrıştığı kombinasyonlar"
   ],
-  "P2739": [],
+  "P2739": [
+    "yazı karakteri",
+    "font",
+    "kullanılan font",
+    "kullanılan yazı karakteri"
+  ],
   "P2743": [
     "koordine isim"
   ],
-  "P2746": [],
+  "P2746": [
+    "üretim verileri",
+    "üretim rakamları"
+  ],
   "P2747": [
     "Filmiroda sınıflandırması"
   ],
   "P275": [
     "içerik lisansı"
   ],
-  "P2754": [],
+  "P2754": [
+    "yapım tarihi",
+    "çekim tarihi",
+    "yapım dönemi"
+  ],
   "P2756": [
     "EIRIN film derecelendirme kategorisi"
   ],
@@ -3458,11 +4926,31 @@
     "semtinde",
     "taşınabilir nesnel konumu"
   ],
-  "P2769": [],
-  "P277": [],
-  "P2770": [],
-  "P2781": [],
-  "P2784": [],
+  "P2769": [
+    "proje bütçesi",
+    "ayrılan bütçe",
+    "bütçe tutarı"
+  ],
+  "P277": [
+    "yazılım dili",
+    "geliştirme dili",
+    "kodlama dili"
+  ],
+  "P2770": [
+    "gelir kaynakları",
+    "kazanç kaynağı",
+    "para kaynağı"
+  ],
+  "P2781": [
+    "yarış süresi",
+    "yarışma zamanı",
+    "yarış derecesi"
+  ],
+  "P2784": [
+    "Mercalli şiddet ölçeği",
+    "değiştirilmiş Mercalli ölçeği",
+    "Mercalli ölçeği"
+  ],
   "P2787": [
     "ana açıklığın uzunluğu",
     "ana açıklık uzunluğu",
@@ -3473,13 +4961,11 @@
     "bağı bulunan",
     "bağlandığı",
     "bağlı olan",
-    "bağlı olduğu",
     "buluşan",
     "buluştuğu",
     "kesiştiği"
   ],
   "P279": [
-    "alt sınıfı",
     "aynı zamanda bir",
     "bir çeşidi",
     "bir kümesi",
@@ -3490,21 +4976,42 @@
     "kategorisidir",
     "zorunlu olarak ayrıca bir"
   ],
-  "P2790": [],
-  "P2791": [],
-  "P2793": [],
-  "P2797": [],
+  "P2790": [
+    "net ton"
+  ],
+  "P2791": [
+    "güç tüketimi",
+    "elektrik tüketimi"
+  ],
+  "P2793": [
+    "köprü altı açıklığı",
+    "serbest yükseklik"
+  ],
+  "P2797": [
+    "akustik güç seviyesi",
+    "ses güç seviyesi"
+  ],
   "P2803": [
     "Vikiveri zaman hassasiyeti"
   ],
-  "P2806": [],
-  "P2807": [],
-  "P2808": [],
+  "P2806": [
+    "titreşim seviyesi",
+    "titreşim düzeyi"
+  ],
+  "P2807": [
+    "mol hacmi"
+  ],
+  "P2808": [
+    "dalgaboyu"
+  ],
   "P2813": [
     "organizasyon yayını",
     "propaganda organı"
   ],
-  "P2817": [],
+  "P2817": [
+    "miras anıtları listesinde yer alır",
+    "kültürel miras listesinde"
+  ],
   "P282": [
     "alfabesi",
     "diyalektiği",
@@ -3513,10 +5020,12 @@
     "karakter sistemi",
     "yazısı"
   ],
-  "P2820": [],
+  "P2820": [
+    "küme kardinalitesi",
+    "eleman sayısı"
+  ],
   "P2821": [
-    "ikincil ekonomik değeri",
-    "yan ürün"
+    "ikincil ekonomik değeri"
   ],
   "P2822": [
     "kaynaklandığı ürün",
@@ -3531,8 +5040,13 @@
     "çiçeğinin rengi",
     "çiçekteki renk"
   ],
-  "P2828": [],
-  "P2831": [],
+  "P2828": [
+    "şirket yetkilisi",
+    "kurum yetkilisi"
+  ],
+  "P2831": [
+    "totem"
+  ],
   "P2834": [
     "kişisel vergi oranı"
   ],
@@ -3542,7 +5056,10 @@
   "P2836": [
     "en yüksek gelir eşiği"
   ],
-  "P2838": [],
+  "P2838": [
+    "sanatçı adı",
+    "usta adı"
+  ],
   "P2839": [
     "nasıl yürüdüğü",
     "yürüme türü"
@@ -3550,7 +5067,10 @@
   "P2841": [
     "ortalama başlangıç yaşı"
   ],
-  "P2842": [],
+  "P2842": [
+    "nikah yeri",
+    "evlilik yeri"
+  ],
   "P2844": [
     "oran",
     "etki",
@@ -3563,7 +5083,6 @@
     "tekerlekli sandalye erişimi"
   ],
   "P2848": [
-    "kablosuz internet",
     "Wi-Fi erişimi",
     "WLAN"
   ],
@@ -3576,21 +5095,26 @@
   ],
   "P2851": [
     "kabul edilen kredi kartları",
-    "kabul edilen ödeme türleri",
     "kabul edilen ödeme yöntemleri"
   ],
-  "P2852": [],
+  "P2852": [
+    "acil durum numarası",
+    "imdat numarası",
+    "acil çağrı numarası"
+  ],
   "P2853": [
     "elektrik konnekterü tipi",
     "fiş soketi tipi",
     "şebeke fişi tipi"
   ],
-  "P2854": [],
+  "P2854": [
+    "hastalık maliyeti",
+    "hastalık etkisi"
+  ],
   "P2855": [
     "katma değer vergisi oranı"
   ],
   "P286": [
-    "müdür",
     "kıdemli antrenör",
     "koç",
     "koçluk",
@@ -3605,7 +5129,10 @@
   "P2868": [
     "öznenin rolü var"
   ],
-  "P2869": [],
+  "P2869": [
+    "rekor ilerleyişi",
+    "rekor gelişimi"
+  ],
   "P287": [
     "desinatörü",
     "dizayn eden",
@@ -3615,12 +5142,23 @@
     "tasarımcı",
     "tasarımcısı"
   ],
-  "P2872": [],
-  "P2873": [],
+  "P2872": [
+    "turizm ofisi",
+    "turist danışma merkezi",
+    "ziyaretçi ofisi"
+  ],
+  "P2873": [
+    "uzayda geçirilen süre",
+    "toplam uzay süresi",
+    "uzay görev süresi"
+  ],
   "P2875": [
     "izlenen özellik (tersi)"
   ],
-  "P2876": [],
+  "P2876": [
+    "birim türü",
+    "özelliğin birimi"
+  ],
   "P2881": [
     "çıktığı küme",
     "geçtiği lig",
@@ -3647,8 +5185,15 @@
     "uzay aracı sınıfı",
     "uzay gemisi sınıfı"
   ],
-  "P2894": [],
-  "P2895": [],
+  "P2894": [
+    "hafta günü",
+    "günü"
+  ],
+  "P2895": [
+    "azami sürekli rüzgâr hızı",
+    "en yüksek sürekli rüzgâr",
+    "maksimum sürekli rüzgâr"
+  ],
   "P2896": [
     "periyodik yayın süresi",
     "yayın döngüsü",
@@ -3670,14 +5215,16 @@
     "basım yeri",
     "çıkış yeri",
     "dağıtıldığı yer",
-    "dağıtım yeri",
     "serbest bırakıldığı yer",
     "yayım yeri",
     "yayınlandığı konum",
     "yayınlandığı şehir",
     "yayınlandığı yer"
   ],
-  "P2911": [],
+  "P2911": [
+    "fark süresi",
+    "geri kalınan süre"
+  ],
   "P2912": [
     "mayo"
   ],
@@ -3698,12 +5245,15 @@
   "P2923": [
     "odak düzleminin yüksekliği"
   ],
-  "P2925": [],
+  "P2925": [
+    "koruyuculuk alanı",
+    "himaye alanı",
+    "azizin koruduğu alan"
+  ],
   "P2927": [
     "alan yüzdesi olarak su"
   ],
   "P2928": [
-    "depolama kapasitesi",
     "hafıza"
   ],
   "P2929": [
@@ -3714,14 +5264,19 @@
     "bağlantı noktaları",
     "portları"
   ],
-  "P2936": [],
+  "P2936": [
+    "konuşulan dil",
+    "yaygın dil",
+    "yerel dil"
+  ],
   "P2937": [
     "meclis dönemi"
   ],
-  "P2955": [],
-  "P2957": [
-    "kapasite"
+  "P2955": [
+    "ceza sayısı",
+    "penaltı puanı"
   ],
+  "P2957": [],
   "P2959": [
     "birden fazla Vikipedi maddesi",
     "birden fazla Vikipedi makalesi"
@@ -3729,7 +5284,10 @@
   "P2960": [
     "arşivlendiği tarih"
   ],
-  "P2962": [],
+  "P2962": [
+    "satranç ünvanı",
+    "FIDE unvanı"
+  ],
   "P2964": [
     "oy hakkı",
     "oy kullanma hakkı",
@@ -3752,12 +5310,21 @@
     "tekerlek düzeni"
   ],
   "P2989": [
-    "durumu",
     "hali"
   ],
-  "P2992": [],
-  "P2993": [],
-  "P2997": [],
+  "P2992": [
+    "yazılım kalite kontrolü",
+    "yazılım kalite süreci"
+  ],
+  "P2993": [
+    "oktanol-su dağılım katsayısı",
+    "logP",
+    "dağılım katsayısı"
+  ],
+  "P2997": [
+    "yasal yetişkinlik yaşı",
+    "ergenlik yaşı"
+  ],
   "P2998": [
     "asgari adaylık yaşı",
     "en düşük adaylık yaşı sınırı"
@@ -3776,11 +5343,13 @@
     "evlenme yaşı",
     "evlenmeye izin verilen yaş"
   ],
-  "P3001": [],
+  "P3001": [
+    "emeklilik çağı",
+    "emekli olma yaşı"
+  ],
   "P3005": [
     "geçerli bölgesi",
     "geçerli ülkesi",
-    "geçtiği yer",
     "kullanıldığı yer"
   ],
   "P301": [
@@ -3790,10 +5359,12 @@
     "kategorinin ana makalesi",
     "kategorinin ilgili olduğu sayfa"
   ],
-  "P3013": [],
+  "P3013": [
+    "yüzeysel gerilim",
+    "yüzey gerginliği"
+  ],
   "P3014": [
-    "uygulanan yasalar",
-    "yasal dayanak"
+    "uygulanan yasalar"
   ],
   "P3015": [
     "yedek ekip",
@@ -3805,9 +5376,21 @@
     "sit bölgesi",
     "ulusal parkı"
   ],
-  "P3019": [],
-  "P3020": [],
-  "P3022": [],
+  "P3019": [
+    "demiryolu sinyal sistemi",
+    "tren sinyalizasyonu",
+    "demiryolu işaretleşme sistemi"
+  ],
+  "P3020": [
+    "su kalış süresi",
+    "suyun bekleme süresi",
+    "su tutunma süresi"
+  ],
+  "P3022": [
+    "bayraktar",
+    "bayrak taşıyan",
+    "ülke bayrağı taşıyıcısı"
+  ],
   "P3025": [
     "açık günü",
     "açık olduğu gün",
@@ -3837,14 +5420,24 @@
     "bitişiğindeki yapı",
     "yanındaki bina"
   ],
-  "P3033": [],
-  "P3036": [],
+  "P3033": [
+    "paket yöneticisi",
+    "yazılım paket yöneticisi"
+  ],
+  "P3036": [
+    "yağış miktarı",
+    "yağış seviyesi",
+    "yağış derinliği"
+  ],
   "P3037": [
     "CRS",
     "koordinat referans sistemi",
     "SRS"
   ],
-  "P3039": [],
+  "P3039": [
+    "aks mesafesi",
+    "tekerlek aralığı"
+  ],
   "P3041": [
     "ışık yoğunluğu",
     "parlaklık şiddeti"
@@ -3858,7 +5451,9 @@
   "P3070": [
     "dinamik akmazlık"
   ],
-  "P3071": [],
+  "P3071": [
+    "standart mol entropisi"
+  ],
   "P3075": [
     "devletin dini",
     "yerleşik din"
@@ -3869,8 +5464,16 @@
   "P3080": [
     "video oyunu sanatçısı"
   ],
-  "P3081": [],
-  "P3082": [],
+  "P3081": [
+    "zarar görmüş",
+    "hasarlı",
+    "hasar alan"
+  ],
+  "P3082": [
+    "yok edilen",
+    "tahrip edilen",
+    "yıkılmış"
+  ],
   "P3085": [
     "kazanılan lig",
     "kazanıldığında oynanacak lig"
@@ -3879,12 +5482,21 @@
     "azami hız",
     "maksimum hız"
   ],
-  "P3087": [],
+  "P3087": [
+    "vergi geliri",
+    "kamu geliri",
+    "mali gelir"
+  ],
   "P3091": [
     "atı",
     "savaş atı"
   ],
-  "P3092": [],
+  "P3092": [
+    "yapım ekibi üyesi",
+    "film ekibi üyesi",
+    "çekim ekibi üyesi",
+    "set ekibi"
+  ],
   "P3093": [
     "kurtaran"
   ],
@@ -3892,14 +5504,17 @@
     "geliştiği anatomik yapı",
     "geliştirildiği anatomik yapı"
   ],
-  "P3095": [],
+  "P3095": [
+    "uygulayıcı",
+    "icra eden",
+    "uğraşanlar",
+    "meslek erbabı"
+  ],
   "P3096": [
     "Anahtar Deliği Biçimlendirme Dili dosyası",
     "Keyhole Markup Language dosyası"
   ],
   "P31": [
-    "sınıfı",
-    "türü",
     "içinde yer aldığı tür",
     "ne olduğu",
     "neyin örneği olduğu",
@@ -3907,7 +5522,11 @@
     "sınıflandırması",
     "türleri"
   ],
-  "P3103": [],
+  "P3103": [
+    "gramer zamanı",
+    "fiil zamanı",
+    "zaman kipi"
+  ],
   "P3113": [
     "bulunmayan bölümü",
     "bulunmayan parçası",
@@ -3919,7 +5538,6 @@
     "kayıp parçası",
     "olmayan bölümü",
     "olmayan parçası",
-    "sahibi olmadığı",
     "sahip olmadığı parça"
   ],
   "P3137": [
@@ -3934,7 +5552,10 @@
   "P3149": [
     "molekül konformasyonları"
   ],
-  "P3150": [],
+  "P3150": [
+    "doğum tarihi günü",
+    "yaş günü"
+  ],
   "P3156": [
     "ACB",
     "ACB derecesi"
@@ -3959,10 +5580,12 @@
   ],
   "P3173": [
     "bakış görüntüsü",
-    "görünen manzara",
-    "manzarası"
+    "görünen manzara"
   ],
-  "P3174": [],
+  "P3174": [
+    "art direktör",
+    "sanat direktörü"
+  ],
   "P3179": [
     "çakışma",
     "kaplama",
@@ -3971,25 +5594,63 @@
     "kısmen bu bölgesel varlıkta bulunur",
     "üst üste gelme"
   ],
-  "P3189": [],
-  "P3190": [],
-  "P3195": [],
-  "P3205": [],
+  "P3189": [
+    "sinirlendiren",
+    "innervasyonu sağlayan sinir"
+  ],
+  "P3190": [
+    "sinirlendirdiği",
+    "innervasyon sağladığı yapı"
+  ],
+  "P3195": [
+    "lig puanlama sistemi"
+  ],
+  "P3205": [
+    "hastası olduğu kişi",
+    "tedavi eden"
+  ],
   "P3216": [
     "BARS"
   ],
-  "P3251": [],
-  "P3252": [],
-  "P3253": [],
-  "P3259": [],
-  "P3260": [],
-  "P3261": [],
+  "P3251": [
+    "minimum canlılık sıcaklığı",
+    "en düşük yaşayabilir sıcaklık",
+    "alt yaşam sıcaklığı"
+  ],
+  "P3252": [
+    "maksimum canlılık sıcaklığı",
+    "en yüksek yaşayabilir sıcaklık",
+    "üst yaşam sıcaklığı"
+  ],
+  "P3253": [
+    "optimum canlılık sıcaklığı",
+    "en uygun yaşam sıcaklığı",
+    "ideal yaşam sıcaklığı"
+  ],
+  "P3259": [
+    "somut olmayan miras statüsü",
+    "somut olmayan kültürel miras statüsü"
+  ],
+  "P3260": [
+    "kazanılan puan",
+    "verilen puanlar",
+    "ödül puanı"
+  ],
+  "P3261": [
+    "ana gövdesi"
+  ],
   "P3262": [
     "anatomik şube",
     "ayrıldığı şube"
   ],
-  "P3263": [],
-  "P3264": [],
+  "P3263": [
+    "taban kenarı",
+    "taban yüzü"
+  ],
+  "P3264": [
+    "sayı tabanı",
+    "basamak tabanı"
+  ],
   "P3270": [
     "zorunlu eğitim için en düşük yaş"
   ],
@@ -3999,9 +5660,19 @@
   "P3274": [
     "içerik dağıtıcı"
   ],
-  "P3275": [],
-  "P3279": [],
-  "P3294": [],
+  "P3275": [
+    "storyboard çizeri",
+    "öykü taslağı sanatçısı",
+    "resimli senaryo sanatçısı"
+  ],
+  "P3279": [
+    "istatistik önderi",
+    "istatistiksel lider"
+  ],
+  "P3294": [
+    "karakter kodlaması",
+    "şifreleme biçimi"
+  ],
   "P3300": [
     "koro yönetmeni",
     "müzik yönetmeni",
@@ -4013,14 +5684,16 @@
     "tarafından yayınlandı",
     "televizyon ağı",
     "televizyon istasyonu",
-    "televizyon kanalı",
-    "TV kanalı",
-    "yayımlayan",
-    "yayımcı",
-    "yayınlayan"
+    "yayımlayan"
   ],
-  "P3306": [],
-  "P3310": [],
+  "P3306": [
+    "ICAA sınıflandırması"
+  ],
+  "P3310": [
+    "kas eylemi",
+    "kas işlevi",
+    "kas fonksiyonu"
+  ],
   "P3320": [
     "yönetim kurulu üyeleri",
     "yönetim kurulu üyesi"
@@ -4028,11 +5701,19 @@
   "P3323": [
     "ihtilaf sırasındaki rakip"
   ],
-  "P3335": [],
+  "P3335": [
+    "bağlantılı tehlike",
+    "ilgili tehlike",
+    "olası tehlike"
+  ],
   "P3337": [
     "nesil zamanı"
   ],
-  "P3342": [],
+  "P3342": [
+    "önemli şahsiyet",
+    "kayda değer kişi",
+    "ilgili önemli kişi"
+  ],
   "P3349": [
     "amaçlanan kargo",
     "amaçlanan yük",
@@ -4075,8 +5756,16 @@
     "kız kardeşi",
     "küçük kardeşi"
   ],
-  "P3374": [],
-  "P3387": [],
+  "P3374": [
+    "endianlık",
+    "bayt sırası",
+    "bit sıralaması"
+  ],
+  "P3387": [
+    "en düşük işitilebilir frekans",
+    "minimum işitme frekansı",
+    "alt işitme sınırı"
+  ],
   "P3395": [
     "kalp frekansı",
     "kalp nabzı"
@@ -4084,16 +5773,17 @@
   "P3402": [
     "CNC film değerlendirmesi"
   ],
-  "P3403": [
-    "bitişiğinde"
-  ],
+  "P3403": [],
   "P3415": [
     "dönemden beri"
   ],
   "P3416": [
     "döneme kadar"
   ],
-  "P3428": [],
+  "P3428": [
+    "INCAA derecelendirmesi",
+    "INCAA sınıflandırması"
+  ],
   "P3432": [
     "ana hücre hattı"
   ],
@@ -4113,18 +5803,24 @@
     "kullandığı tren",
     "normalde kullandığı motosiklet"
   ],
-  "P3439": [],
+  "P3439": [
+    "açısal ayırma gücü",
+    "açısal ayırma"
+  ],
   "P344": [
     "alıcı yönetmeni"
   ],
   "P3440": [
-    "ölçümü",
     "ölçü işareti",
     "ölçü işaretlemesi",
     "ölçütü",
     "zaman işareti"
   ],
-  "P3447": [],
+  "P3447": [
+    "veri yansıtır",
+    "ayna site",
+    "yansı site"
+  ],
   "P3448": [
     "üvey anne",
     "üvey baba"
@@ -4133,13 +5829,19 @@
     "bir sezonu",
     "lig spor sezonu",
     "lig veya müsabaka spor sezonu",
-    "sezonu",
     "spor ligi sezonu",
     "spor müsabakası sezonu",
     "spor turnuvası sezonu"
   ],
-  "P3452": [],
-  "P3457": [],
+  "P3452": [
+    "çıkarım kaynağı",
+    "çıkarsanan kaynak"
+  ],
+  "P3457": [
+    "olgu ölüm oranı",
+    "vaka ölüm hızı",
+    "hastalık ölüm oranı"
+  ],
   "P3460": [
     "baş albayı"
   ],
@@ -4150,30 +5852,88 @@
   "P3464": [
     "ilaç için pazarlama ruhsatı"
   ],
-  "P3465": [],
-  "P3485": [],
-  "P3486": [],
-  "P3487": [],
-  "P3488": [],
-  "P3489": [],
-  "P3490": [],
-  "P3491": [],
-  "P3492": [],
-  "P3493": [],
-  "P3494": [],
-  "P3496": [],
-  "P3497": [],
-  "P35": [],
-  "P3501": [],
+  "P3465": [
+    "en yüksek işitilebilir frekans",
+    "maksimum işitme frekansı",
+    "üst işitme sınırı"
+  ],
+  "P3485": [
+    "ısırma gücü katsayısı",
+    "ısırık kuvveti katsayısı"
+  ],
+  "P3486": [
+    "normal solunum sayısı",
+    "dakikadaki solunum sayısı",
+    "solunum frekansı"
+  ],
+  "P3487": [
+    "insanlarda maksimum kuluçka süresi",
+    "insanlarda en uzun kuluçka süresi",
+    "azami inkübasyon süresi"
+  ],
+  "P3488": [
+    "insanlarda minimum kuluçka süresi",
+    "insanlarda en kısa kuluçka süresi",
+    "asgari inkübasyon süresi"
+  ],
+  "P3489": [
+    "hamilelik kategorisi",
+    "gebelik risk kategorisi",
+    "ilaç gebelik kategorisi"
+  ],
+  "P3490": [
+    "kas başlangıcı",
+    "kasın başlangıç noktası",
+    "origo"
+  ],
+  "P3491": [
+    "kas yapışma yeri",
+    "kasın sonlanma noktası",
+    "insersiyo"
+  ],
+  "P3492": [
+    "bulaşma katsayısı",
+    "R0",
+    "temel üreme oranı",
+    "bulaşma sayısı"
+  ],
+  "P3493": [
+    "ilaç yasal durumu",
+    "reçete statüsü",
+    "ilacın yasal statüsü"
+  ],
+  "P3494": [
+    "sayı klasmanı",
+    "puan sıralaması"
+  ],
+  "P3496": [
+    "takım puan klasmanı",
+    "takımların puan sıralaması"
+  ],
+  "P3497": [
+    "takım zaman klasmanı",
+    "takımların zaman sıralaması"
+  ],
+  "P35": [
+    "devlet reisi",
+    "ülkenin en üst yöneticisi"
+  ],
+  "P3501": [
+    "Hristiyan ayini",
+    "litürjik ayin",
+    "kilise ayini"
+  ],
   "P3512": [
-    "hareketi",
     "hareket aracı",
     "hareket araçları"
   ],
   "P3529": [
     "medyan gelir"
   ],
-  "P3530": [],
+  "P3530": [
+    "golf par değeri",
+    "par sayısı"
+  ],
   "P355": [
     "alt kuruluşları",
     "alt kurumları",
@@ -4205,15 +5965,21 @@
     "diskografi bağlantısı",
     "diskografi linki"
   ],
-  "P3592": [],
-  "P36": [],
+  "P3592": [
+    "saros serisi",
+    "tutulmanın saros serisi",
+    "saros döngüsü"
+  ],
+  "P36": [
+    "başşehir",
+    "başkent şehri",
+    "yönetim merkezi"
+  ],
   "P360": [
-    "listesi",
     "ait olduğu liste",
     "ana madde listesi"
   ],
   "P3602": [
-    "seçildiği seçim",
     "aday olduğu seçimler",
     "seçileceği seçim"
   ],
@@ -4249,7 +6015,9 @@
     "çevresel problem",
     "önemli çevresel etki"
   ],
-  "P3648": [],
+  "P3648": [
+    "natureserve statüsü"
+  ],
   "P3650": [
     "JMK film derecesi",
     "JMK film reytingi"
@@ -4260,15 +6028,16 @@
     "misyonu",
     "ne için kullanıldığı",
     "nerede kullanıldığı",
-    "rolü",
     "yararı",
-    "faydaları",
-    "kullanımları"
+    "faydaları"
   ],
-  "P3679": [],
+  "P3679": [
+    "hisse senedi endeksi",
+    "borsa göstergesi",
+    "pay piyasası endeksi"
+  ],
   "P3680": [
     "göre",
-    "destekleyen",
     "iddia edilen"
   ],
   "P369": [
@@ -4285,8 +6054,14 @@
     "avatarı",
     "reenkarnasyonu"
   ],
-  "P3709": [],
-  "P371": [],
+  "P3709": [
+    "vikiveri'den farklı değerli kategori"
+  ],
+  "P371": [
+    "program sunucusu",
+    "takdimci",
+    "muhabir"
+  ],
   "P3712": [
     "amaç",
     "belirtilen hedef",
@@ -4296,22 +6071,32 @@
     "niyet",
     "ulaşılmak istenen hedef"
   ],
-  "P3713": [],
+  "P3713": [
+    "vikiveri'de bulunmayan değer kategorisi"
+  ],
   "P3716": [
-    "sosyal durum",
     "sosyal sınıf",
     "sosyal sınıflandırma"
   ],
   "P3719": [
-    "düzenleyen",
     "borsanın düzenleyicisi",
     "düzenleyici otorite",
     "faaliyetin düzenleyicisi",
     "finansal düzenleyicisi"
   ],
-  "P3729": [],
-  "P3730": [],
-  "P3734": [],
+  "P3729": [
+    "alt rütbe",
+    "bir alt seviye",
+    "alt kademe"
+  ],
+  "P3730": [
+    "üst rütbe",
+    "bir üst seviye",
+    "üst kademe"
+  ],
+  "P3734": [
+    "vikiveri ile eşleşen kategori"
+  ],
   "P3737": [
     "en yüksek dalga boyu hassasiyeti",
     "maks dalga boyu",
@@ -4322,19 +6107,25 @@
     "min dalga boyu",
     "minimum dalga boyu elektromanyetik hassasiyeti"
   ],
-  "P3739": [],
+  "P3739": [
+    "çiçeklenme",
+    "çiçek dizilişi",
+    "salkım durumu"
+  ],
   "P3740": [
     "çalışma sayısı",
-    "çevrimiçi erişilebilen eserlerin sayısı",
     "eser miktarı",
     "oluşturduğu eser sayısı",
     "yarattığı eser sayısı"
   ],
-  "P3741": [],
+  "P3741": [
+    "tohum dağılımı",
+    "tohum saçılımı",
+    "tohum yayılma şekli"
+  ],
   "P3744": [
     "abone",
-    "takipçi",
-    "takipçi sayısı"
+    "takipçi"
   ],
   "P375": [
     "taşıyıcı roket",
@@ -4345,17 +6136,49 @@
     "gezegeni",
     "yer edindiği astronomik cisim"
   ],
-  "P3764": [],
-  "P3771": [],
-  "P3772": [],
-  "P3773": [],
-  "P3774": [],
-  "P3775": [],
-  "P3776": [],
-  "P3777": [],
-  "P3778": [],
-  "P3779": [],
-  "P3780": [],
+  "P3764": [
+    "pol pozisyon",
+    "ilk sıra",
+    "pole pozisyonu"
+  ],
+  "P3771": [
+    "etkinleştiricisi",
+    "aktive edici"
+  ],
+  "P3772": [
+    "agonist"
+  ],
+  "P3773": [
+    "antagonist",
+    "karşıt etkili"
+  ],
+  "P3774": [
+    "bloke edici",
+    "engelleyicisi"
+  ],
+  "P3775": [
+    "bozucu ajan",
+    "bozucu madde"
+  ],
+  "P3776": [
+    "engelleyici",
+    "baskılayıcı"
+  ],
+  "P3777": [
+    "antisens baskılayıcı",
+    "antisens engelleyici"
+  ],
+  "P3778": [
+    "pozitif allosterik düzenleyici"
+  ],
+  "P3779": [
+    "negatif allosterik düzenleyici"
+  ],
+  "P3780": [
+    "etkin madde olduğu",
+    "etken madde olduğu",
+    "aktif madde olduğu"
+  ],
   "P3781": [
     "aktif maddeleri",
     "içerdiği aktif bileşenler",
@@ -4376,10 +6199,21 @@
     "film göstergesi",
     "filmin orijinal formatı"
   ],
-  "P3815": [],
-  "P3816": [],
-  "P3818": [],
-  "P3822": [],
+  "P3815": [
+    "volkan gözlemevi",
+    "yanardağ izleme merkezi"
+  ],
+  "P3816": [
+    "film senaryo metni",
+    "senaryo"
+  ],
+  "P3818": [
+    "KMRB derecelendirmesi"
+  ],
+  "P3822": [
+    "sıralama kuralları",
+    "sınıflandırma kriterleri"
+  ],
   "P3823": [
     "EGIDS"
   ],
@@ -4395,8 +6229,12 @@
     "diasporanın bir parçası",
     "diasporası"
   ],
-  "P3834": [],
-  "P3840": [],
+  "P3834": [
+    "RTC derecelendirmesi"
+  ],
+  "P3840": [
+    "slope değeri"
+  ],
   "P3842": [
     "bugün var olsa idi bu idari bölgede yer alacaktı",
     "bugünkü bulunduğu idari bölge",
@@ -4406,7 +6244,9 @@
   "P3858": [
     "hat diyagramı"
   ],
-  "P3864": [],
+  "P3864": [
+    "özkıyım oranı"
+  ],
   "P3865": [
     "kayıt tipi",
     "kayıt türü",
@@ -4460,7 +6300,10 @@
     "son öğün olarak yediği",
     "son yemek"
   ],
-  "P3912": [],
+  "P3912": [
+    "gazete boyutu",
+    "gazete ebatı"
+  ],
   "P3919": [
     "katkıda bulunduğu",
     "katkıda bulunduğu yaratıcı çalışma",
@@ -4473,7 +6316,6 @@
     "mülk sahibi"
   ],
   "P3934": [
-    "banknot değeri",
     "görünen değer",
     "madeni para değeri",
     "pul değeri"
@@ -4483,8 +6325,15 @@
     "tarafından adlandırıldı",
     "tarafından icat edildi"
   ],
-  "P3966": [],
-  "P3967": [],
+  "P3966": [
+    "programlama yaklaşımı",
+    "kodlama paradigması"
+  ],
+  "P3967": [
+    "final müsabakası",
+    "final karşılaşması",
+    "final maçı"
+  ],
   "P3969": [
     "elle imzalanmış form",
     "işaret dilinde form"
@@ -4493,7 +6342,9 @@
     "ana cisim",
     "birincil"
   ],
-  "P3975": [],
+  "P3975": [
+    "genel sekreter"
+  ],
   "P398": [
     "ikincil",
     "uydu",
@@ -4504,7 +6355,10 @@
     "ligin seviye durumu",
     "ligin seviyesi"
   ],
-  "P3985": [],
+  "P3985": [
+    "desteklenen programlama dili",
+    "desteklediği dil"
+  ],
   "P3989": [
     "üye mesleği",
     "üyelerin mesleği"
@@ -4547,7 +6401,10 @@
     "Su Çerçevesi Direktifi ekolojik durum",
     "Water Framework directive ekolojik durum"
   ],
-  "P4006": [],
+  "P4006": [
+    "üstün gelen karar",
+    "yerini aldığı dava"
+  ],
   "P4010": [
     "gayri safi yurtiçi hasıla (SAGP)",
     "GSYİH SAGP",
@@ -4558,7 +6415,6 @@
     "nehir ağzı"
   ],
   "P4032": [
-    "inceleyen",
     "tarafından incelendi"
   ],
   "P4036": [
@@ -4571,8 +6427,15 @@
   "P404": [
     "mod"
   ],
-  "P4043": [],
-  "P4044": [],
+  "P4043": [
+    "öykündüğü sistem",
+    "emüle ettiği platform",
+    "taklit ettiği sistem"
+  ],
+  "P4044": [
+    "tedavi alanı",
+    "hastalık alanı"
+  ],
   "P405": [
     "tarafından tanımlandı",
     "yazardan alıntı"
@@ -4602,17 +6465,17 @@
   "P408": [
     "güçlendiren",
     "gücünü aldığı",
-    "gücünü veren",
     "kullandığı betik dili",
     "kullandığı script",
     "kullandığı yazılım",
     "oyun motoru",
     "yazılımın motoru"
   ],
-  "P4080": [],
+  "P4080": [
+    "konut sayısı"
+  ],
   "P4082": [
     "görüntüyü çeken",
-    "ile çekildi",
     "ile filme alındı",
     "ile fotoğraflandı",
     "ile kaydedildi",
@@ -4629,8 +6492,6 @@
     "rütbesi"
   ],
   "P4100": [
-    "bölümü",
-    "partisi",
     "tarafı",
     "kısmı",
     "meclis grubu üyeliği",
@@ -4643,7 +6504,10 @@
     "YAV",
     "yönetimi altındaki fonlar"
   ],
-  "P4105": [],
+  "P4105": [
+    "EGF puanı",
+    "avrupa go federasyonu derecesi"
+  ],
   "P411": [
     "azizlik durumu",
     "azizlik mertebesine yükselmesi"
@@ -4653,7 +6517,6 @@
     "ses tipi"
   ],
   "P413": [
-    "özelliği",
     "mevkii",
     "tipi"
   ],
@@ -4682,7 +6545,12 @@
     "işlem gördüğü borsa",
     "listelendiği borsa"
   ],
-  "P4140": [],
+  "P4140": [
+    "depolama kapasitesi",
+    "batarya kapasitesi",
+    "pil kapasitesi",
+    "enerji kapasitesi"
+  ],
   "P4147": [
     "birleşik asit",
     "eşlenik asit",
@@ -4694,16 +6562,33 @@
     "sahip olduğu eşlenik baz"
   ],
   "P415": [
-    "biçimi",
     "formatı",
     "çaldığı müzik türleri",
     "müzik türleri"
   ],
-  "P4151": [],
-  "P4153": [],
-  "P4163": [],
-  "P417": [],
-  "P4176": [],
+  "P4151": [
+    "oyun mekaniği",
+    "oyun kuralları",
+    "oyun dinamikleri"
+  ],
+  "P4153": [
+    "bayt ofseti",
+    "konum kayması"
+  ],
+  "P4163": [
+    "optik büyütme",
+    "büyütme",
+    "büyütme gücü"
+  ],
+  "P417": [
+    "hami aziz",
+    "patron aziz"
+  ],
+  "P4176": [
+    "etkili menzil",
+    "etkin atış menzili",
+    "etkili atış mesafesi"
+  ],
   "P418": [
     "amblemin açıklaması",
     "amblemin içeriği"
@@ -4711,7 +6596,10 @@
   "P4183": [
     "açısı"
   ],
-  "P4184": [],
+  "P4184": [
+    "meyil",
+    "yamaç açısı"
+  ],
   "P4185": [
     "atribü"
   ],
@@ -4734,8 +6622,16 @@
     "en yaşlı kişinin yaşı",
     "maksimum ömür"
   ],
-  "P4218": [],
-  "P4220": [],
+  "P4218": [
+    "depolama ömrü",
+    "kullanım süresi",
+    "saklama ömrü"
+  ],
+  "P4220": [
+    "savaş düzeni",
+    "harp düzeni",
+    "muharebe nizamı"
+  ],
   "P4224": [
     "içinde yer aldığı kategori",
     "ögenin kategorisi"
@@ -4745,7 +6641,6 @@
     "baskın el seçimi"
   ],
   "P4240": [
-    "düzenli ifade sinteksi",
     "düzenli ifade sözdizimi",
     "regular expression dizilimi",
     "regular expression sinteksi"
@@ -4773,7 +6668,9 @@
   "P4250": [
     "DDD"
   ],
-  "P4253": [],
+  "P4253": [
+    "seçim çevresi sayısı"
+  ],
   "P4268": [
     "IC50",
     "medyan inhibitör konsantrasyon (IC50)"
@@ -4782,11 +6679,12 @@
     "EC50",
     "medyan etkili konsantrasyon (EC50)"
   ],
-  "P427": [],
+  "P427": [
+    "tip tür",
+    "tip cins",
+    "adlandırıcı tip"
+  ],
   "P4271": [
-    "değeri",
-    "derecelendirme",
-    "sıralaması",
     "derecesi",
     "izlenme oranı",
     "rating",
@@ -4801,23 +6699,46 @@
     "ruhunu ele geçiren",
     "ruhunu kullanan"
   ],
-  "P4295": [],
+  "P4295": [
+    "okur sayısı",
+    "okur kitlesi"
+  ],
   "P4296": [
     "dönme hızı",
     "yıldız dönme hızı",
     "yıldız dönüş hızı"
   ],
-  "P4312": [],
-  "P4320": [],
-  "P4321": [],
-  "P4322": [],
-  "P4323": [],
-  "P4324": [],
-  "P4329": [],
+  "P4312": [
+    "kamera düzeni",
+    "çekim düzeni"
+  ],
+  "P4320": [
+    "tırmanış klasmanı",
+    "dağ klasmanı"
+  ],
+  "P4321": [
+    "mücadeleci ödülü",
+    "en mücadeleci yarışmacı"
+  ],
+  "P4322": [
+    "sprint klasmanı",
+    "en iyi sprint yarışmacısı"
+  ],
+  "P4323": [
+    "genç sürücü klasmanı",
+    "gençler klasmanı"
+  ],
+  "P4324": [
+    "kombine klasman",
+    "karma klasman"
+  ],
+  "P4329": [
+    "kategoriyi dolduran bileşen",
+    "kategoriyi ekleyen"
+  ],
   "P4330": [
     "çevrelediği",
     "içerdiği",
-    "içerdikleri",
     "içeriği",
     "sardığı",
     "sardıkları"
@@ -4825,9 +6746,21 @@
   "P4341": [
     "sinodik dönemi"
   ],
-  "P4345": [],
-  "P4350": [],
-  "P4353": [],
+  "P4345": [
+    "kazı başkanı",
+    "kazı müdürü",
+    "arkeolojik kazı yöneticisi"
+  ],
+  "P4350": [
+    "tuz oranı",
+    "tuz içeriği",
+    "suda tuz miktarı"
+  ],
+  "P4353": [
+    "aday eden",
+    "aday gösteren kişi",
+    "aday gösteren kurum"
+  ],
   "P437": [
     "biçimi",
     "medya türü",
@@ -4857,35 +6790,68 @@
     "planlama türü",
     "SKOS haritalama ilişkisi"
   ],
-  "P4403": [],
-  "P4424": [],
-  "P4425": [],
-  "P4426": [],
-  "P4428": [],
-  "P4437": [],
-  "P4441": [],
+  "P4403": [
+    "namlu çapı",
+    "top çapı",
+    "silah çapı"
+  ],
+  "P4424": [
+    "zorunlu kılma",
+    "gerekli kılar",
+    "şart koşar"
+  ],
+  "P4425": [
+    "mitokondriyal DNA haplogrubu",
+    "mitokondri haplogrubu"
+  ],
+  "P4426": [
+    "y kromozomu haplogrubu",
+    "Y-kromozomal haplogrup"
+  ],
+  "P4428": [
+    "uygulayıcısı",
+    "gerçeklemesi",
+    "hayata geçirilmesi"
+  ],
+  "P4437": [
+    "FPB sınıflandırması",
+    "Güney Afrika FPB derecesi"
+  ],
+  "P4441": [
+    "hidrolik basınç yüksekliği",
+    "su yükü",
+    "düşü yüksekliği"
+  ],
   "P4442": [
     "ortalama yaşı",
     "yaş ortalaması"
   ],
-  "P4443": [],
+  "P4443": [
+    "kart şebekesi",
+    "ödeme kartı ağı",
+    "kredi kartı ağı"
+  ],
   "P4444": [
-    "ödül para",
     "ödül puan"
   ],
   "P4445": [
     "ek süre"
   ],
-  "P4446": [],
+  "P4446": [
+    "sadakat programı",
+    "puan programı",
+    "müşteri ödül programı"
+  ],
   "P4447": [
     "minimum harcama bonusu"
   ],
   "P4448": [
     "ödül para"
   ],
-  "P4452": [],
+  "P4452": [
+    "Thibaudeau tasnifi"
+  ],
   "P447": [
-    "inceleyen",
     "eleştiren",
     "inceleme puanını veren",
     "puanlayan"
@@ -4903,7 +6869,11 @@
     "uzay görevi",
     "uzay misyonu"
   ],
-  "P4500": [],
+  "P4500": [
+    "akrabalık derecesi",
+    "kan bağı derecesi",
+    "soy derecesi"
+  ],
   "P4501": [
     "albedo",
     "yansıtabilirlik"
@@ -4921,9 +6891,7 @@
   "P4510": [
     "açıklanan proje tarafından kullanılan yöntem"
   ],
-  "P4511": [
-    "derinlik"
-  ],
+  "P4511": [],
   "P4519": [
     "taşıyabileceği ağırlık",
     "taşıyabileceği yük"
@@ -4935,8 +6903,7 @@
     "endüstrisi",
     "eylem alanı",
     "görev alanı",
-    "sanayisi",
-    "sahası"
+    "sanayisi"
   ],
   "P453": [
     "rolü",
@@ -4944,7 +6911,10 @@
     "karakteri",
     "oynadığı rol"
   ],
-  "P4543": [],
+  "P4543": [
+    "bileşenler",
+    "etiketli bileşen"
+  ],
   "P4545": [
     "cinsel homolojisi"
   ],
@@ -4952,7 +6922,11 @@
     "dağlık alanı",
     "sıradağları"
   ],
-  "P4566": [],
+  "P4566": [
+    "ödül kapsama dönemi",
+    "başarı dönemi",
+    "ödül değerlendirme dönemi"
+  ],
   "P457": [
     "kurucu antlaşması",
     "kurucu belge",
@@ -4968,7 +6942,12 @@
     "ilk ortaya çıkışı",
     "ilk tanıtım"
   ],
-  "P4586": [],
+  "P4586": [
+    "yazı tipi üreticisi",
+    "font dökümhanesi",
+    "font üreticisi",
+    "yazı karakteri dökümhanesi"
+  ],
   "P459": [
     "belirleme yöntemi",
     "karar vereni",
@@ -4978,7 +6957,10 @@
     "standartı",
     "yöntemi"
   ],
-  "P4599": [],
+  "P4599": [
+    "monomer birimi",
+    "yapı taşı olduğu polimer"
+  ],
   "P460": [
     "aynısı",
     "aynısı olduğu belirtilen",
@@ -4988,7 +6970,10 @@
     "özdeşi",
     "tıpkısı"
   ],
-  "P4600": [],
+  "P4600": [
+    "polimer formu",
+    "monomerden oluşan polimer"
+  ],
   "P4602": [
     "cenaze tarihi",
     "defin tarihi",
@@ -5001,13 +6986,18 @@
   "P461": [
     "karşıt",
     "karşıtı",
-    "tersi",
     "zıttı",
     "tam tersi olan öge",
     "ters öge",
     "zıt öge"
   ],
-  "P4614": [],
+  "P4614": [
+    "drenaj havzası",
+    "su toplama havzası",
+    "nehir havzası",
+    "akaçlama havzası",
+    "yağış havzası"
+  ],
   "P462": [
     "göründüğü renk",
     "görünen rengi",
@@ -5015,8 +7005,17 @@
     "renkleri",
     "sahip olduğu renk"
   ],
-  "P4622": [],
-  "P4624": [],
+  "P4622": [
+    "kazanılan kupa",
+    "verilen kupa",
+    "ödül kupası",
+    "verilen madalya"
+  ],
+  "P4624": [
+    "gemideki filolar",
+    "konuşlu filolar",
+    "görevli uçak filoları"
+  ],
   "P4626": [
     "durumda nesne kimliği"
   ],
@@ -5030,8 +7029,15 @@
     "üyelikleri",
     "üyesi olduğu"
   ],
-  "P4634": [],
-  "P4646": [],
+  "P4634": [
+    "prömiyer tipi",
+    "ilk gösterim türü",
+    "galalaması türü"
+  ],
+  "P4646": [
+    "sahnelemesi",
+    "temsil ettiği eser"
+  ],
   "P4647": [
     "ilk performansın yeri"
   ],
@@ -5039,15 +7045,23 @@
     "bu bağlamdaki öznesi",
     "buradaki bağlama göre öznesi"
   ],
-  "P4653": [],
+  "P4653": [
+    "disk bölümleme türü",
+    "bölüm tablosu tipi",
+    "disk bölüm tablosu"
+  ],
   "P466": [
-    "konumu",
     "kiracısı",
     "kiralayan",
     "mal sahibi",
     "oturanı"
   ],
-  "P4661": [],
+  "P4661": [
+    "baraj gölü",
+    "oluşturulan rezervuar",
+    "meydana getirdiği göl",
+    "yapay göl"
+  ],
   "P467": [
     "kanunlaştıran",
     "kanunu düzenleyen",
@@ -5075,7 +7089,11 @@
     "shogi sıralaması",
     "wushu sıralaması"
   ],
-  "P4680": [],
+  "P4680": [
+    "kısıtlama alanı",
+    "kontrol kapsamı",
+    "kısıt kapsamı"
+  ],
   "P4688": [
     "fizyografik birim"
   ],
@@ -5095,11 +7113,14 @@
     "paylaştığı sınırlar",
     "sınırı",
     "sınırında",
-    "sınırları",
     "yanında",
     "bitişiğinde"
   ],
-  "P470": [],
+  "P470": [
+    "Sekiz Bayrak kaydı",
+    "Mançu hane kaydı",
+    "Sekiz Sancak defteri"
+  ],
   "P4714": [
     "kapak sayfası numarası",
     "baş sayfa",
@@ -5109,24 +7130,33 @@
   ],
   "P4733": [
     "çağrı sesi",
-    "çıkardığı ses",
     "üretilen ses",
     "üretilmiş ses",
     "yayılan ses"
   ],
-  "P4743": [
-    "türü",
-    "cinsi"
-  ],
+  "P4743": [],
   "P4745": [
     "dokümanın etkinliği"
   ],
-  "P4770": [],
-  "P4774": [],
+  "P4770": [
+    "sulu formu",
+    "hidrat hali",
+    "hidratlı biçimi"
+  ],
+  "P4774": [
+    "biyolojik dönem",
+    "biyolojik aşama",
+    "gelişim evresi"
+  ],
   "P4777": [
     "var olan sınırları"
   ],
-  "P4788": [],
+  "P4788": [
+    "veri depolama aygıtı",
+    "hafıza aygıtı",
+    "depolama birimi",
+    "bellek aygıtı"
+  ],
   "P479": [
     "fare",
     "giriş",
@@ -5134,14 +7164,21 @@
     "sayısallaştırıcı"
   ],
   "P4791": [
-    "kaptanı",
     "komutanı"
   ],
   "P4792": [
     "toplayıcı"
   ],
-  "P4794": [],
-  "P4805": [],
+  "P4794": [
+    "sezon başlama zamanı",
+    "sezonun başladığı ay",
+    "sezon açılışı"
+  ],
+  "P4805": [
+    "makyöz",
+    "makyajcı",
+    "makyaj uzmanı"
+  ],
   "P4809": [
     "ayarladığı çevre değişkeni",
     "ayarladığı çevre değişkenleri",
@@ -5159,9 +7196,19 @@
     "okuduğu ortam değişkeni",
     "okuduğu ortam değişkenleri"
   ],
-  "P4815": [],
-  "P4825": [],
-  "P4826": [],
+  "P4815": [
+    "teknik eleman puanı",
+    "teknik unsur puanı"
+  ],
+  "P4825": [
+    "puan kesintisi",
+    "ceza puanı",
+    "puan düşümü"
+  ],
+  "P4826": [
+    "program bileşen skoru",
+    "bileşen puanı"
+  ],
   "P483": [
     "kaydedildiği müzik stüdyosu",
     "kaydedildiği stüdyo",
@@ -5186,8 +7233,14 @@
     "arşivin konumu",
     "belgeleri bulunduran"
   ],
-  "P4850": [],
-  "P4851": [],
+  "P4850": [
+    "izinli gıda katkısı",
+    "onaylı gıda katkı maddesi"
+  ],
+  "P4851": [
+    "maksimum katkı maddesi kullanım seviyesi",
+    "azami gıda katkı maddesi seviyesi"
+  ],
   "P4873": [],
   "P4875": [],
   "P4876": [
@@ -5204,16 +7257,22 @@
   "P488": [
     "kadın başkanı",
     "lideri",
-    "reisi",
-    "devlet başkanı"
+    "reisi"
   ],
-  "P4882": [],
+  "P4882": [
+    "segmental sinirlenme",
+    "bölütsel innervasyon"
+  ],
   "P4884": [
     "görüldüğü mahkeme",
     "karar verilen mahkeme",
     "yargılama yapılan mahkeme"
   ],
-  "P489": [],
+  "P489": [
+    "döviz sembolü",
+    "para sembolü",
+    "para birimi işareti"
+  ],
   "P4895": [
     "nispi zaman",
     "zaman fihristi",
@@ -5236,7 +7295,10 @@
     "spor yapan insan sayısı",
     "sporcu sayısı"
   ],
-  "P4912": [],
+  "P4912": [
+    "yüzlük break",
+    "century break"
+  ],
   "P4913": [
     "lehçe lisanı",
     "lehçenin ait olduğu dil"
@@ -5255,23 +7317,36 @@
     "menşei",
     "kaynağı"
   ],
-  "P4952": [],
+  "P4952": [
+    "güvenlik sınıflandırma ve etiketleme",
+    "kimyasal güvenlik etiketlemesi"
+  ],
   "P4954": [
     "durdurabildiği",
     "kaçınabildiği",
     "uyarabildiği"
   ],
   "P4958": [],
-  "P4967": [],
+  "P4967": [
+    "ön şart",
+    "önşart",
+    "ön gereksinim",
+    "gereklilik"
+  ],
   "P4968": [
     "vasıf"
   ],
-  "P4969": [],
+  "P4969": [
+    "türev eser",
+    "türetilmiş eser"
+  ],
   "P4988": [
     "yöntem",
     "metodoloji"
   ],
-  "P4999": [],
+  "P4999": [
+    "kulüp adedi"
+  ],
   "P50": [
     "eser sahibi",
     "eseri yazan",
@@ -5281,7 +7356,11 @@
     "yazarları",
     "yazıcısı"
   ],
-  "P500": [],
+  "P500": [
+    "dış bölge",
+    "anklav",
+    "eksklav"
+  ],
   "P5004": [
     "karşı çıkan protesto eylemi",
     "karşı protesto",
@@ -5296,25 +7375,37 @@
   "P5009": [
     "inşa edildiği standart",
     "standardı",
-    "standartı",
     "teknik standartı",
     "uygun olduğu koşul",
     "uygunluğu",
     "uyumlu olduğu koşul"
   ],
-  "P501": [],
+  "P501": [
+    "çevrelenen bölge",
+    "iç bölge",
+    "enklav"
+  ],
   "P5012": [],
   "P5017": [
     "değiştirildiği tarih",
     "güncellendiği tarih",
     "kaynağın güncelleme tarihi"
   ],
-  "P5021": [],
-  "P5022": [],
-  "P5023": [],
-  "P5024": [
-    "koro yönetmeni"
+  "P5021": [
+    "girilen sınav",
+    "uygulanan test"
   ],
+  "P5022": [
+    "sınav puanı",
+    "sınav skoru",
+    "test skoru"
+  ],
+  "P5023": [
+    "mekan kuralları",
+    "yer kuralları",
+    "faaliyet kuralları"
+  ],
+  "P5024": [],
   "P5025": [
     "aile grubu",
     "aynı adı paylaşan Romalı aile grubu"
@@ -5322,15 +7413,24 @@
   "P5026": [
     "aydınlatma tasarımcısı"
   ],
-  "P5027": [],
-  "P5028": [],
+  "P5027": [
+    "gösteri sayısı",
+    "temsil sayısı"
+  ],
+  "P5028": [
+    "ses tasarımı",
+    "ses kurgucusu"
+  ],
   "P5030": [
     "misafiri"
   ],
   "P504": [
     "ana liman"
   ],
-  "P5040": [],
+  "P5040": [
+    "GHS piktogramı",
+    "tehlike piktogramı"
+  ],
   "P5041": [
     "AUH ifadesi",
     "EUH ifadesi",
@@ -5355,55 +7455,82 @@
   ],
   "P505": [],
   "P5051": [
-    "son durak",
-    "son istasyon",
     "yönünde"
   ],
-  "P5052": [],
+  "P5052": [
+    "denetleme kurulu üyesi",
+    "denetim kurulu üyeliği"
+  ],
   "P5053": [
     "en hızlı tur atan kişi",
     "en iyi tur atan kişi",
     "turu en hızlı atan kişi"
   ],
   "P5054": [
-    "hükümet",
-    "kabine",
-    "hükumet"
+    "hükümet"
   ],
-  "P5056": [],
+  "P5056": [
+    "baba adı",
+    "soyadı öncesi ad",
+    "patronim"
+  ],
   "P5059": [
     "versiyonu",
     "adaptasyonu",
     "düzenlenmesi",
-    "modifikasyonu",
-    "remiksi"
+    "modifikasyonu"
   ],
-  "P5065": [],
-  "P5066": [],
-  "P5067": [],
-  "P5069": [],
-  "P5070": [],
-  "P5071": [],
-  "P5072": [],
+  "P5065": [
+    "rüzgâr hızı"
+  ],
+  "P5066": [
+    "işletim sıcaklığı",
+    "çalışma ısısı"
+  ],
+  "P5067": [
+    "kapalı durum sıcaklığı",
+    "depolama sıcaklığı"
+  ],
+  "P5069": [
+    "kullanım ömrü",
+    "servis ömrü",
+    "ürün ömrü"
+  ],
+  "P5070": [
+    "fransız tuval boyutu standardı",
+    "fransız yağlı boya tuval boyutu"
+  ],
+  "P5071": [
+    "kazan işletim basıncı"
+  ],
+  "P5072": [
+    "sunum etkinliği",
+    "sunulduğu yer",
+    "takdim edildiği etkinlik"
+  ],
   "P509": [
     "ölmesine neden olan",
     "ölmesinin nedeni",
     "ölümüne neden olan"
   ],
-  "P5095": [],
+  "P5095": [
+    "jeolojik fay",
+    "kırık hattı",
+    "fay hattı"
+  ],
   "P5096": [
     "gemi hizmetçisi"
   ],
   "P5102": [
-    "açıklaması",
-    "durumu",
     "açıklanma durumu",
     "doğadaki tarifi",
     "doğası",
     "ifadenin geçerliliği",
     "ifadenin saflaştırılması"
   ],
-  "P5109": [],
+  "P5109": [
+    "dilbilgisi cinsiyeti"
+  ],
   "P511": [
     "onursal ön ek",
     "onursal önek",
@@ -5417,19 +7544,38 @@
   ],
   "P512": [
     "akademik diploma",
-    "derece",
     "diploma"
   ],
-  "P5125": [],
-  "P5126": [],
-  "P5131": [],
-  "P5132": [],
-  "P5133": [],
+  "P5125": [
+    "vikimedya ana hatları",
+    "vikimedya özet maddesi"
+  ],
+  "P5126": [
+    "asistan yönetmen",
+    "yönetmen yardımcısı"
+  ],
+  "P5131": [
+    "olası tıbbi belirtiler",
+    "olası klinik bulgular"
+  ],
+  "P5132": [
+    "işaret eder",
+    "düşündürdüğü durum"
+  ],
+  "P5133": [
+    "karşılık gelen değerlendirme"
+  ],
   "P5134": [
     "ölçümü"
   ],
-  "P5135": [],
-  "P5136": [],
+  "P5135": [
+    "daha büyüktür",
+    "üstündür"
+  ],
+  "P5136": [
+    "daha küçüktür",
+    "altındadır"
+  ],
   "P5137": [
     "açıklaması",
     "geldiği anlam",
@@ -5446,14 +7592,23 @@
     "arasına giren",
     "araya girmiş"
   ],
-  "P5141": [],
+  "P5141": [
+    "sahil uzunluğu",
+    "kıyı şeridi uzunluğu",
+    "sahil şeridi uzunluğu"
+  ],
   "P515": [
     "maddenin aşamaları",
     "maddenin aşaması",
     "maddenin halleri"
   ],
-  "P5150": [],
-  "P5152": [],
+  "P5150": [
+    "IGAC sınıflandırması",
+    "Portekiz derecelendirme sistemi"
+  ],
+  "P5152": [
+    "KAVI sınıflandırması"
+  ],
   "P516": [
     "enerji santrali",
     "güş kaynağı",
@@ -5466,7 +7621,10 @@
     "kurulduğu tıbbi durum",
     "yerleştiği tıbbi durum"
   ],
-  "P5167": [],
+  "P5167": [
+    "bin kişiye düşen araç sayısı",
+    "bin kişi başına araç sayısı"
+  ],
   "P517": [
     "etkileştiği"
   ],
@@ -5480,35 +7638,64 @@
     "dil bilgisel cinsiyet",
     "dilbilgisel cinsiyet"
   ],
-  "P5186": [],
+  "P5186": [
+    "fiil çekim sınıfı",
+    "çekim kategorisi",
+    "çekim grubu"
+  ],
   "P5194": [
     "resmîleştiren"
   ],
-  "P5196": [],
+  "P5196": [
+    "çıktı aygıtı",
+    "çıktı birimi",
+    "çıkış birimi"
+  ],
   "P520": [
     "gemi silahları"
   ],
-  "P5201": [],
-  "P5202": [],
-  "P5203": [],
+  "P5201": [
+    "IMDA sınıflandırması",
+    "Singapur derecelendirmesi"
+  ],
+  "P5202": [
+    "uyarlayıcı",
+    "uyarlayan kişi"
+  ],
+  "P5203": [
+    "topoğrafik harita",
+    "topografya haritası"
+  ],
   "P5204": [
     "kullanılabilirlik tarihi",
-    "ticarileştirme tarihi",
-    "yayın tarihi"
+    "ticarileştirme tarihi"
   ],
   "P5205": [
     "vuruş sayısı"
   ],
-  "P5206": [],
+  "P5206": [
+    "çekim sınıfına sahip",
+    "dildeki çekim sınıfı"
+  ],
   "P521": [
     "tarifeli hizmet hedefi"
   ],
   "P522": [
     "orbit türü"
   ],
-  "P523": [],
-  "P5230": [],
-  "P5236": [],
+  "P523": [
+    "zaman aralığı başlangıcı",
+    "jeolojik aralık başlangıcı",
+    "zamansal menzil başlangıcı"
+  ],
+  "P5230": [
+    "kromozom adedi",
+    "tür kromozom sayısı"
+  ],
+  "P5236": [
+    "asal çarpan",
+    "asal bölen"
+  ],
   "P5237": [
     "aksanı",
     "lehçesi",
@@ -5517,7 +7704,11 @@
     "şu telaffuz ile",
     "telaffuzu"
   ],
-  "P524": [],
+  "P524": [
+    "zaman aralığı sonu",
+    "jeolojik aralık sonu",
+    "zamansal menzil sonu"
+  ],
   "P5244": [],
   "P5248": [
     "sevk edilen sağlık kurumu",
@@ -5531,7 +7722,6 @@
   ],
   "P527": [
     "alt sınıfı",
-    "oluşturan",
     "içerdikleri",
     "bileşenleri",
     "birleşmesi sonucunda",
@@ -5548,56 +7738,87 @@
     "üyeleri",
     "yer alanlar"
   ],
-  "P5277": [],
+  "P5277": [
+    "kanji zorluk derecesi",
+    "kanji sınıfı"
+  ],
   "P5278": [
     "diğer cinsiyet için aile adı",
     "diğer cinsiyet için soyadı",
     "soyadının cinsiyet değişimi"
   ],
-  "P5280": [],
-  "P5281": [],
+  "P5280": [
+    "çince radikal",
+    "kanji radikali"
+  ],
+  "P5281": [
+    "artık vuruş sayısı",
+    "kalan vuruş sayısı"
+  ],
   "P53": [
     "ailesi",
     "hanedanı",
     "kraliyet hanedanı",
-    "soyadı",
     "soylu ailesi"
   ],
   "P530": [
     "ülkeler arasindeki diplomasi",
     "ülkeler arası diplomasisi"
   ],
-  "P5304": [],
+  "P5304": [
+    "tür lokalitesi",
+    "tip lokalitesi",
+    "tip bölgesi"
+  ],
   "P5307": [
     "görüntüleme teknolojisi"
   ],
   "P531": [
     "elçilik"
   ],
-  "P5314": [],
-  "P5317": [],
-  "P532": [],
+  "P5314": [
+    "özellik alanı"
+  ],
+  "P5317": [
+    "at binicisi",
+    "yarış binicisi",
+    "cokey"
+  ],
+  "P532": [
+    "sicil limanı",
+    "bağlama limanı",
+    "tescil limanı"
+  ],
   "P5323": [
     "bulunduğu sözcükbirimi",
     "doğrulayan",
     "içinde bulunan sözlükbirim formu",
-    "ispatlayan",
-    "onaylayan"
+    "ispatlayan"
   ],
-  "P5328": [],
+  "P5328": [
+    "turne versiyonu",
+    "yeniden sahneleme",
+    "canlandırma versiyonu"
+  ],
   "P533": [
     "askerî hedefi",
     "operasyon hedefi",
     "operasyonel hedefi",
     "saldırı hedefi"
   ],
-  "P534": [],
+  "P534": [
+    "çizik rengi",
+    "iz rengi"
+  ],
   "P5348": [
     "açısal boyutu",
     "açısal kalınlığı",
     "görünen boyutu"
   ],
-  "P5349": [],
+  "P5349": [
+    "tur sayısı",
+    "tamamlanan turlar"
+  ],
   "P5353": [
     "okulun bölgesi"
   ],
@@ -5609,8 +7830,15 @@
     "kristal kırığı",
     "mineral kırığı"
   ],
-  "P5386": [],
-  "P5389": [],
+  "P5386": [
+    "jma şiddet ölçeği",
+    "japonya sismik şiddet ölçeği"
+  ],
+  "P5389": [
+    "daimi ikamet ülkesi",
+    "sürekli oturma izni ülkesi",
+    "kalıcı ikamet yeri"
+  ],
   "P54": [
     "daha önce oynadığı takım",
     "futbol takımı",
@@ -5631,7 +7859,6 @@
     "resmî olarak başlatan"
   ],
   "P5422": [
-    "motifi",
     "dekoratif modeli",
     "dekore edildiği motif",
     "dekore edilidiği desen",
@@ -5643,14 +7870,26 @@
     "uygulanan tasarım",
     "uygulanmış model"
   ],
-  "P5425": [],
+  "P5425": [
+    "sözlük birimi han karakteri",
+    "ilgili han karakteri"
+  ],
   "P5426": [
     "Japon aksanı perde türü",
     "Japon perde aksanı"
   ],
-  "P5427": [],
-  "P5428": [],
-  "P543": [],
+  "P5427": [
+    "vurgulu hece konumu",
+    "aksan çekirdeği yeri"
+  ],
+  "P5428": [
+    "sessiz ünlü konumu",
+    "ötümsüz ünlü konumu"
+  ],
+  "P543": [
+    "yemin ettiren kişi",
+    "yemini okutan"
+  ],
   "P5436": [
     "dilenme sayısı",
     "dinleyici sayısı",
@@ -5663,12 +7902,34 @@
   "P5438": [
     "takma adı"
   ],
-  "P5439": [],
-  "P5444": [],
-  "P5446": [],
-  "P5447": [],
-  "P5448": [],
-  "P545": [],
+  "P5439": [
+    "bilimsel ölçüm",
+    "deneysel ölçüm"
+  ],
+  "P5444": [
+    "model senesi",
+    "üretim modeli yılı"
+  ],
+  "P5446": [
+    "referans aralığı",
+    "normal değer",
+    "referans değeri",
+    "tıbbi referans değer"
+  ],
+  "P5447": [
+    "alt limit",
+    "minimum değer",
+    "alt değer"
+  ],
+  "P5448": [
+    "üst limit",
+    "maksimum değer",
+    "üst değer"
+  ],
+  "P545": [
+    "meşaleyi tutuşturan",
+    "olimpiyat meşalesini yakan"
+  ],
   "P546": [
     "dock İstasyonu"
   ],
@@ -5683,34 +7944,57 @@
     "onuruna",
     "şerefine"
   ],
-  "P5474": [],
-  "P5475": [],
-  "P5479": [],
+  "P5474": [
+    "kesim numarası",
+    "grup numarası"
+  ],
+  "P5475": [
+    "CJKV varyant karakteri",
+    "CJKV alternatif karakter"
+  ],
+  "P5479": [
+    "kopma dayanımı",
+    "çekme mukavemeti",
+    "maksimum çekme dayanımı"
+  ],
   "P548": [
     "yazılım sürümü türü"
   ],
-  "P5480": [],
+  "P5480": [
+    "çekme modülü",
+    "elastisite modülü",
+    "young modülü"
+  ],
   "P5481": [],
-  "P5483": [],
-  "P550": [],
+  "P5483": [
+    "katılık",
+    "mukavemet"
+  ],
+  "P550": [
+    "şövalyelik nişanı",
+    "şövalye nişanı"
+  ],
   "P551": [
     "ikametgâhı",
     "yaşadığı yer"
   ],
   "P5514": [
-    "güçlendiren",
     "akredite eden",
-    "onaylayan",
     "resmen tanıyan",
     "sertifikalı olduğu",
     "yetki veren"
   ],
   "P552": [
-    "el tercihi",
     "el kullanımı"
   ],
-  "P5520": [],
-  "P5522": [],
+  "P5520": [
+    "dayanıklılık",
+    "kırılma tokluğu",
+    "malzeme tokluğu"
+  ],
+  "P5522": [
+    "unikod bloğu"
+  ],
   "P5523": [
     "PyanxChet"
   ],
@@ -5733,14 +8017,28 @@
     "hesabın sosyal medyası",
     "kullanıcı hesabı sitesi"
   ],
-  "P5537": [],
+  "P5537": [
+    "hangıl okunuşu",
+    "hangul okunuşu"
+  ],
   "P556": [
     "kristal katmanı"
   ],
-  "P5560": [],
-  "P5564": [],
-  "P5572": [],
-  "P5575": [],
+  "P5560": [
+    "edilgen çatı",
+    "edilgen ses"
+  ],
+  "P5564": [
+    "tescil bölgesi",
+    "sicil bölgesi",
+    "kayıt dairesi"
+  ],
+  "P5572": [
+    "ifade edildiği koşul"
+  ],
+  "P5575": [
+    "sürtünme kuvveti katsayısı"
+  ],
   "P5582": [
     "tutuklamalar",
     "tutuklananlar",
@@ -5755,44 +8053,79 @@
     "yabancısı olduğu",
     "yayıldığı yer"
   ],
-  "P5589": [],
+  "P5589": [
+    "mikro yapı",
+    "iç yapı"
+  ],
   "P559": [
     "son durak",
     "son istasyon"
   ],
-  "P5591": [],
-  "P5592": [
-    "eser sayısı"
+  "P5591": [
+    "normalize Unicode karakteri"
   ],
-  "P5593": [],
+  "P5592": [],
+  "P5593": [
+    "Poisson katsayısı"
+  ],
   "P5594": [
     "su soğurumu"
   ],
   "P5595": [
     "platform yüzleri"
   ],
-  "P5596": [],
-  "P560": [],
+  "P5596": [
+    "nisbi nem",
+    "izafi nem",
+    "bağıl nemlilik"
+  ],
+  "P560": [
+    "doğrultu",
+    "istikamet"
+  ],
   "P5606": [
     "istasyon kategorisi"
   ],
-  "P5607": [],
-  "P5608": [],
+  "P5607": [
+    "bulunduğu dini bölge",
+    "ait olduğu dini bölge"
+  ],
+  "P5608": [
+    "yorulma dayanımı",
+    "dayanıklılık sınırı"
+  ],
   "P562": [
     "düzenleyen yetkili makam",
     "ihraççı",
     "yetkili makam"
   ],
-  "P5623": [],
-  "P5624": [],
+  "P5623": [
+    "su temini türü",
+    "su kaynağı tipi"
+  ],
+  "P5624": [
+    "çukurlaşma direnci denklik sayısı",
+    "PREN sayısı"
+  ],
   "P5630": [
     "mahkum miktarı",
     "mahkumların sayısı",
     "mahpus sayısı"
   ],
-  "P5642": [],
-  "P565": [],
-  "P5658": [],
+  "P5642": [
+    "risk etmeni",
+    "risk unsuru"
+  ],
+  "P565": [
+    "kristal biçimi",
+    "kristal alışkanlığı",
+    "kristal formu"
+  ],
+  "P5658": [
+    "demiryolu trafik yönü",
+    "tren trafiği yönü",
+    "raylı trafik yönü"
+  ],
   "P566": [
     "doğru adı",
     "doğru ismi"
@@ -5800,18 +8133,51 @@
   "P5668": [
     "yığın modülü"
   ],
-  "P5669": [],
+  "P5669": [
+    "basınç dayanımı",
+    "basınç mukavemeti",
+    "sıkışma dayanımı"
+  ],
   "P567": [
     "altında yatan"
   ],
-  "P5670": [],
-  "P5672": [],
-  "P5673": [],
-  "P5674": [],
-  "P5675": [],
-  "P5676": [],
-  "P5677": [],
-  "P5678": [],
+  "P5670": [
+    "camlaşma sıcaklığı",
+    "cam geçiş sıcaklığı"
+  ],
+  "P5672": [
+    "çizgisel ısıl genleşme katsayısı",
+    "doğrusal genleşme katsayısı",
+    "lineer ısıl genleşme katsayısı"
+  ],
+  "P5673": [
+    "makaslama modülü",
+    "kesme modülü",
+    "kayma esneklik modülü"
+  ],
+  "P5674": [
+    "ısıl difüzivite",
+    "termal difüzivite",
+    "ısıl yayılım"
+  ],
+  "P5675": [
+    "dielektrik sabiti",
+    "bağıl dielektrik sabiti",
+    "göreli elektrik geçirgenliği"
+  ],
+  "P5676": [
+    "göreli manyetik geçirgenlik",
+    "bağıl permeabilite"
+  ],
+  "P5677": [
+    "eğilme mukavemeti",
+    "bükülme dayanımı"
+  ],
+  "P5678": [
+    "kayıp faktörü",
+    "sönüm faktörü",
+    "yitim faktörü"
+  ],
   "P5679": [
     "direnç",
     "elektriksel direnç ve iletkenlik",
@@ -5821,7 +8187,10 @@
     "üzerine kaplayan",
     "üzerini örten"
   ],
-  "P5681": [],
+  "P5681": [
+    "bükülme modülü",
+    "eğilme elastisite modülü"
+  ],
   "P5682": [
     "ısı bozulma sıcaklığı",
     "ısı sapma sıcaklığı"
@@ -5834,14 +8203,12 @@
     "doğduğu zaman",
     "doğum yılı",
     "doğuş tarihi",
-    "tevellüdü",
-    "doğum günü"
+    "tevellüdü"
   ],
   "P57": [
     "dizi yönetmeni",
     "film yönetmeni",
-    "tiyatro yönetmeni",
-    "sanat yönetmeni"
+    "tiyatro yönetmeni"
   ],
   "P570": [
     "ahirete gidiş zamanı",
@@ -5854,7 +8221,11 @@
     "öldüğü zaman",
     "vefat tarihi"
   ],
-  "P5706": [],
+  "P5706": [
+    "makaslama dayanımı",
+    "kayma dayanımı",
+    "kesme mukavemeti"
+  ],
   "P5707": [
     "ses örnekleri"
   ],
@@ -5870,12 +8241,13 @@
     "kurulan tarih",
     "kuruluş tarihi",
     "kuruluş yılı",
-    "oluşturulduğu tarih",
-    "temeli",
-    "açılış tarihi",
-    "açılışı"
+    "oluşturulduğu tarih"
   ],
-  "P5713": [],
+  "P5713": [
+    "gereken dilbilgisi özelliği",
+    "zorunlu gramer özelliği",
+    "gerekli gramer özelliği"
+  ],
   "P574": [
     "açıklandığı",
     "bilimsel açıklama tarihi",
@@ -5893,7 +8265,10 @@
     "keşif veya buluş zamanı",
     "keşif zamanı"
   ],
-  "P5753": [],
+  "P5753": [
+    "IDS",
+    "ideografik betimleme dizisi"
+  ],
   "P576": [
     "dağıldığı tarih",
     "dağıldığı zaman",
@@ -5910,7 +8285,6 @@
     "serbest bırakıldığı tarih",
     "yayın yılı",
     "yayın zamanı",
-    "yayınlandığı tarih",
     "yayınlanma zamanı"
   ],
   "P578": [
@@ -5929,33 +8303,41 @@
   ],
   "P580": [
     "başlama",
-    "başlangıç",
-    "başlama tarihi"
+    "başlangıç"
   ],
-  "P5800": [],
+  "P5800": [
+    "anlatısal rol",
+    "öykü rolü"
+  ],
   "P5802": [
     "sahne ekibi üyesi"
   ],
   "P5804": [
     "program komitesi üyeliği"
   ],
-  "P5805": [],
-  "P5811": [],
+  "P5805": [
+    "OSI katmanı",
+    "OSI modeli katmanı",
+    "OSI ağ katmanı"
+  ],
+  "P5811": [
+    "kopma uzaması",
+    "kopmadaki uzama"
+  ],
   "P5816": [
-    "durumu",
     "anıtın durumu",
     "binanın durumu",
     "binanın mevcut durumu",
-    "hâli",
     "koruma durumu",
     "kullanılabilirliği",
     "ören yerinin durumu",
     "vaziyeti",
     "yapının durumu"
   ],
-  "P5817": [],
+  "P5817": [
+    "mevcut kullanım durumu"
+  ],
   "P582": [
-    "bitiş tarihi",
     "bitti",
     "durduğu zaman",
     "durdurulduğu zaman",
@@ -5963,12 +8345,22 @@
     "tamamlandı",
     "tamamlandığı zaman"
   ],
-  "P5822": [],
+  "P5822": [
+    "kabul edilme oranı",
+    "başvuru kabul oranı"
+  ],
   "P5824": [
     "tarafından geri çekildi"
   ],
-  "P5826": [],
-  "P5828": [],
+  "P5826": [
+    "çoğunluk kararı",
+    "çoğunluk görüşü sahibi"
+  ],
+  "P5828": [
+    "seribaşı",
+    "seri numarası",
+    "seribaşılık"
+  ],
   "P5832": [
     "koalisyon",
     "ittifak",
@@ -5978,17 +8370,20 @@
     "siyasi blok",
     "siyasi ittifak"
   ],
-  "P5841": [],
+  "P5841": [
+    "Çek Kırmızı Listesi durumu",
+    "Çekya kırmızı liste statüsü"
+  ],
   "P585": [
     "etkinlik zamanı",
     "itibariyle",
-    "yılı",
-    "gerçekleştiği zaman",
-    "zamanı"
+    "yılı"
   ],
-  "P5852": [],
+  "P5852": [
+    "ifadeyi miras aldığı öge",
+    "üst sınıftan miras alınan ifade"
+  ],
   "P5869": [
-    "örnek",
     "en iyi örnek"
   ],
   "P5872": [
@@ -5996,24 +8391,53 @@
     "parfüm notası",
     "koku"
   ],
-  "P5873": [],
-  "P588": [],
-  "P5880": [],
-  "P5881": [],
-  "P5886": [],
+  "P5873": [
+    "adanmışlık yeri",
+    "ibadet mekânı",
+    "dindarlık yeri"
+  ],
+  "P588": [
+    "soğutma akışkanı",
+    "soğutucu sıvı",
+    "soğutucu madde"
+  ],
+  "P5880": [
+    "video tasarımı sorumlusu"
+  ],
+  "P5881": [
+    "projeksiyon tasarımı sorumlusu",
+    "sahne projeksiyon tasarımcısı"
+  ],
+  "P5886": [
+    "türetme biçimi",
+    "türetiliş şekli",
+    "türetim yöntemi"
+  ],
   "P589": [
     "kristal sınıfı",
     "kristalografik grubu",
     "nokta grubu"
   ],
-  "P5893": [],
+  "P5893": [
+    "deformasyon sertleşmesi",
+    "soğuk işleme sertleşmesi",
+    "pekleşme"
+  ],
   "P5894": [
     "ders ücreti",
     "eğitim ücreti",
     "okul parası"
   ],
-  "P5895": [],
-  "P5896": [],
+  "P5895": [
+    "döviz işlem ücreti",
+    "yabancı para işlem ücreti",
+    "uluslararası işlem ücreti"
+  ],
+  "P5896": [
+    "alım satım ücreti",
+    "komisyon ücreti",
+    "işlem komisyonu"
+  ],
   "P5897": [
     "abone ücreti",
     "abonman ücreti",
@@ -6023,19 +8447,44 @@
     "üyelik ücreti",
     "yıllık ücreti"
   ],
-  "P5898": [],
-  "P5899": [],
-  "P59": [],
-  "P5900": [],
-  "P5911": [
-    "çekim sınıfı",
-    "form modeli"
+  "P5898": [
+    "kredi faiz oranı",
+    "borçlanma faizi",
+    "yıllık borçlanma oranı"
   ],
-  "P5913": [],
-  "P5923": [],
-  "P5929": [],
-  "P5940": [],
-  "P5947": [],
+  "P5899": [
+    "yıllık faiz oranı",
+    "faiz haddi",
+    "nominal faiz"
+  ],
+  "P59": [
+    "yıldız kümesi",
+    "burç"
+  ],
+  "P5900": [
+    "JMA şiddeti",
+    "Japonya Meteoroloji Ajansı büyüklüğü"
+  ],
+  "P5911": [],
+  "P5913": [
+    "çekim paradigması",
+    "paradigma sınıfı"
+  ],
+  "P5923": [
+    "ürettiği sözcük türü",
+    "oluşturduğu sözlükbirim türü"
+  ],
+  "P5929": [
+    "limit oksijen indeksi",
+    "LOI değeri"
+  ],
+  "P5940": [
+    "konusu genişletilen eser",
+    "öyküsü genişletilen yapıt"
+  ],
+  "P5947": [
+    "Vicat yumuşama sıcaklığı"
+  ],
   "P5961": [
     "betimlenen bölüm",
     "betimlenen parça",
@@ -6056,13 +8505,28 @@
   "P598": [
     "komutanı olduğu"
   ],
-  "P5982": [],
-  "P5991": [],
+  "P5982": [
+    "yıllık nikah sayısı",
+    "yıllık evlenme sayısı"
+  ],
+  "P5991": [
+    "karbon salımı",
+    "karbon emisyonu",
+    "CO2 ayak izi"
+  ],
   "P5992": [
     "absorpsiyon katsayısı"
   ],
-  "P5993": [],
-  "P5995": [],
+  "P5993": [
+    "basınç elastisite modülü",
+    "basınç modülü",
+    "sıkıştırma elastiklik modülü"
+  ],
+  "P5995": [
+    "forma sponsoru",
+    "formacı",
+    "forma sağlayıcısı"
+  ],
   "P5996": [
     "bu dildeki filmler kategorisi"
   ],
@@ -6072,21 +8536,22 @@
   ],
   "P6": [
     "cumhurbaşkanı",
-    "başkan",
-    "devlet başkanı",
     "şansölye",
     "vali"
   ],
-  "P6000": [],
+  "P6000": [
+    "su tüketim ayak izi"
+  ],
   "P6001": [
     "alt grubu",
     "geçerli olduğu insanlar",
     "uygulandığı kişiler"
   ],
-  "P6014": [],
+  "P6014": [
+    "kırılma eğilme gerinimi"
+  ],
   "P6022": [
     "durumu",
-    "hareketi",
     "aksiyonu",
     "ifadesi",
     "mimiği",
@@ -6098,7 +8563,9 @@
     "ilk uçma zamanı",
     "ilk uçuş zamanı"
   ],
-  "P6069": [],
+  "P6069": [
+    "INEP IGC sürekli notu"
+  ],
   "P607": [
     "çatışmalar",
     "katıldığı çatışmalar",
@@ -6106,15 +8573,28 @@
     "savaşlar",
     "yer aldığı savaşlar"
   ],
-  "P6073": [],
-  "P6075": [],
-  "P6076": [],
+  "P6073": [
+    "permeabilite",
+    "nüfuz edebilirlik",
+    "geçirgenlik katsayısı"
+  ],
+  "P6075": [
+    "bünyesel enerji",
+    "içkin enerji"
+  ],
+  "P6076": [
+    "biyobazlı içerik yüzdesi",
+    "biyo-temelli içerik ağırlık yüzdesi"
+  ],
   "P608": [
     "görüntülendiği",
     "gösterildiği",
     "sergilendiği"
   ],
-  "P6084": [],
+  "P6084": [
+    "anlam kullanım bölgesi",
+    "kullanım yeri"
+  ],
   "P6086": [
     "dramaturge",
     "oyun yazarı (yapım)"
@@ -6126,14 +8606,22 @@
     "kulüp yöneticisi",
     "spor takımı menajeri"
   ],
-  "P6088": [],
-  "P6089": [],
+  "P6088": [
+    "bira acılık derecesi",
+    "IBU değeri"
+  ],
+  "P6089": [
+    "bira renk derecesi",
+    "SRM değeri"
+  ],
   "P609": [
     "arasında",
     "son bulunduğu konum",
     "son bulunduğu yer"
   ],
-  "P6095": [],
+  "P6095": [
+    "INEP IGC ayrık puanı"
+  ],
   "P6099": [
     "klinik deneme aşaması"
   ],
@@ -6159,11 +8647,26 @@
   "P6104": [
     "Wikiproject"
   ],
-  "P6106": [],
-  "P611": [],
-  "P6112": [],
-  "P6116": [],
-  "P6118": [],
+  "P6106": [
+    "büyük harfle yazılan",
+    "büyük harf kuralı uygulanan"
+  ],
+  "P611": [
+    "dini tarikat",
+    "tarikat"
+  ],
+  "P6112": [
+    "takım oyuncuları kategorisi",
+    "takım üyeleri kategorisi"
+  ],
+  "P6116": [
+    "akor dizisi",
+    "akor sırası"
+  ],
+  "P6118": [
+    "sezon bitişi",
+    "sezon kapanışı"
+  ],
   "P612": [
     "ana evi",
     "ana evinin adı",
@@ -6198,7 +8701,10 @@
     "referansın rolü",
     "referansın sahip olduğu rol"
   ],
-  "P6185": [],
+  "P6185": [
+    "tautomeri ilişkisi",
+    "totomer"
+  ],
   "P6186": [],
   "P619": [
     "başlatma zamanı",
@@ -6212,11 +8718,13 @@
   ],
   "P6193": [
     "kabul edenler",
-    "katılan",
-    "onaylayan",
     "onaylayanlar"
   ],
-  "P6195": [],
+  "P6195": [
+    "fon desteği",
+    "finansman desteği",
+    "hibe programı"
+  ],
   "P620": [
     "iniş tarihi",
     "iniş zamanı",
@@ -6227,13 +8735,27 @@
     "uzay aracı yörünge bozulma zamanı",
     "uzay aracının bozulma zamanı"
   ],
-  "P6212": [],
+  "P6212": [
+    "ısıl işlem uygulaması",
+    "termal işlem",
+    "ısıtma işlemi"
+  ],
   "P6216": [
     "telif hakkı statüsü"
   ],
-  "P622": [],
-  "P6224": [],
-  "P6237": [],
+  "P622": [
+    "kenetlenme tarihi",
+    "ayrılma tarihi",
+    "dok tarihi"
+  ],
+  "P6224": [
+    "tanımlama düzeyi",
+    "betimleme seviyesi"
+  ],
+  "P6237": [
+    "inşaatçı",
+    "gayrimenkul geliştirici"
+  ],
   "P624": [
     "refakat sistemi",
     "rehberlik sistemi"
@@ -6261,11 +8783,13 @@
   "P6259": [
     "zaman"
   ],
-  "P6260": [],
-  "P6261": [],
-  "P6271": [
-    "kullanıldığı yer"
+  "P6260": [
+    "galaktik boylam koordinatı"
   ],
+  "P6261": [
+    "galaktik enlem koordinatı"
+  ],
+  "P6271": [],
   "P6272": [
     "özgül dönme",
     "spesifik rotasyon"
@@ -6279,14 +8803,19 @@
     "molar oran",
     "molarite"
   ],
-  "P6275": [],
+  "P6275": [
+    "telif temsilcisi",
+    "telif hakkı vekili"
+  ],
   "P629": [
     "sürümü",
-    "baskısı",
-    "çevirisi",
     "uyarlaması"
   ],
-  "P6291": [],
+  "P6291": [
+    "reklamı yapılan",
+    "tanıtımı yapılan",
+    "reklam konusu"
+  ],
   "P631": [
     "mühendisi",
     "yapı mühendisi"
@@ -6300,10 +8829,24 @@
     "ölçümlerin periyodikliği",
     "veri periyodu"
   ],
-  "P634": [],
-  "P6343": [],
-  "P6344": [],
-  "P6354": [],
+  "P634": [
+    "takım kaptanı",
+    "kaptan"
+  ],
+  "P6343": [
+    "şehirli nüfus",
+    "kent nüfusu",
+    "şehir nüfusu"
+  ],
+  "P6344": [
+    "köy nüfusu",
+    "kırsal kesim nüfusu"
+  ],
+  "P6354": [
+    "en yakın yaklaşma mesafesi",
+    "minimum yaklaşma mesafesi",
+    "en yakın geçiş mesafesi"
+  ],
   "P636": [
     "maddenin alınma yolu"
   ],
@@ -6333,13 +8876,25 @@
   "P6437": [
     "yayınlandığı gün"
   ],
-  "P6438": [],
-  "P6439": [],
+  "P6438": [
+    "euler sayısı",
+    "euler değişmezi"
+  ],
+  "P6439": [
+    "sözleri alınan eser",
+    "söz kaynağı"
+  ],
   "P6440": [
     "bakım metodu"
   ],
-  "P6452": [],
-  "P647": [],
+  "P6452": [
+    "cbfc sınıflandırması",
+    "hint film derecelendirmesi"
+  ],
+  "P647": [
+    "draft edildiği takım",
+    "draftlandığı takım"
+  ],
   "P6477": [
     "sahibi olmadığı",
     "bulunmadığı durum",
@@ -6350,7 +8905,11 @@
     "olmayan niteliği",
     "özelliğinden yoksun"
   ],
-  "P6497": [],
+  "P6497": [
+    "direnç katsayısı",
+    "sürüklenme katsayısı",
+    "aerodinamik direnç katsayısı"
+  ],
   "P6498": [
     "okuma yazma bilmeyen nüfus"
   ],
@@ -6360,7 +8919,11 @@
   "P65": [
     "keşif sitesi"
   ],
-  "P6509": [],
+  "P6509": [
+    "kariyer gol sayısı",
+    "toplam kariyer golü",
+    "kariyer boyunca atılan gol"
+  ],
   "P6510": [
     "perdövites hızı"
   ],
@@ -6373,7 +8936,11 @@
     "çalışmada kullanılan",
     "modellemede kullanılan"
   ],
-  "P6531": [],
+  "P6531": [
+    "gözlem yeri",
+    "gözlemlendiği yer",
+    "gözlem koşulu"
+  ],
   "P6532": [
     "sahip olduğu kalıtımla oluşan dış görünüş"
   ],
@@ -6387,18 +8954,35 @@
     "arka süspansiyon türü",
     "süspansiyon (arka)"
   ],
-  "P654": [],
+  "P654": [
+    "göreli yön",
+    "bağıl yön",
+    "konuma göre doğrultu"
+  ],
   "P6540": [
     "MCN",
     "multi-channel network"
   ],
-  "P6543": [],
-  "P6544": [],
-  "P6545": [],
+  "P6543": [
+    "kariyer atış sayısı",
+    "toplam kariyer atışı"
+  ],
+  "P6544": [
+    "kariyer puanı",
+    "toplam kariyer puanı"
+  ],
+  "P6545": [
+    "kariyer asist sayısı",
+    "toplam kariyer asisti"
+  ],
   "P6546": [
     "kariyerindeki PIMS"
   ],
-  "P6547": [],
+  "P6547": [
+    "kariyer +/- değeri",
+    "kariyer artı eksi değeri",
+    "artı eksi istatistiği"
+  ],
   "P655": [
     "çeviren",
     "çevirici",
@@ -6412,7 +8996,6 @@
     "ölçüm göstergesi"
   ],
   "P6568": [
-    "bahsedilen",
     "kayıtta bahsedilen",
     "kayıtta bahsi geçen",
     "yazıtta bahsedilen",
@@ -6433,7 +9016,10 @@
     "track list",
     "track listesi"
   ],
-  "P6587": [],
+  "P6587": [
+    "lig piramidi",
+    "lig yapısı"
+  ],
   "P6589": [
     "finansal bağış",
     "finansal bağışlar"
@@ -6441,24 +9027,33 @@
   "P659": [
     "GenLoc derlemesi"
   ],
-  "P6590": [],
+  "P6590": [
+    "kariyer en yüksek seri",
+    "en yüksek break"
+  ],
   "P6591": [
     "en yüksek sıcaklık",
     "mutlak ısı kaydı"
   ],
   "P66": [
-    "atayurdu",
-    "kökeni"
+    "atayurdu"
   ],
   "P660": [
     "Enzim Komisyonu sınıflandırma adı"
   ],
-  "P6606": [],
-  "P6608": [],
-  "P6639": [],
+  "P6606": [
+    "eskiz çalışması",
+    "hazırlık çalışması"
+  ],
+  "P6608": [
+    "genel malzeme tanımı"
+  ],
+  "P6639": [
+    "kullanım faktörü",
+    "kapasite kullanım oranı"
+  ],
   "P664": [
-    "etkinlik yapımcısı",
-    "düzenleyen"
+    "etkinlik yapımcısı"
   ],
   "P6657": [
     "Kanada Video Derecelendirme Sistemi Sınıflandırması"
@@ -6476,9 +9071,17 @@
     "caddesi",
     "sokak"
   ],
-  "P6695": [],
-  "P6697": [],
-  "P6707": [],
+  "P6695": [
+    "tümce sayısı"
+  ],
+  "P6697": [
+    "Deloitte Football Money League sıralaması",
+    "Football Money League sırası"
+  ],
+  "P6707": [
+    "rampa açısı",
+    "tırmanma açısı"
+  ],
   "P6708": [
     "arka çıkıntı açısı",
     "arka saldırı açısı",
@@ -6504,8 +9107,15 @@
     "Commons seçkin resim",
     "Wikimedia Commons değerlendirmesi"
   ],
-  "P674": [],
-  "P6753": [],
+  "P674": [
+    "kişiler",
+    "karakter kadrosu",
+    "roller"
+  ],
+  "P6753": [
+    "oy sandığı sayısı",
+    "sandık adedi"
+  ],
   "P6757": [
     "maruziyet süresi"
   ],
@@ -6540,8 +9150,14 @@
     "ƒ numarası",
     "ƒ/"
   ],
-  "P6794": [],
-  "P680": [],
+  "P6794": [
+    "en düşük ücret",
+    "yasal asgari ücret",
+    "taban ücret"
+  ],
+  "P680": [
+    "moleküler işlev"
+  ],
   "P6801": [
     "hastane yatakları",
     "yatak sayısı"
@@ -6554,23 +9170,49 @@
   "P681": [
     "hücre altı lokalizasyonu"
   ],
-  "P6819": [],
-  "P682": [],
+  "P6819": [
+    "kaligraf",
+    "hüsnühat sanatçısı"
+  ],
+  "P682": [
+    "biyolojik işlem",
+    "biyolojik olay"
+  ],
   "P6826": [
     "gelişmiş yenilenebilir tarife",
     "standart teklif sözleşmesi",
     "yenilenebilir enerji ödemesi"
   ],
-  "P684": [],
+  "P684": [
+    "ortolog",
+    "ortolog gen"
+  ],
   "P6840": [
     "öğrenci organizasyonu",
     "öğrenci organizasyonunun okulu"
   ],
-  "P6855": [],
-  "P6856": [],
-  "P6872": [],
-  "P6875": [],
-  "P6876": [],
+  "P6855": [
+    "acil yardım hizmetleri",
+    "ivedi servis hizmetleri"
+  ],
+  "P6856": [
+    "ortalama sürat"
+  ],
+  "P6872": [
+    "katkıda bulunduğu yayın",
+    "yazdığı yayın",
+    "çalıştığı yayın"
+  ],
+  "P6875": [
+    "motifin temsil ettiği",
+    "motifin kaynağı",
+    "temsil edilen nesne"
+  ],
+  "P6876": [
+    "güneş irradyansı",
+    "güneş ışıma şiddeti",
+    "güneş radyasyonu"
+  ],
   "P6879": [
     "denge sıcaklığı"
   ],
@@ -6578,14 +9220,25 @@
     "için kodu",
     "kodları"
   ],
-  "P6884": [],
-  "P6885": [],
+  "P6884": [
+    "çalıştırılan kas",
+    "hedeflenen kas"
+  ],
+  "P6885": [
+    "tarihî bölge",
+    "tarihsel bölge",
+    "tarihi coğrafya"
+  ],
   "P6886": [
     "yazdığı diller",
     "yazma dili",
     "yazma dilleri"
   ],
-  "P6887": [],
+  "P6887": [
+    "maç dakikası",
+    "karşılaşma aralığı",
+    "maç anı"
+  ],
   "P6889": [
     "CPU mikro mimarisi",
     "GPU mikro mimarisi",
@@ -6621,9 +9274,19 @@
     "tamamladığı üniversite",
     "tamamladığı yüksekokul"
   ],
-  "P690": [],
-  "P6902": [],
-  "P693": [],
+  "P690": [
+    "uzay grubu simetrisi",
+    "kristalografik uzay grubu"
+  ],
+  "P6902": [
+    "saltanat dönemi adı",
+    "hükümdarlık dönemi adı",
+    "nengō"
+  ],
+  "P693": [
+    "dilinim",
+    "kristal dilinimi"
+  ],
   "P6938": [
     "önergeyi mecliste destekleyen",
     "öneriye destek veren",
@@ -6638,9 +9301,12 @@
   "P694": [
     "değiştirilen isim"
   ],
-  "P6942": [],
+  "P6942": [
+    "canlandırmacı",
+    "çizgi film sanatçısı",
+    "animasyoncu"
+  ],
   "P6948": [
-    "GPU",
     "PPU"
   ],
   "P6949": [
@@ -6653,7 +9319,6 @@
     "açık erişim durumu",
     "arşiv erişim durumu",
     "erişilebilirlik türü",
-    "erişim durumu",
     "koleksiyon erişim durumu",
     "makale erişim durumu",
     "yayın erişim durumu"
@@ -6661,10 +9326,11 @@
   "P6962": [
     "hikaye motifi"
   ],
-  "P697": [],
+  "P697": [
+    "önceki takson yazarı",
+    "eski tür yazarı"
+  ],
   "P6977": [
-    "incelemeleri",
-    "yorumu",
     "gözden geçirmesi",
     "yorumları"
   ],
@@ -6677,7 +9343,11 @@
     "imprimitur",
     "kilisenin verdiği basma izni"
   ],
-  "P7015": [],
+  "P7015": [
+    "yüzey çekimi",
+    "yüzeydeki yerçekimi ivmesi",
+    "yüzey yerçekimi"
+  ],
   "P702": [
     "gen özelliği",
     "gen türü",
@@ -6685,35 +9355,42 @@
     "kodlandığı"
   ],
   "P703": [
-    "çeşidi",
-    "türü",
     "cinsi",
     "dayandığı cins",
     "dayandığı takson",
     "ortak özelliğe sahip olduğu grubu"
   ],
-  "P7045": [],
+  "P7045": [
+    "şase",
+    "araç şasisi",
+    "taşıt şasisi"
+  ],
   "P7047": [
     "düşmanı",
     "ezeli rakibi"
   ],
   "P706": [
-    "içerisinde",
     "adasında",
     "arazisinde",
     "coğrafi özelliğinde",
     "coğrafyasında",
     "doğal özelliğinde",
-    "yerde (arazi özelliği)",
-    "içinde"
+    "yerde (arazi özelliği)"
   ],
   "P707": [
-    "otobüs",
-    "platform",
     "uzay aracı otobüsü"
   ],
-  "P7075": [],
-  "P7078": [],
+  "P7075": [
+    "dayandığı oyun",
+    "temel oyun",
+    "ana oyun"
+  ],
+  "P7078": [
+    "tip sistemi",
+    "tip disiplini",
+    "tür sistemi",
+    "tipleme sistemi"
+  ],
   "P7079": [
     "azalma",
     "büzülme",
@@ -6741,17 +9418,24 @@
     "bağlı kategori",
     "ilişkili kategori"
   ],
-  "P7086": [],
+  "P7086": [
+    "başlangıç sınıfı",
+    "en alt sınıf",
+    "en düşük sınıf düzeyi"
+  ],
   "P7087": [
     "ters özellikteki etiketlisi",
     "zıt özellikte etikete sahip",
     "zıt özellikteki etiketlisi"
   ],
-  "P7095": [],
+  "P7095": [
+    "bitiş sınıfı",
+    "en üst sınıf",
+    "en yüksek sınıf düzeyi"
+  ],
   "P710": [
     "devlet",
     "oyuncu",
-    "aday",
     "oyuncular",
     "adaylar",
     "etkinlik katılımcısı",
@@ -6778,7 +9462,10 @@
     "bakış noktası konumu",
     "görüş noktası"
   ],
-  "P7122": [],
+  "P7122": [
+    "karara katılan hakimler",
+    "görüşe iştirak edenler"
+  ],
   "P7124": [
     "ilk gerçekleşenin tarihi",
     "ilk olanın tarihi",
@@ -6795,19 +9482,34 @@
     "kabul gören",
     "tanınan"
   ],
-  "P7152": [],
+  "P7152": [
+    "telif hakkı muafiyeti",
+    "telif istisnası",
+    "telif muafiyeti"
+  ],
   "P7153": [
     "işaret edilen yer",
     "konuyla ilişkili yer",
     "önemli yer"
   ],
-  "P7160": [],
-  "P7162": [],
+  "P7160": [
+    "işkence biçimi",
+    "kötü muamele biçimi",
+    "insanlık dışı muamele şekli",
+    "onur kırıcı muamele biçimi"
+  ],
+  "P7162": [
+    "birleşen davalar",
+    "birleştirilen davalar"
+  ],
   "P7163": [
     "satılan",
     "sattığı"
   ],
-  "P7165": [],
+  "P7165": [
+    "ad sınıfı",
+    "isim kategorisi"
+  ],
   "P7167": [
     "etki vermeyen",
     "etki vermeyenler"
@@ -6815,12 +9517,24 @@
   "P7169": [
     "yedek direktör/menajer"
   ],
-  "P7174": [],
+  "P7174": [
+    "sınıf",
+    "mezuniyet sınıfı",
+    "öğrencilik sınıfı"
+  ],
   "P720": [
     "bir asteroidin spektral tipi"
   ],
-  "P7209": [],
-  "P7228": [],
+  "P7209": [
+    "işkence yöntemi",
+    "ordalia",
+    "çile yöntemi",
+    "adli sınama"
+  ],
+  "P7228": [
+    "erişim kısıtlaması",
+    "erişim durumu"
+  ],
   "P725": [
     "dublajcısı",
     "ses aktörü",
@@ -6829,39 +9543,70 @@
     "seslendiren",
     "seslendirme oyuncusu"
   ],
-  "P7252": [],
-  "P7253": [],
+  "P7252": [
+    "güçlük derecesi",
+    "zorluk seviyesi",
+    "zorluk düzeyi"
+  ],
+  "P7253": [
+    "ürettiği renk",
+    "verdiği renk",
+    "elde edilen renk"
+  ],
   "P7256": [
     "FLOPS",
     "saniyede kayan nokta işlemleri"
   ],
   "P726": [
-    "aday",
     "başvuru sahibi",
     "bu seçimde aday",
     "istekli",
     "talip"
   ],
   "P7261": [
-    "kısıtlama durumu",
     "kullanılan kısıtlama durumu"
   ],
-  "P729": [],
-  "P7295": [],
-  "P7297": [],
+  "P729": [
+    "hizmete giriş tarihi",
+    "göreve başlama tarihi",
+    "envantere giriş",
+    "kullanıma giriş tarihi"
+  ],
+  "P7295": [
+    "miladi takvime geçiş tarihi",
+    "gregoryen takvim başlangıcı",
+    "gregoryen takvime geçiş"
+  ],
+  "P7297": [
+    "toplam tırmanış",
+    "toplam yükselti kazancı",
+    "kümülatif yükselti",
+    "toplam yükseklik farkı"
+  ],
   "P730": [
     "görevden alındığı tarih",
     "hizmet dışı tarihi",
     "hizmetten ayrılma tarihi"
   ],
-  "P7309": [],
+  "P7309": [
+    "tırmanma rotası",
+    "tırmanış güzergahı",
+    "tırmanış yolu"
+  ],
   "P7316": [
     "basamak sayısı"
   ],
-  "P7327": [],
-  "P7328": [],
+  "P7327": [
+    "yeni zelanda yaş sınırı",
+    "oflc derecelendirmesi",
+    "yeni zelanda içerik derecelendirmesi"
+  ],
+  "P7328": [
+    "kataloglanmış miktar",
+    "kayıt altına alınan miktar",
+    "tanımlanan koleksiyon miktarı"
+  ],
   "P734": [
-    "soyadı",
     "aile adı",
     "aile ismi",
     "son ad",
@@ -6899,7 +9644,11 @@
     "giyen kişi",
     "giyenler"
   ],
-  "P7377": [],
+  "P7377": [
+    "soyadı eki",
+    "ara ek",
+    "isim eki"
+  ],
   "P7378": [
     "tartışmalı"
   ],
@@ -6915,7 +9664,10 @@
     "kartuş",
     "mühimmat"
   ],
-  "P7391": [],
+  "P7391": [
+    "çizge yarıçapı",
+    "graf yarıçapı"
+  ],
   "P740": [
     "bulunduğu yer",
     "grubun kaynağı",
@@ -6925,18 +9677,32 @@
     "oluşma yeri",
     "oluşum yeri"
   ],
-  "P7406": [],
+  "P7406": [
+    "karate tarzı",
+    "karate ekolü",
+    "karate okulu"
+  ],
   "P741": [
     "oynanan el",
     "tenis eli"
   ],
-  "P7419": [],
+  "P7419": [
+    "kabul edilen cinsiyet",
+    "öğrenci cinsiyeti",
+    "eğitim alan cinsiyet"
+  ],
   "P7422": [
     "en düşük sıcaklık",
     "en düşük sıcaklık kaydı"
   ],
-  "P744": [],
-  "P7442": [],
+  "P744": [
+    "asteroit kuşağı ailesi",
+    "küçük gezegen ailesi"
+  ],
+  "P7442": [
+    "buzul hali",
+    "buzulun durumu"
+  ],
   "P7443": [
     "CPU iş parçacığı sayısı"
   ],
@@ -6951,16 +9717,15 @@
     "son görülme",
     "son görülme tarihi"
   ],
-  "P7462": [],
+  "P7462": [
+    "çizge çapı",
+    "graf çapı"
+  ],
   "P7469": [
-    "yönü",
     "oryantasyonu"
   ],
   "P747": [
-    "sürümü",
     "baskı numarası",
-    "baskısı",
-    "çevirisi",
     "basımı",
     "baskı sayısı",
     "baskılar",
@@ -6968,13 +9733,20 @@
     "sürüm numarası",
     "sürüm sayısı"
   ],
-  "P7479": [],
+  "P7479": [
+    "anahtar geçit",
+    "kilit boyun"
+  ],
   "P748": [
     "belirleyen",
     "görevlendiren",
     "tayin eden"
   ],
-  "P7481": [],
+  "P7481": [
+    "lehçe varyantı",
+    "sözlükbirim çeşidi",
+    "sözcükbirim çeşitlemesi"
+  ],
   "P7482": [
     "dosyanın kaynağı",
     "görüntü kaynağı",
@@ -6982,7 +9754,6 @@
   ],
   "P7486": [
     "görünüşü",
-    "yönü",
     "hâli",
     "cephesi",
     "dilbilgisel yönü"
@@ -7002,9 +9773,20 @@
     "dağıtan",
     "distribütör"
   ],
-  "P7500": [],
-  "P7501": [],
-  "P7508": [],
+  "P7500": [
+    "eş hastalık",
+    "eşlik eden hastalık",
+    "ek hastalık",
+    "eşzamanlı hastalık"
+  ],
+  "P7501": [
+    "ses donanımı",
+    "ses sistemi donanımı"
+  ],
+  "P7508": [
+    "seçimi ilan eden",
+    "seçim çağrısında bulunan"
+  ],
   "P751": [
     "yeni özellik"
   ],
@@ -7021,15 +9803,24 @@
     "spoiler",
     "spoiler olarak kabul edilir"
   ],
-  "P756": [],
+  "P756": [
+    "çıkarılan özellik",
+    "kaldırılmış özellik"
+  ],
   "P7561": [
     "bu ögeye ait medyalar kategorisi",
     "içindeki medyalar",
     "ögenin dâhilindekiler için kategori",
     "ögenin içinde yer alan medya kategorisi"
   ],
-  "P7573": [],
-  "P7582": [],
+  "P7573": [
+    "IFCO sınıflandırması",
+    "İrlanda film derecelendirmesi"
+  ],
+  "P7582": [
+    "Yaban Hayatı Koruma Yasası çizelgesi",
+    "Hindistan Yaban Hayatı Yasası çizelgesi"
+  ],
   "P7584": [
     "jeolojik yaş",
     "jeolojik yaşı",
@@ -7046,16 +9837,30 @@
     "onaylanma tarihi",
     "resmî gazetede yayımlanma tarihi"
   ],
-  "P7600": [],
-  "P7601": [],
-  "P7603": [],
+  "P7600": [
+    "ana nota",
+    "baş nota",
+    "birincil perde"
+  ],
+  "P7601": [
+    "ikincil perde",
+    "ikinci nota"
+  ],
+  "P7603": [
+    "CITES eki",
+    "CITES listesi"
+  ],
   "P7604": [
     "gözetmeni",
     "amiri",
     "denetleyicisi",
     "denetmeni"
   ],
-  "P7643": [],
+  "P7643": [
+    "kapsanan dönem",
+    "ele alınan dönem",
+    "kapsadığı dönem"
+  ],
   "P765": [
     "yüzey tipi",
     "yüzey türü"
@@ -7082,23 +9887,45 @@
     "ilaç etkileşimi",
     "ile ilaç etkileşimi"
   ],
-  "P770": [],
-  "P7719": [],
-  "P7725": [],
-  "P7727": [],
+  "P770": [
+    "tahribat nedeni",
+    "yok oluş nedeni",
+    "yıkılma sebebi"
+  ],
+  "P7719": [
+    "genellemesi",
+    "genelleştirilmiş hâli"
+  ],
+  "P7725": [
+    "batın sayısı",
+    "bir batındaki yavru sayısı",
+    "doğum başına yavru sayısı"
+  ],
+  "P7727": [
+    "yasama komitesi",
+    "yasama komisyonu",
+    "meclis komisyonu"
+  ],
   "P7763": [
-    "telif hakkı durumu",
     "bir yaratıcı olarak telif hakkı durumu",
     "yaratıcı olarak telif hakkı durumu"
   ],
-  "P7767": [],
+  "P7767": [
+    "servis ısısı",
+    "sunum sıcaklığı",
+    "ikram sıcaklığı"
+  ],
   "P7770": [
     "civciv çıkarma süresi",
     "kuluçka",
     "kuluçka dönemi",
     "yumurta kuluçka dönemi"
   ],
-  "P7779": [],
+  "P7779": [
+    "askerî birlik",
+    "ordu birliği",
+    "askeri birim"
+  ],
   "P7781": [
     "temize çıktığı suç",
     "temize çıktığı suçlama"
@@ -7107,7 +9934,6 @@
     "gemi adı için ortak kategori"
   ],
   "P7787": [
-    "yönü",
     "azimut",
     "bakış açısından yn",
     "görüntülenen yön",
@@ -7116,7 +9942,6 @@
     "sapma"
   ],
   "P78": [
-    "domain",
     "alan adı",
     "gTLD",
     "TLD",
@@ -7132,18 +9957,33 @@
     "semptom",
     "semptomlar"
   ],
-  "P783": [],
+  "P783": [
+    "spor yüzeyi tipi",
+    "himenyum türü"
+  ],
   "P784": [
     "şapka tipi"
   ],
-  "P785": [],
-  "P786": [],
-  "P7861": [],
+  "P785": [
+    "himenyum bağlantısı",
+    "himenyum tutunması"
+  ],
+  "P786": [
+    "sap karakteri",
+    "mantar sapı özelliği"
+  ],
+  "P7861": [
+    "programla üretilen dosyalar kategorisi"
+  ],
   "P7862": [
     "emzirme",
     "sütten kesilme"
   ],
-  "P7863": [],
+  "P7863": [
+    "objektif açıklığı",
+    "diyafram değeri",
+    "f sayısı"
+  ],
   "P7867": [
     "Commons harita kategorisi",
     "harita kategorisi",
@@ -7152,9 +9992,11 @@
   "P787": [
     "mantar spor rengi"
   ],
-  "P788": [],
+  "P788": [
+    "mantar ekoloji türü",
+    "mantarın ekolojik sınıfı"
+  ],
   "P7887": [
-    "derecelendirme",
     "derecelendirme sayısı",
     "inceleme sayısı",
     "yorumlar"
@@ -7168,7 +10010,10 @@
   "P789": [
     "mantar yenebilirliği"
   ],
-  "P790": [],
+  "P790": [
+    "onay veren",
+    "tasdik eden"
+  ],
   "P7903": [
     "aldığı bölge",
     "aldığı toprak",
@@ -7204,7 +10049,10 @@
     "seçim bölgesinde bulunan yerler",
     "seçim bölgesinde bulunanlar"
   ],
-  "P795": [],
+  "P795": [
+    "üzerinde bulunduğu hat",
+    "bulunduğu doğrusal yapı"
+  ],
   "P7959": [
     "eski idari bölge",
     "eski ilçe",
@@ -7214,11 +10062,17 @@
     "tarafından yönetilir",
     "yetki sahibi",
     "yönetim birimi",
-    "yönetim organı",
-    "yetkili makam"
+    "yönetim organı"
   ],
-  "P7971": [],
-  "P7984": [],
+  "P7971": [
+    "gıda enerjisi",
+    "kalori değeri",
+    "besin kalorisi"
+  ],
+  "P7984": [
+    "tasvir edilen biçim",
+    "betimleme formatı"
+  ],
   "P800": [
     "eser",
     "çalışmaları",
@@ -7229,8 +10083,15 @@
     "tarafından desteklendi",
     "tarafından destekleniyor"
   ],
-  "P8004": [],
-  "P8005": [],
+  "P8004": [
+    "emreden",
+    "sipariş veren",
+    "ısmarlayan"
+  ],
+  "P8005": [
+    "denek kaydı durumu",
+    "katılımcı alım durumu"
+  ],
   "P8006": [
     "kullandığı ayağı",
     "sağ ayağıyla",
@@ -7246,14 +10107,19 @@
     "ögrencileri",
     "tanınmış ögrencisi"
   ],
-  "P8026": [],
+  "P8026": [
+    "LiverTox olasılık skoru"
+  ],
   "P803": [
     "ihtisas yaptığı anadal",
     "ihtisası",
     "profesörlük branşı",
     "profesörlük dalı"
   ],
-  "P8030": [],
+  "P8030": [
+    "büyüklük sınıflandırması",
+    "ölçek sınıflandırması"
+  ],
   "P8031": [
     "adam kaçıran",
     "bombacı",
@@ -7276,11 +10142,18 @@
     "terörizm kurbanı",
     "vurulan kurban"
   ],
-  "P8045": [],
+  "P8045": [
+    "salgın müdahalesi",
+    "salgına karşı yanıt"
+  ],
   "P8047": [
     "kayıt ülkesi"
   ],
-  "P8049": [],
+  "P8049": [
+    "hastaneye kaldırılan vaka sayısı",
+    "yatan hasta sayısı",
+    "hastanede tedavi gören vaka sayısı"
+  ],
   "P805": [
     "bağlı açıklaması",
     "bağlı olduğu konu",
@@ -7290,9 +10163,7 @@
     "makalesi",
     "özel ögesi",
     "özel yazısı",
-    "konusu",
-    "bağlı olduğu",
-    "maddesi"
+    "bağlı olduğu"
   ],
   "P8058": [
     "gösterdiği amblem",
@@ -7305,9 +10176,7 @@
     "ayrılmış",
     "dallanma"
   ],
-  "P8093": [
-    "bağışlar"
-  ],
+  "P8093": [],
   "P8097": [
     "ağ bantları"
   ],
@@ -7326,8 +10195,6 @@
     "akademik yan dal"
   ],
   "P8111": [
-    "ölçü birimi",
-    "birimi",
     "ölçülen birim",
     "önerilen ölçü birimi"
   ],
@@ -7342,7 +10209,11 @@
     "akademik konu",
     "majör"
   ],
-  "P8127": [],
+  "P8127": [
+    "turnuva usulü",
+    "müsabaka formatı",
+    "turnuva sistemi"
+  ],
   "P813": [
     "zamanı",
     "alındığı tarih",
@@ -7352,11 +10223,18 @@
     "ulaşılabildiği tarih",
     "ulaşılabildiği zaman"
   ],
-  "P8131": [],
+  "P8131": [
+    "bilgisayar dili lehçesi",
+    "programlama dili diyalekti",
+    "programlama dili lehçesi"
+  ],
   "P8138": [
     "içinde bulunduğu istatistiksel varlık"
   ],
-  "P814": [],
+  "P814": [
+    "IUCN koruma alanı kategorisi",
+    "IUCN kategorisi"
+  ],
   "P816": [
     "bozunmalar",
     "kendiliğinden parçalanır"
@@ -7364,16 +10242,36 @@
   "P817": [
     "radyoaktif radyasyon modu"
   ],
-  "P8193": [],
-  "P8194": [],
-  "P8196": [],
-  "P8203": [],
+  "P8193": [
+    "bitki dayanıklılığı",
+    "bitki soğuğa dayanıklılığı"
+  ],
+  "P8194": [
+    "iklim dayanıklılık bölgesi",
+    "bitki iklim bölgesi",
+    "USDA bölgesi"
+  ],
+  "P8196": [
+    "seçim sistemi",
+    "oy sistemi",
+    "oylama yöntemi",
+    "seçim yöntemi"
+  ],
+  "P8203": [
+    "desteklenen üst veriler",
+    "desteklenen üstveri",
+    "desteklenen metadata"
+  ],
   "P8208": [
     "eğim",
     "fotoğraf açısı",
     "kameranın yönü"
   ],
-  "P822": [],
+  "P822": [
+    "sembol",
+    "amblem hayvan",
+    "takım maskotu"
+  ],
   "P8225": [
     "için metasınıf"
   ],
@@ -7384,8 +10282,15 @@
     "sözcü",
     "spiker"
   ],
-  "P8241": [],
-  "P8247": [],
+  "P8241": [
+    "yaş sınırı tipi",
+    "yaş kısıtlaması türü"
+  ],
+  "P8247": [
+    "nominal pay sermayesi",
+    "itibari sermaye",
+    "çıkarılmış sermaye"
+  ],
   "P825": [
     "adanan",
     "ithaf edilen"
@@ -7406,8 +10311,15 @@
     "içerdiği eğitim konuları",
     "müfredat konuları"
   ],
-  "P8274": [],
-  "P8275": [],
+  "P8274": [
+    "yaşayan kişileri koruma sınıfı",
+    "yaşayan kişi koruma kategorisi"
+  ],
+  "P8275": [
+    "dizideki konum",
+    "biyolojik dizideki konum",
+    "genomik konum"
+  ],
   "P828": [
     "altta yatan sebebi",
     "altta yatan sebep",
@@ -7417,11 +10329,19 @@
     "cemaat kilisesi",
     "cemaatin kilisesi"
   ],
-  "P8306": [],
-  "P8307": [],
-  "P8308": [],
+  "P8306": [
+    "gruplama ölçütü",
+    "gruplandırma"
+  ],
+  "P8307": [
+    "sıralama ölçütü",
+    "sıralama kriteri"
+  ],
+  "P8308": [
+    "sütun sayısı",
+    "tablo sütunları"
+  ],
   "P831": [
-    "ortağı",
     "büyük lig üyesi",
     "ebeveyn takımı"
   ],
@@ -7431,7 +10351,6 @@
     "yasal tatil"
   ],
   "P8324": [
-    "bağışçı",
     "destekleyen bağışçı",
     "finanse eden",
     "fon sağlayan",
@@ -7440,15 +10359,30 @@
   "P8327": [
     "kastedilen konu"
   ],
-  "P8328": [],
+  "P8328": [
+    "demokrasi indeksi"
+  ],
   "P8329": [
     "araştırmanın başındaki",
     "araştırmayı yöneten"
   ],
-  "P833": [],
-  "P8330": [],
-  "P8331": [],
-  "P8339": [],
+  "P833": [
+    "aktarma durağı",
+    "transfer istasyonu",
+    "bağlantı istasyonu"
+  ],
+  "P8330": [
+    "sayfa ofseti",
+    "sayfa kayması"
+  ],
+  "P8331": [
+    "çan tonu",
+    "baskın nota"
+  ],
+  "P8339": [
+    "hücre giriş reseptörü",
+    "viral giriş reseptörü"
+  ],
   "P834": [
     "demiryolu deposu",
     "depo"
@@ -7458,9 +10392,20 @@
     "tahmini fiyatı",
     "ticari değeri"
   ],
-  "P8345": [],
-  "P8363": [],
-  "P8368": [],
+  "P8345": [
+    "medya serisi",
+    "medya franchise'ı",
+    "seri evreni"
+  ],
+  "P8363": [
+    "araştırma türü",
+    "deney türü",
+    "çalışma tipi"
+  ],
+  "P8368": [
+    "mağaza sayısı",
+    "bayi sayısı"
+  ],
   "P837": [
     "önemli günü",
     "önemli tarihi",
@@ -7469,8 +10414,14 @@
     "tekrar eden olayın günü",
     "yıl içindeki günü"
   ],
-  "P8371": [],
-  "P8395": [],
+  "P8371": [
+    "atıf yapılan eser",
+    "gönderme yapılan eser",
+    "referans alınan eser"
+  ],
+  "P8395": [
+    "özellik değeri ile kullanım"
+  ],
   "P8397": [
     "eksik olanı sor",
     "eksik olanı sorun"
@@ -7488,7 +10439,10 @@
     "hikayenin yeri",
     "oynandığı yer"
   ],
-  "P8402": [],
+  "P8402": [
+    "açık veri platformu",
+    "açık veri sitesi"
+  ],
   "P8403": [
     "öneren",
     "önerileştiren",
@@ -7496,7 +10450,11 @@
     "teoristi",
     "teoriye döken"
   ],
-  "P841": [],
+  "P841": [
+    "yortu günü",
+    "bayram günü",
+    "aziz günü"
+  ],
   "P8411": [
     "anlatılan ortam",
     "anlatının çevresi",
@@ -7508,7 +10466,11 @@
     "oynanan yerin çevresi",
     "yaşandığı ortam"
   ],
-  "P8413": [],
+  "P8413": [
+    "akademik görev",
+    "akademik pozisyon",
+    "akademik unvan"
+  ],
   "P8423": [
     "SKS",
     "versiyon kontrol sistemi",
@@ -7517,25 +10479,52 @@
   "P8428": [
     "ESRB IE"
   ],
-  "P8431": [],
-  "P8450": [],
-  "P8453": [],
+  "P8431": [
+    "yemek kursu",
+    "menü sırası",
+    "servis sırası"
+  ],
+  "P8450": [
+    "zirve şişkinlik sınıfı",
+    "zirve şişkinlik kategorisi"
+  ],
+  "P8453": [
+    "yakın toplu taşıma durağı",
+    "otobüs durağı",
+    "en yakın durak"
+  ],
   "P8459": [
     "çözünürlük (kalitatif)",
     "çözünürlük (tanımlayıcı)",
     "tanımlayıcı çözünürlük"
   ],
-  "P8464": [],
-  "P8465": [],
-  "P8466": [],
+  "P8464": [
+    "Commons içerik ortaklığı kategorisi",
+    "kurum medya kategorisi"
+  ],
+  "P8465": [
+    "van der Waals a sabiti",
+    "vdW sabiti a"
+  ],
+  "P8466": [
+    "van der Waals b sabiti",
+    "vdW sabiti b"
+  ],
   "P8476": [
     "BTI Yönetişim Endeksi"
   ],
   "P8477": [
     "Bertelsmann Dönüşüm Endeksi Durumu"
   ],
-  "P8480": [],
-  "P8497": [],
+  "P8480": [
+    "Ofsted teftiş notu",
+    "Ofsted derecesi",
+    "Ofsted değerlendirme notu"
+  ],
+  "P8497": [
+    "ağırlık merkezi yüksekliği",
+    "kütle merkezi yüksekliği mesafesi"
+  ],
   "P85": [
     "marşı",
     "resmî şarkısı",
@@ -7548,52 +10537,131 @@
     "Vietnamca ikinci ad",
     "Vietnamca ikinci isim"
   ],
-  "P8503": [],
-  "P852": [],
-  "P853": [],
-  "P8535": [],
-  "P8536": [],
-  "P8546": [],
-  "P8554": [],
-  "P8555": [],
-  "P8556": [],
-  "P8570": [],
-  "P8571": [],
+  "P8503": [
+    "armacılık duruşu",
+    "arma duruşu",
+    "hanedanlık duruşu"
+  ],
+  "P852": [
+    "ESRB derecelendirmesi",
+    "ESRB yaş sınırı",
+    "ESRB sınıflandırması"
+  ],
+  "P853": [
+    "CERO derecelendirmesi",
+    "CERO yaş sınırı",
+    "CERO sınıflandırması"
+  ],
+  "P8535": [
+    "tâla",
+    "Hint müziği ölçüsü"
+  ],
+  "P8536": [
+    "râga",
+    "Hint makamı"
+  ],
+  "P8546": [
+    "kayıt konumu",
+    "kayıt mekânı"
+  ],
+  "P8554": [
+    "en erken sona erme tarihi",
+    "en erken bitiş zamanı"
+  ],
+  "P8555": [
+    "en geç başlama tarihi",
+    "en geç başlangıç zamanı"
+  ],
+  "P8556": [
+    "soyu tükenme tarihi",
+    "tükenme tarihi",
+    "nesli tükenme tarihi"
+  ],
+  "P8570": [
+    "kitap ön ve arka bölümleri"
+  ],
+  "P8571": [
+    "bağımsız denetçi",
+    "dış denetim firması",
+    "harici denetçi"
+  ],
   "P859": [
-    "destekleyen",
     "cirolayan",
-    "finanse eden",
     "patronu",
     "reklamvereni",
     "takviye eden"
   ],
-  "P8594": [],
+  "P8594": [
+    "yerden açıklık",
+    "yol açıklığı",
+    "şasi yüksekliği"
+  ],
   "P8596": [
     "ortak dış kategorisi"
   ],
-  "P8597": [],
+  "P8597": [
+    "iz genişliği",
+    "tekerlek izi",
+    "aks izi"
+  ],
   "P86": [
-    "yazarı",
     "bestecisi",
     "bestekarı",
     "bestelendi",
     "müzisyeni",
     "şarkı yazarı"
   ],
-  "P8615": [],
-  "P8620": [],
-  "P8621": [],
-  "P8622": [],
-  "P8625": [],
-  "P8626": [],
+  "P8615": [
+    "Oakeshott sınıflandırması",
+    "Oakeshott kılıç tipolojisi"
+  ],
+  "P8620": [
+    "inşa noktası",
+    "referans noktası"
+  ],
+  "P8621": [
+    "dönüş çapı",
+    "manevra yarıçapı"
+  ],
+  "P8622": [
+    "tepe boyutu",
+    "atlama tepesi büyüklüğü"
+  ],
+  "P8625": [
+    "bibliyografya",
+    "kaynak listesi",
+    "başvuru kaynakları"
+  ],
+  "P8626": [
+    "açılış zamanı",
+    "açılış vakti"
+  ],
   "P8627": [
     "kapanma"
   ],
-  "P8628": [],
-  "P8646": [],
-  "P8652": [],
-  "P8670": [],
-  "P868": [],
+  "P8628": [
+    "silindir hacmi",
+    "motor silindir hacmi",
+    "kübik kapasite"
+  ],
+  "P8646": [
+    "ek paket",
+    "eklenti paketi",
+    "oyun eklentisi"
+  ],
+  "P8652": [
+    "Netflix içerik derecelendirmesi",
+    "Netflix yaş derecelendirmesi"
+  ],
+  "P8670": [
+    "karakter tasarımı sorumlusu",
+    "karakter konsept tasarımcısı"
+  ],
+  "P868": [
+    "geleneksel yemekler",
+    "yöresel yiyecekler",
+    "geleneksel yemek kültürü"
+  ],
   "P8682": [
     "hayır oyu",
     "negatif oy sayısı",
@@ -7605,38 +10673,73 @@
     "evet diyenlerin sayısı",
     "pozitif oy sayısı"
   ],
-  "P8684": [],
-  "P8685": [],
+  "P8684": [
+    "x ekseni ofseti",
+    "yatay kayma",
+    "x ofseti"
+  ],
+  "P8685": [
+    "y ekseni ofseti",
+    "dikey kayma",
+    "y ofseti"
+  ],
   "P8687": [
-    "takipçi sayısı",
     "abone sayısı",
     "aboneler",
     "takipçiler"
   ],
-  "P8693": [],
+  "P8693": [
+    "hayran topluluğu",
+    "fandom",
+    "taraftar kitlesi",
+    "hayran grubu"
+  ],
   "P87": [
-    "yazarı",
     "opera metincisi"
   ],
   "P870": [
     "müzikal enstrümantasyon"
   ],
-  "P8701": [],
+  "P8701": [
+    "nüfus sayımına sahip",
+    "sayım verisi"
+  ],
   "P8702": [
     "paralel cadde"
   ],
-  "P8706": [],
+  "P8706": [
+    "tören nesnesi",
+    "dini nesne",
+    "ayin nesnesi",
+    "kült nesnesi"
+  ],
   "P872": [
     "basan",
     "baskıcı",
     "baskıyı yapan",
     "yazıcı"
   ],
-  "P873": [],
-  "P8733": [],
-  "P8738": [],
-  "P8739": [],
-  "P8744": [],
+  "P873": [
+    "faz diyagramı noktası",
+    "kritik nokta",
+    "üçlü nokta"
+  ],
+  "P8733": [
+    "oda adedi",
+    "toplam oda sayısı"
+  ],
+  "P8738": [
+    "izin verir",
+    "müsaade eder"
+  ],
+  "P8739": [
+    "yasaklar",
+    "men eder"
+  ],
+  "P8744": [
+    "ekonomisi",
+    "konuya ait ekonomi"
+  ],
   "P8745": [
     "check-in saati"
   ],
@@ -7647,16 +10750,35 @@
     "para ekseni",
     "para yönü"
   ],
-  "P8753": [],
-  "P8757": [],
-  "P8763": [],
-  "P8764": [],
-  "P878": [
-    "elektronikler",
-    "sensörler"
+  "P8753": [
+    "yıllık ortalama günlük araç trafiği",
+    "YOGT",
+    "ortalama günlük trafik"
   ],
-  "P8786": [],
-  "P8789": [],
+  "P8757": [
+    "maksimum akım",
+    "en yüksek akım"
+  ],
+  "P8763": [
+    "doğum hızı",
+    "canlı doğum oranı"
+  ],
+  "P8764": [
+    "uğranılan liman",
+    "sefer limanı",
+    "ziyaret edilen liman"
+  ],
+  "P878": [
+    "elektronikler"
+  ],
+  "P8786": [
+    "ilgili miras varlığı",
+    "bağlı miras ögesi"
+  ],
+  "P8789": [
+    "belirleyici mutasyonlar",
+    "tanımlayıcı genetik mutasyonlar"
+  ],
   "P8791": [
     "sayısallaştıran"
   ],
@@ -7664,8 +10786,7 @@
     "renk kartelası",
     "renk şeması",
     "renk şeması kullanımı",
-    "renk şeması tercihi",
-    "renk uyumu"
+    "renk şeması tercihi"
   ],
   "P88": [
     "adına inşa edilmiş",
@@ -7679,11 +10800,32 @@
     "değişen türü",
     "değişken yıldız türü"
   ],
-  "P8810": [],
-  "P8822": [],
-  "P8824": [],
-  "P8839": [],
-  "P8843": [],
+  "P8810": [
+    "anne baba",
+    "ana baba",
+    "veli"
+  ],
+  "P8822": [
+    "mahlas",
+    "unvan",
+    "sıfat",
+    "takma ad"
+  ],
+  "P8824": [
+    "cinsel ilgi duyulan",
+    "cinsel çekim",
+    "ilgi duyulan"
+  ],
+  "P8839": [
+    "saç modeli",
+    "saç kesimi",
+    "saç biçimi",
+    "saç uzunluğu"
+  ],
+  "P8843": [
+    "yoksulluk yaygınlığı",
+    "yoksulluk görülme oranı"
+  ],
   "P885": [
     "akış kaynağı",
     "bir akışın kaynağı",
@@ -7697,44 +10839,122 @@
   "P8852": [
     "sakal"
   ],
-  "P8864": [],
-  "P8865": [],
-  "P8866": [],
+  "P8864": [
+    "etkisiz eleman",
+    "birim öge",
+    "özdeşlik elemanı"
+  ],
+  "P8865": [
+    "ters eleman",
+    "tersi",
+    "matematiksel tersi"
+  ],
+  "P8866": [
+    "işleme sahip",
+    "işlemi var",
+    "ilişkili işlem"
+  ],
   "P887": [
     "kaynağın dayanak temeli",
     "kaynağın esası"
   ],
-  "P8872": [],
-  "P8874": [],
+  "P8872": [
+    "işaretleyiciye sahip",
+    "belirteç taşır",
+    "markör"
+  ],
+  "P8874": [
+    "Hong Kong film sınıflandırması",
+    "Hong Kong film yaş sınırı"
+  ],
   "P8875": [
     "bibliyografik inceleme dizini",
     "bibliyografik inceleme indeksi",
     "dizinlendiği bibliyografik inceleme veri tabanı"
   ],
-  "P8876": [],
-  "P8884": [],
-  "P8887": [],
-  "P8889": [],
-  "P8890": [],
-  "P8891": [],
-  "P8901": [],
-  "P8927": [],
+  "P8876": [
+    "vergi mükellefi sayısı",
+    "mükellef adedi"
+  ],
+  "P8884": [
+    "şut sayısı",
+    "atış girişimi sayısı",
+    "sayı denemesi"
+  ],
+  "P8887": [
+    "su yüzey alanı",
+    "su yüzölçümü",
+    "sularla kaplı alan"
+  ],
+  "P8889": [
+    "mtrcb sınıflandırması",
+    "filipin film derecelendirmesi"
+  ],
+  "P8890": [
+    "enerji tüketim değeri",
+    "enerji tüketim katsayısı"
+  ],
+  "P8891": [
+    "ısıtma enerjisi tüketimi",
+    "ısınma tüketim endeksi",
+    "ısıtma tüketim katsayısı"
+  ],
+  "P8901": [
+    "elspa sınıflandırması",
+    "elspa yaş sınıflandırması"
+  ],
+  "P8927": [
+    "arapça künye",
+    "teknonim"
+  ],
   "P8933": [],
-  "P8938": [],
-  "P8956": [],
-  "P8986": [],
+  "P8938": [
+    "artistik direktör",
+    "sanatsal yönetmen"
+  ],
+  "P8956": [
+    "uyumludur",
+    "ile uyumlu",
+    "birlikte çalışabilir"
+  ],
+  "P8986": [
+    "çevrim uzunluğu",
+    "en kısa döngü uzunluğu"
+  ],
   "P8989": [
     "kategori görünümü"
   ],
-  "P9002": [],
-  "P9028": [],
-  "P9030": [],
+  "P9002": [
+    "liturjik sıra",
+    "litürjik derece",
+    "bayram günü sıralaması"
+  ],
+  "P9028": [
+    "ccc derecelendirmesi",
+    "şili oyun derecelendirmesi"
+  ],
+  "P9030": [
+    "çözümdür",
+    "problemin çözümü"
+  ],
   "P9047": [
     "arkeolojik site türü"
   ],
-  "P9052": [],
-  "P9059": [],
-  "P9071": [],
+  "P9052": [
+    "damga tarihi",
+    "iptal tarihi",
+    "posta iptal tarihi"
+  ],
+  "P9059": [
+    "alt birim",
+    "para alt birimi",
+    "ast birim"
+  ],
+  "P9071": [
+    "karakter tipi",
+    "karakter arketipi",
+    "stok karakter"
+  ],
   "P9072": [
     "kaynak taksonu",
     "kaynaklandığı takson bireyi",
@@ -7744,9 +10964,20 @@
   "P9073": [
     "uygulanabilir P248 değeri"
   ],
-  "P9077": [],
-  "P908": [],
-  "P9086": [],
+  "P9077": [
+    "yardım alan kişi sayısı",
+    "yardımdan yararlanan sayısı",
+    "yararlanıcı sayısı"
+  ],
+  "P908": [
+    "PEGI yaş sınıflandırması",
+    "PEGI yaş derecelendirmesi",
+    "Pan Avrupa Oyun Bilgisi derecelendirmesi"
+  ],
+  "P9086": [
+    "BAMID derecelendirmesi",
+    "Tayvan film derecelendirmesi"
+  ],
   "P91": [
     "cinselliği"
   ],
@@ -7758,17 +10989,33 @@
   "P9107": [
     "aşı sayısı"
   ],
-  "P912": [],
-  "P9126": [],
+  "P912": [
+    "sahip olduğu tesisler",
+    "mevcut tesisler",
+    "olanaklar",
+    "imkanlar"
+  ],
+  "P9126": [
+    "Commons görsel kaynağı",
+    "Commons katkı kurumu",
+    "Commons medya katkısı"
+  ],
   "P913": [
-    "sembolü",
     "simgesi"
   ],
-  "P9139": [],
+  "P9139": [
+    "Portekizce ilk soyadı",
+    "Portekizce anne soyadı"
+  ],
   "P914": [
     "Unterhaltungssoftware Selbstkontrolle derecelendirmesi"
   ],
-  "P9140": [],
+  "P9140": [
+    "sahada kalma süresi",
+    "oyunda kalma süresi",
+    "maçta oynadığı süre",
+    "oynama süresi"
+  ],
   "P915": [
     "çekildiği yer",
     "çekildiği stüdyo",
@@ -7780,13 +11027,40 @@
     "CSRR derecelendirmesi",
     "GSRMR derecelendirmesi"
   ],
-  "P9161": [],
-  "P9180": [],
-  "P9184": [],
-  "P9188": [],
-  "P9190": [],
-  "P9191": [],
-  "P9192": [],
+  "P9161": [
+    "tez komitesi üyesi",
+    "tez savunma jürisi üyesi",
+    "jüri üyesi"
+  ],
+  "P9180": [
+    "sayı vuruşu girişimi",
+    "at bat sayısı",
+    "vuruş denemesi sayısı"
+  ],
+  "P9184": [
+    "isabetli vuruş",
+    "hit sayısı",
+    "sayı vuruşu"
+  ],
+  "P9188": [
+    "atılan serbest vuruş",
+    "yürüyüş sayısı",
+    "walk sayısı"
+  ],
+  "P9190": [
+    "RBI sayısı",
+    "koşu getirten vuruş",
+    "getirilen koşu sayısı"
+  ],
+  "P9191": [
+    "harflendirici",
+    "yazı çizeri",
+    "letterer"
+  ],
+  "P9192": [
+    "algılayıcılar",
+    "cihaz sensörleri"
+  ],
   "P92": [
     "yasal kuruluş metni",
     "yönetim belgesi",
@@ -7808,23 +11082,51 @@
     "etkinlikte yinelenen örgü",
     "yinelenen olay"
   ],
-  "P9217": [],
+  "P9217": [
+    "çalınan üs sayısı",
+    "kale çalma sayısı"
+  ],
   "P922": [
     "manyetik davranış"
   ],
-  "P9220": [],
-  "P9225": [],
+  "P9220": [
+    "dabıl sayısı",
+    "iki kale vuruşu"
+  ],
+  "P9225": [
+    "tripıl sayısı",
+    "üç kale vuruşu"
+  ],
   "P923": [
     "tıbbi inceleme",
     "tıbbî kontrol",
     "tıbbî test",
     "tıbbî tetkik"
   ],
-  "P9234": [],
-  "P9235": [],
-  "P9237": [],
-  "P9238": [],
-  "P9239": [],
+  "P9234": [
+    "tamamlayıcısı",
+    "ilavesi",
+    "ek yayını"
+  ],
+  "P9235": [
+    "deprem bölgesi sınıflandırması",
+    "sismik risk sınıfı",
+    "deprem risk bölgesi"
+  ],
+  "P9237": [
+    "yeniden basımı",
+    "yeni sürümü",
+    "tekrar yayımı"
+  ],
+  "P9238": [
+    "staking oranı",
+    "kilitleme yüzdesi"
+  ],
+  "P9239": [
+    "bağlı sendika",
+    "bağlı işçi örgütü",
+    "bağlı çalışan örgütü"
+  ],
   "P924": [
     "olası tedavisi",
     "sağlık tedavisi",
@@ -7833,38 +11135,90 @@
     "tıbbî tedavisi",
     "tıbbî terapi"
   ],
-  "P9241": [],
-  "P925": [],
-  "P9259": [],
-  "P926": [],
-  "P9260": [],
+  "P9241": [
+    "konunun nüfus yapısı",
+    "ilgili nüfus bilgileri"
+  ],
+  "P925": [
+    "sinaps öncesi bağlantı",
+    "presinaptik uç bağlantısı"
+  ],
+  "P9259": [
+    "test sonucu",
+    "değerlendirme çıktısı",
+    "sınav sonucu"
+  ],
+  "P926": [
+    "sinaps sonrası bağlantı",
+    "postsinaptik uç bağlantısı"
+  ],
+  "P9260": [
+    "notaya döken",
+    "notaya alan",
+    "müzik transkripsiyoncusu"
+  ],
   "P927": [
     "anatomik bölge"
   ],
-  "P9274": [],
-  "P9275": [],
-  "P9279": [],
+  "P9274": [
+    "devlet desteği",
+    "mali destek",
+    "teşvik"
+  ],
+  "P9275": [
+    "ters etkili agonist"
+  ],
+  "P9279": [
+    "Egapro endeksi",
+    "Egapro cinsiyet eşitliği skoru"
+  ],
   "P928": [
     "Ligandlar"
   ],
-  "P929": [],
-  "P9295": [],
-  "P930": [],
-  "P9302": [],
+  "P929": [
+    "renk modeli",
+    "renk sistemi"
+  ],
+  "P9295": [
+    "geçişli olma",
+    "geçişlilik özelliği"
+  ],
+  "P930": [
+    "elektrifikasyon sistemi",
+    "elektrikleşme türü",
+    "elektrifikasyon tipi"
+  ],
+  "P9302": [
+    "yazı stili",
+    "betik stili",
+    "yazı tipi stili"
+  ],
   "P931": [
     "hizmet ettiği şehir",
     "hizmet ettiği yer",
     "hizmet verdiği şehir",
     "hizmet verdiği yer"
   ],
-  "P9325": [],
-  "P9344": [],
-  "P9353": [],
+  "P9325": [
+    "Gedong Kirtya sınıfı"
+  ],
+  "P9344": [
+    "grafik unsuru",
+    "görsel öge",
+    "grafik motif"
+  ],
+  "P9353": [
+    "nedeni değil",
+    "sebep değildir"
+  ],
   "P937": [
     "faaliyet yeri",
     "iş konumu"
   ],
-  "P9396": [],
+  "P9396": [
+    "sendika üyelik oranı",
+    "sendikalı işçi oranı"
+  ],
   "P941": [
     "ilham aldığı",
     "ilham kaynağı"
@@ -7880,7 +11234,11 @@
     "jenerik şarkısı",
     "tema şarkısı"
   ],
-  "P943": [],
+  "P943": [
+    "yazılımcısı",
+    "yazılım geliştiricisi",
+    "kodlayıcısı"
+  ],
   "P944": [
     "adlandırma kodu",
     "dizin kodu",
@@ -7890,8 +11248,16 @@
     "pH",
     "㏗"
   ],
-  "P9448": [],
-  "P945": [],
+  "P9448": [
+    "tanıtılma tarihi",
+    "meclise sunulma tarihi",
+    "takdim tarihi"
+  ],
+  "P945": [
+    "hizmet ettiği ülke",
+    "sadakat",
+    "tabiiyet"
+  ],
   "P9488": [
     "bilgi alanı",
     "etkinlik alanı",
@@ -7904,13 +11270,37 @@
     "sanatçının içerikleri",
     "sanatçının resimleri"
   ],
-  "P9496": [],
-  "P9547": [],
-  "P9548": [],
-  "P9549": [],
-  "P9566": [],
-  "P9567": [],
-  "P9597": [],
+  "P9496": [
+    "ısıtma derece günü",
+    "derece gün değeri"
+  ],
+  "P9547": [
+    "karşılık gelen görev",
+    "muadil pozisyon",
+    "gölge görev"
+  ],
+  "P9548": [
+    "ERA",
+    "sayı ortalaması"
+  ],
+  "P9549": [
+    "resmi podcasti",
+    "resmî podcast"
+  ],
+  "P9566": [
+    "günlük aktivite döngüsü",
+    "diurnal döngü",
+    "günlük ritim"
+  ],
+  "P9567": [
+    "hedeflenen arka plan rengi",
+    "amaçlanan fon rengi"
+  ],
+  "P9597": [
+    "lens türü",
+    "objektif türü",
+    "mercek tipi"
+  ],
   "P9600": [
     "sözlü tarihi bulunduran",
     "sözlü tarihin konumu"
@@ -7932,37 +11322,68 @@
     "kaynak tarafından açıklanmadı",
     "tasdik edilmedi"
   ],
-  "P9664": [],
-  "P9667": [],
-  "P967": [],
-  "P9680": [],
+  "P9664": [
+    "harita üzerindeki yer",
+    "haritadaki yer adı"
+  ],
+  "P9667": [
+    "istifa günü",
+    "çekilme tarihi"
+  ],
+  "P967": [
+    "şeref konuğu",
+    "özel konuk",
+    "onursal konuk"
+  ],
+  "P9680": [
+    "yasal dayanak sonucu"
+  ],
   "P9681": [
     "oylandığı meclis",
     "oylandığı parlamento",
     "yasandığı meclis",
     "yasayı oylayan meclis"
   ],
-  "P9683": [],
+  "P9683": [
+    "Qualis derecesi",
+    "Qualis/CAPES sıralaması"
+  ],
   "P97": [
     "asilliği",
     "kalıtsal unvanı",
     "kraliyet unvanı",
     "unvanı (kalıtsal)"
   ],
-  "P970": [],
-  "P9700": [],
+  "P970": [
+    "sinirsel işlev",
+    "nörolojik işlev"
+  ],
+  "P9700": [
+    "nehir deltası",
+    "deltayı oluşturan nehir"
+  ],
   "P971": [
     "birbiriyle kesişen konular",
     "birleşen konular",
     "kategori konuları"
   ],
-  "P9714": [],
+  "P9714": [
+    "taksonun yayılış alanı",
+    "yayılış alanı",
+    "coğrafi dağılım"
+  ],
   "P972": [
     "fihrist adı",
     "kayıt adı"
   ],
-  "P9729": [],
-  "P9731": [],
+  "P9729": [
+    "yedek değer",
+    "alternatif değer"
+  ],
+  "P9731": [
+    "tanıtıldığı etkinlik",
+    "duyuru etkinliği"
+  ],
   "P974": [
     "akan",
     "dökülen",
@@ -7977,40 +11398,83 @@
     "teklife imza atanların sayısı",
     "toplam imza talebi sayısı"
   ],
-  "P9745": [],
+  "P9745": [
+    "tercümesi",
+    "çeviri kaynağı",
+    "asıl metin"
+  ],
   "P9758": [
-    "gösterimi",
-    "temsil ettiği",
-    "temsili",
     "temsil eden sembol"
   ],
-  "P9763": [],
-  "P9793": [],
-  "P9798": [],
+  "P9763": [
+    "sözdizimsel bağ",
+    "bağımlılık ilişkisi",
+    "sözdizimsel bağımlılık"
+  ],
+  "P9793": [
+    "konser programı",
+    "repertuvar"
+  ],
+  "P9798": [
+    "COFOG",
+    "devlet işlevleri sınıflandırması"
+  ],
   "P98": [
-    "düzenleyen",
     "derleyen",
     "derleyici",
     "editörü"
   ],
-  "P9803": [],
-  "P9810": [],
-  "P9813": [],
+  "P9803": [
+    "UEFA stadyum sınıfı",
+    "UEFA stat kategorisi"
+  ],
+  "P9810": [
+    "remiks kaynağı",
+    "orijinal şarkı"
+  ],
+  "P9813": [
+    "içine alan",
+    "kuşatan nesne",
+    "muhafaza"
+  ],
   "P9831": [
     "çıkarıldığı albüm",
     "müzikâl çıkışı",
     "yer aldığı albüm"
   ],
-  "P9866": [],
-  "P9883": [],
-  "P9887": [],
+  "P9866": [
+    "GRAC yaş sınırı",
+    "GRAC yaş derecelendirmesi"
+  ],
+  "P9883": [
+    "yaratılış amacı",
+    "adanmış olduğu eser",
+    "için yazıldığı eser"
+  ],
+  "P9887": [
+    "kandomble soyu",
+    "kandomble geleneği"
+  ],
   "P9888": [
     "Yeni Zelanda Tehdit Sınıflandırma Sistemi koruma durumu"
   ],
-  "P9895": [],
-  "P9897": [],
-  "P9899": [],
-  "P9901": [],
+  "P9895": [
+    "SMECCV derecelendirmesi",
+    "Meksika oyun derecelendirmesi"
+  ],
+  "P9897": [
+    "Apple yaş sınırı",
+    "App Store içerik derecelendirmesi"
+  ],
+  "P9899": [
+    "için yazılan müzik",
+    "adanmış beste"
+  ],
+  "P9901": [
+    "yayımcı kurum",
+    "yayımlayan kuruluş",
+    "süreli yayın yayımcısı"
+  ],
   "P9905": [
     "telif hakkı ile ilgili tarih",
     "telif hakkının başlatıldığı tarih"
@@ -8019,19 +11483,37 @@
     "başarılı aday",
     "seçilmiş",
     "seçilmiş kişi",
-    "seçimi kazanan",
     "seçimin galibi"
   ],
-  "P9924": [],
-  "P9926": [],
-  "P9927": [],
+  "P9924": [
+    "tahliye sayısı",
+    "boşaltılan kişi sayısı"
+  ],
+  "P9926": [
+    "eklendiği kategori"
+  ],
+  "P9927": [
+    "try sayısı",
+    "atılan try sayısı"
+  ],
   "P9929": [
     "fıkıh mezhepleri",
     "İslam'da mezhepler"
   ],
-  "P9945": [],
-  "P9946": [],
-  "P9969": [],
+  "P9945": [
+    "tez bölümü",
+    "tez veren bölüm",
+    "tez programı bölümü"
+  ],
+  "P9946": [
+    "veraset onay tarihi",
+    "vasiyet onay tarihi",
+    "tereke tescil tarihi"
+  ],
+  "P9969": [
+    "sanatçı eser kataloğu",
+    "tam eser kataloğu"
+  ],
   "P9970": [
     "bu sözlükbirimin fiili",
     "fiil bağlantısı",
@@ -8041,8 +11523,23 @@
     "sözlükbirimin fiili",
     "yüklemi"
   ],
-  "P9971": [],
-  "P9972": [],
-  "P9977": [],
-  "P9998": []
+  "P9971": [
+    "semantik argüman",
+    "anlamsal rol",
+    "tematik rol"
+  ],
+  "P9972": [
+    "resimleme türü",
+    "görsel malzeme türü",
+    "illüstrasyon türü"
+  ],
+  "P9977": [
+    "izotopik türev",
+    "izotopik değişik biçim",
+    "izotopça modifiye biçim"
+  ],
+  "P9998": [
+    "uyarma enerjisi",
+    "eksitasyon enerjisi"
+  ]
 }
