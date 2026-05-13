@@ -20,7 +20,7 @@ from typing import Optional
 from dotenv import load_dotenv, find_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 from pymongo import MongoClient
 
 load_dotenv(find_dotenv())
@@ -68,12 +68,25 @@ def _check_mongo():
 
 # ── Profile resolution ────────────────────────────────────────────────────────
 
-def _resolve_profile(embedding_key: str):
+_LANG_TO_ONTOLOGY_PROFILE = {
+    "en": "ontology_en_v1",
+    "tr": "ontology_tr_v1",
+}
+
+
+def _resolve_profile(embedding_key: str, ontology_language: str = "en"):
     """
-    Resolve RuntimeProfile for English ontology + given embedding key.
-    Raises ValueError for unknown embedding_key.
+    Resolve RuntimeProfile for given ontology language + embedding key.
+    Raises ValueError for unknown embedding_key or ontology_language.
     """
     from src.wikontic.profiles import EMBEDDING_PROFILES, resolve_runtime_profile
+
+    ontology_profile_id = _LANG_TO_ONTOLOGY_PROFILE.get(ontology_language)
+    if ontology_profile_id is None:
+        raise ValueError(
+            f"Unknown ontology_language '{ontology_language}'. "
+            f"Known: {list(_LANG_TO_ONTOLOGY_PROFILE)}"
+        )
 
     matched_ep = next(
         (ep for ep in EMBEDDING_PROFILES.values() if ep.embedding_key == embedding_key),
@@ -85,16 +98,16 @@ def _resolve_profile(embedding_key: str):
             f"Unknown embedding_model '{embedding_key}'. Known keys: {known}"
         )
 
-    return resolve_runtime_profile("ontology_en_v1", matched_ep.profile_id)
+    return resolve_runtime_profile(ontology_profile_id, matched_ep.profile_id)
 
 
-# ── Aligner cache (one per embedding model — model loading is expensive) ──────
+# ── Aligner cache (one per (embedding, language) — model loading is expensive) ─
 
 @lru_cache(maxsize=8)
-def _get_aligner(embedding_key: str):
+def _get_aligner(embedding_key: str, ontology_language: str = "en"):
     from src.wikontic.utils.structured_aligner import Aligner
 
-    profile = _resolve_profile(embedding_key)
+    profile = _resolve_profile(embedding_key, ontology_language)
     client  = _get_mongo()
     return Aligner(
         ontology_db=client.get_database(profile.ontology_db_name),
@@ -107,9 +120,15 @@ def _get_aligner(embedding_key: str):
 # ── Request / Response schemas ────────────────────────────────────────────────
 
 class ExtractionRequest(BaseModel):
+    model_config = ConfigDict(populate_by_name=True, protected_namespaces=())
+
     text: str
     embedding_model: str = "contriever"   # embedding_key
-    llm_model: str = "gpt-4o-mini"
+    llm_model: str = Field(
+        default="gpt-4o-mini",
+        validation_alias=AliasChoices("llm_model", "model"),
+    )
+    ontology_language: str = "en"         # "en" or "tr"
 
 
 class Triplet(BaseModel):
@@ -141,9 +160,10 @@ def healthcheck():
 @app.post("/extract", response_model=ExtractionResponse)
 def extract(req: ExtractionRequest):
     logging.info(
-        "POST /extract  →  embedding_model=%s  llm_model=%s  text_len=%d  text_preview=%r",
+        "POST /extract  →  embedding_model=%s  llm_model=%s  ontology_language=%s  text_len=%d  text_preview=%r",
         req.embedding_model,
         req.llm_model,
+        req.ontology_language,
         len(req.text),
         req.text[:120],
     )
@@ -172,7 +192,7 @@ def extract(req: ExtractionRequest):
 
     # Resolve profile
     try:
-        profile = _resolve_profile(req.embedding_model)
+        profile = _resolve_profile(req.embedding_model, req.ontology_language)
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
 
@@ -184,13 +204,13 @@ def extract(req: ExtractionRequest):
         proxy=_PROXY_URL,
     )
 
-    # Get cached aligner for this embedding model
+    # Get cached aligner for this (embedding, language) combo
     try:
-        aligner = _get_aligner(req.embedding_model)
+        aligner = _get_aligner(req.embedding_model, req.ontology_language)
     except Exception as e:
         raise HTTPException(
             status_code=503,
-            detail=f"Failed to load aligner for '{req.embedding_model}': {e}",
+            detail=f"Failed to load aligner for '{req.embedding_model}' / '{req.ontology_language}': {e}",
         )
 
     # Run pipeline — no DB writes
