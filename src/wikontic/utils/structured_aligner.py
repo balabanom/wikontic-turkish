@@ -465,11 +465,11 @@ class Aligner:
             triple["embedding_profile_id"] = self.embedding_profile_id
             triple["embedding_model_name"] = self.embedding_model_name
             filter_query = {
-                "subject": triple["subject"],
-                "relation": triple["relation"],
-                "object": triple["object"],
-                "subject_type": triple["subject_type"],
-                "object_type": triple["object_type"],
+                "subject": triple.get("subject"),
+                "relation": triple.get("relation"),
+                "object": triple.get("object"),
+                "subject_type": triple.get("subject_type"),
+                "object_type": triple.get("object_type"),
                 "sample_id": triple["sample_id"],
             }
             operations.append(
@@ -477,7 +477,21 @@ class Aligner:
             )
 
         if operations:
-            collection.bulk_write(operations)
+            result = collection.bulk_write(operations)
+            return {
+                "attempted_count": len(operations),
+                "inserted_count": result.upserted_count,
+                "already_existing_count": len(operations) - result.upserted_count,
+                "matched_count": result.matched_count,
+                "modified_count": result.modified_count,
+            }
+        return {
+            "attempted_count": 0,
+            "inserted_count": 0,
+            "already_existing_count": 0,
+            "matched_count": 0,
+            "modified_count": 0,
+        }
 
     def add_filtered_triplets(self, triplets_list, sample_id):
         collection = self.triplets_db.get_collection(
@@ -492,11 +506,11 @@ class Aligner:
             triple["embedding_profile_id"] = self.embedding_profile_id
             triple["embedding_model_name"] = self.embedding_model_name
             filter_query = {
-                "subject": triple["subject"],
-                "relation": triple["relation"],
-                "object": triple["object"],
-                "subject_type": triple["subject_type"],
-                "object_type": triple["object_type"],
+                "subject": triple.get("subject"),
+                "relation": triple.get("relation"),
+                "object": triple.get("object"),
+                "subject_type": triple.get("subject_type"),
+                "object_type": triple.get("object_type"),
                 "sample_id": triple["sample_id"],
             }
             operations.append(
@@ -504,7 +518,21 @@ class Aligner:
             )
 
         if operations:
-            collection.bulk_write(operations)
+            result = collection.bulk_write(operations)
+            return {
+                "attempted_count": len(operations),
+                "inserted_count": result.upserted_count,
+                "already_existing_count": len(operations) - result.upserted_count,
+                "matched_count": result.matched_count,
+                "modified_count": result.modified_count,
+            }
+        return {
+            "attempted_count": 0,
+            "inserted_count": 0,
+            "already_existing_count": 0,
+            "matched_count": 0,
+            "modified_count": 0,
+        }
 
     def add_ontology_filtered_triplets(self, triplets_list, sample_id):
         collection = self.triplets_db.get_collection(
@@ -519,11 +547,11 @@ class Aligner:
             triple["embedding_profile_id"] = self.embedding_profile_id
             triple["embedding_model_name"] = self.embedding_model_name
             filter_query = {
-                "subject": triple["subject"],
-                "relation": triple["relation"],
-                "object": triple["object"],
-                "subject_type": triple["subject_type"],
-                "object_type": triple["object_type"],
+                "subject": triple.get("subject"),
+                "relation": triple.get("relation"),
+                "object": triple.get("object"),
+                "subject_type": triple.get("subject_type"),
+                "object_type": triple.get("object_type"),
                 "sample_id": triple["sample_id"],
             }
             operations.append(
@@ -531,7 +559,21 @@ class Aligner:
             )
 
         if operations:
-            collection.bulk_write(operations)
+            result = collection.bulk_write(operations)
+            return {
+                "attempted_count": len(operations),
+                "inserted_count": result.upserted_count,
+                "already_existing_count": len(operations) - result.upserted_count,
+                "matched_count": result.matched_count,
+                "modified_count": result.modified_count,
+            }
+        return {
+            "attempted_count": 0,
+            "inserted_count": 0,
+            "already_existing_count": 0,
+            "matched_count": 0,
+            "modified_count": 0,
+        }
 
     def add_initial_triplets(self, triplets_list, sample_id):
         if not sample_id:
@@ -545,18 +587,32 @@ class Aligner:
             triple["embedding_profile_id"] = self.embedding_profile_id
             triple["embedding_model_name"] = self.embedding_model_name
             filter_query = {
-                "subject": triple["subject"],
-                "relation": triple["relation"],
-                "object": triple["object"],
-                "subject_type": triple["subject_type"],
-                "object_type": triple["object_type"],
+                "subject": triple.get("subject"),
+                "relation": triple.get("relation"),
+                "object": triple.get("object"),
+                "subject_type": triple.get("subject_type"),
+                "object_type": triple.get("object_type"),
                 "sample_id": triple["sample_id"],
             }
             operations.append(
                 UpdateOne(filter_query, {"$setOnInsert": triple}, upsert=True)
             )
         if operations:
-            collection.bulk_write(operations)
+            result = collection.bulk_write(operations)
+            return {
+                "attempted_count": len(operations),
+                "inserted_count": result.upserted_count,
+                "already_existing_count": len(operations) - result.upserted_count,
+                "matched_count": result.matched_count,
+                "modified_count": result.modified_count,
+            }
+        return {
+            "attempted_count": 0,
+            "inserted_count": 0,
+            "already_existing_count": 0,
+            "matched_count": 0,
+            "modified_count": 0,
+        }
 
     def retrieve_similar_entity_names(
         self, entity_name: str, k: int = 10, sample_id: str = None

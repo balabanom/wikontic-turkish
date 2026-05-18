@@ -36,6 +36,7 @@ def _ensure_indexes(db):
     runs.create_index([("profile_id", ASCENDING)], background=True)
     runs.create_index([("ontology_language", ASCENDING)], background=True)
     runs.create_index([("embedding_model_name", ASCENDING)], background=True)
+    runs.create_index([("extra_config.batch_id", ASCENDING)], background=True)
 
     artifacts = db["extraction_artifacts"]
     artifacts.create_index([("run_id", ASCENDING)], background=True)
@@ -48,6 +49,7 @@ def _ensure_indexes(db):
     artifacts.create_index([("embedding_model_name", ASCENDING)], background=True)
     artifacts.create_index([("embedding_profile_id", ASCENDING)], background=True)
     artifacts.create_index([("ontology_profile_id", ASCENDING)], background=True)
+    artifacts.create_index([("payload.batch_info.batch_id", ASCENDING)], background=True)
 
 
 def start_run(

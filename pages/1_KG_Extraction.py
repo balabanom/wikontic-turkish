@@ -2,12 +2,22 @@ import streamlit as st
 from pyvis.network import Network
 import tempfile
 import os
+import json
 from dataclasses import replace
+from datetime import datetime, timezone
 from dotenv import load_dotenv, find_dotenv
 from src.wikontic.utils.structured_inference_with_db import StructuredInferenceWithDB
 from src.wikontic.utils.openai_utils import LLMTripletExtractor
 from src.wikontic.utils.structured_aligner import Aligner
 from src.wikontic.utils.run_reader import get_run, get_artifact, list_recent_runs
+from src.wikontic.utils.run_logger import log_artifact
+from src.wikontic.utils.paper_report import build_batch_report
+from src.wikontic.utils.wiki_extractor import (
+    DEFAULT_MAX_CHARS,
+    DEFAULT_MIN_CHARS,
+    DEFAULT_TARGET_CHARS,
+    extract_wikipedia_chunks,
+)
 from src.wikontic.profiles import (
     resolve_runtime_profile,
     DEFAULT_RUNTIME_PROFILE,
@@ -443,6 +453,28 @@ def _show_sentence_detail(triplets: list, key_prefix: str):
                 st.info(t["sentence_full"])
 
 
+def _json_download_bytes(payload: dict) -> bytes:
+    return json.dumps(payload, ensure_ascii=False, indent=2, default=str).encode("utf-8")
+
+
+def _paper_report_summary(report: dict) -> dict:
+    counts = report.get("triple_counts", {})
+    extra = report.get("run_info", {}).get("extra_config", {})
+    return {
+        "chunk": extra.get("chunk_index"),
+        "run_id": report.get("run_info", {}).get("run_id"),
+        "raw": counts.get("initial_raw_triple_count", 0),
+        "final": counts.get("final_triple_count", 0),
+        "filtered": counts.get("filtered_count", 0),
+        "ontology_filtered": counts.get("ontology_filtered_count", 0),
+        "pipeline_filtered": counts.get("pipeline_filtered_count", 0),
+        "merges": report.get("merge_info", {}).get("merge_count", 0),
+        "kg_inserted": counts.get("kg_inserted_count", 0),
+        "kg_already_existing": counts.get("kg_already_existing_count", 0),
+        "runtime_ms": report.get("telemetry", {}).get("total_time_ms"),
+    }
+
+
 # ── Transparency Panel ────────────────────────────────────────────────────────
 
 def render_transparency_panel(selected_run_id: str):
@@ -750,6 +782,388 @@ with col2:
         key="text_area",
     )
     st.session_state.input_text = input_text
+
+st.divider()
+st.subheader("Wikipedia Link ile Çek")
+
+for _k, _default in {
+    "wiki_url": "",
+    "wiki_preview": None,
+    "wiki_batch_report": None,
+    "wiki_batch_rows": [],
+}.items():
+    if _k not in st.session_state:
+        st.session_state[_k] = _default
+
+wiki_url = st.text_input(
+    "Wikipedia URL",
+    value=st.session_state["wiki_url"],
+    placeholder="https://tr.wikipedia.org/wiki/Cristiano_Ronaldo",
+    key="wiki_url_input",
+).strip()
+st.session_state["wiki_url"] = wiki_url
+
+wch1, wch2, wch3 = st.columns(3)
+wiki_target_chars = wch1.number_input(
+    "Target chars",
+    min_value=200,
+    max_value=8000,
+    value=DEFAULT_TARGET_CHARS,
+    step=100,
+    key="wiki_target_chars",
+)
+wiki_max_chars = wch2.number_input(
+    "Max chars",
+    min_value=300,
+    max_value=12000,
+    value=DEFAULT_MAX_CHARS,
+    step=100,
+    key="wiki_max_chars",
+)
+wiki_min_chars = wch3.number_input(
+    "Min chars",
+    min_value=0,
+    max_value=5000,
+    value=DEFAULT_MIN_CHARS,
+    step=100,
+    key="wiki_min_chars",
+)
+
+resume_col1, resume_col2, resume_col3 = st.columns([2, 1, 1])
+wiki_batch_id_override = resume_col1.text_input(
+    "Mevcut batch_id ile devam et (opsiyonel)",
+    value=st.session_state.get("wiki_batch_id_override", ""),
+    placeholder="örn. wiki_20260518_101430_0bd50c91",
+    key="wiki_batch_id_override",
+).strip()
+wiki_start_chunk = int(
+    resume_col2.number_input(
+        "Başlangıç chunk",
+        min_value=1,
+        max_value=999,
+        value=int(st.session_state.get("wiki_start_chunk", 1)),
+        step=1,
+        key="wiki_start_chunk",
+    )
+)
+wiki_end_chunk_input = int(
+    resume_col3.number_input(
+        "Bitiş chunk",
+        min_value=0,
+        max_value=999,
+        value=int(st.session_state.get("wiki_end_chunk", 0)),
+        step=1,
+        help="0 = son chunka kadar",
+        key="wiki_end_chunk",
+    )
+)
+
+wp_col1, wp_col2 = st.columns([1, 1])
+preview_wiki = wp_col1.button("Linki Önizle", width="stretch", disabled=not wiki_url)
+run_wiki_batch = wp_col2.button(
+    "Chunkları Sırayla KG'ye Ekle",
+    width="stretch",
+    disabled=not wiki_url,
+)
+
+if preview_wiki:
+    with st.spinner("Wikipedia sayfası çekiliyor ve chunklara ayrılıyor..."):
+        try:
+            wiki_result = extract_wikipedia_chunks(
+                wiki_url,
+                target_chars=int(wiki_target_chars),
+                max_chars=int(wiki_max_chars),
+                min_chars=int(wiki_min_chars),
+            )
+            st.session_state["wiki_preview"] = {
+                "url": wiki_result.url,
+                "paragraph_count": wiki_result.paragraph_count,
+                "chunk_count": wiki_result.chunk_count,
+                "chunk_summaries": wiki_result.chunk_summaries(),
+                "chunks": [chunk.to_dict() for chunk in wiki_result.chunks],
+            }
+            st.session_state["wiki_batch_report"] = None
+            st.session_state["wiki_batch_rows"] = []
+        except Exception as e:
+            st.session_state["wiki_preview"] = None
+            st.error(f"Wikipedia çekimi başarısız: {e}")
+
+wiki_preview = st.session_state.get("wiki_preview")
+if wiki_preview:
+    wc = st.columns(3)
+    wc[0].metric("Paragraf", wiki_preview["paragraph_count"])
+    wc[1].metric("Chunk", wiki_preview["chunk_count"])
+    wc[2].metric("URL", wiki_preview["url"].split("/wiki/")[-1][:30])
+    st.dataframe(
+        pd.DataFrame(wiki_preview["chunk_summaries"]),
+        width="stretch",
+        hide_index=True,
+    )
+    with st.expander("Chunk metinlerini göster", expanded=False):
+        for chunk in wiki_preview["chunks"]:
+            st.markdown(
+                f"**Chunk {chunk['index']:03d}** · "
+                f"{chunk['char_count']} chars · {chunk['paragraph_count']} paragraphs"
+            )
+            st.text_area(
+                "",
+                value=chunk["text"],
+                height=180,
+                disabled=True,
+                key=f"wiki_preview_chunk_{chunk['index']}",
+            )
+
+if run_wiki_batch:
+    if not selected_model:
+        st.warning("Please select a model for KG extraction.")
+    else:
+        if not wiki_preview or wiki_preview.get("url") != wiki_url:
+            with st.spinner("Önizleme yok veya URL değişti; yeniden çekiliyor..."):
+                wiki_result = extract_wikipedia_chunks(
+                    wiki_url,
+                    target_chars=int(wiki_target_chars),
+                    max_chars=int(wiki_max_chars),
+                    min_chars=int(wiki_min_chars),
+                )
+                wiki_preview = {
+                    "url": wiki_result.url,
+                    "paragraph_count": wiki_result.paragraph_count,
+                    "chunk_count": wiki_result.chunk_count,
+                    "chunk_summaries": wiki_result.chunk_summaries(),
+                    "chunks": [chunk.to_dict() for chunk in wiki_result.chunks],
+                }
+                st.session_state["wiki_preview"] = wiki_preview
+
+        total_chunks = int(wiki_preview["chunk_count"])
+        start_chunk = max(1, min(int(wiki_start_chunk), total_chunks))
+        end_chunk = (
+            total_chunks
+            if int(wiki_end_chunk_input) <= 0
+            else max(start_chunk, min(int(wiki_end_chunk_input), total_chunks))
+        )
+        chunks_to_run = [
+            chunk for chunk in wiki_preview["chunks"]
+            if start_chunk <= int(chunk["index"]) <= end_chunk
+        ]
+        batch_id = (
+            wiki_batch_id_override
+            or f"wiki_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}"
+        )
+        progress = st.progress(0, text="Wikipedia batch başlıyor...")
+        status_box = st.empty()
+        table_box = st.empty()
+        chunk_reports = []
+        failed_chunks = []
+        rows = []
+        batch_status = "DONE"
+        batch_error = None
+
+        extractor = LLMTripletExtractor(
+            model=selected_model,
+            api_key=api_key,
+            proxy=proxy_url,
+            prompt_type=selected_prompt_type,
+        )
+        inference_with_db = StructuredInferenceWithDB(
+            extractor=extractor,
+            aligner=aligner,
+            triplets_db=triplets_db,
+            runtime_profile=effective_profile,
+        )
+
+        run_total = len(chunks_to_run)
+        for run_pos, chunk in enumerate(chunks_to_run, start=1):
+            pos = int(chunk["index"])
+            status_box.info(
+                f"Chunk {pos}/{wiki_preview['chunk_count']} çalışıyor "
+                f"({chunk['char_count']} chars, {chunk['paragraph_count']} paragraphs)."
+            )
+            progress.progress(
+                (run_pos - 1) / run_total,
+                text=f"Chunk {pos}/{wiki_preview['chunk_count']} çalışıyor...",
+            )
+            try:
+                (
+                    _initial_triplets,
+                    _final_triplets,
+                    _filtered_triplets,
+                    _ontology_filtered_triplets,
+                    run_id,
+                ) = inference_with_db.extract_triplets_with_ontology_filtering_and_add_to_db(
+                    text=chunk["text"],
+                    sample_id=user_id,
+                    source_text_id=f"{batch_id}:chunk:{pos}",
+                    extra_config={
+                        "batch_id": batch_id,
+                        "batch_type": "wikipedia_url",
+                        "source_url": wiki_preview["url"],
+                        "chunk_index": pos,
+                        "chunk_count": wiki_preview["chunk_count"],
+                        "resume_start_chunk": start_chunk,
+                        "resume_end_chunk": end_chunk,
+                        "resume_run_position": run_pos,
+                        "resume_run_total": run_total,
+                        "chunk_char_count": chunk["char_count"],
+                        "chunk_paragraph_count": chunk["paragraph_count"],
+                    },
+                )
+                paper_report = get_artifact(
+                    run_id,
+                    "paper_report",
+                    db_name=effective_profile.triplets_db_name,
+                )
+                if paper_report:
+                    chunk_reports.append(paper_report)
+                    row = _paper_report_summary(paper_report)
+                else:
+                    row = {
+                        "chunk": pos,
+                        "run_id": run_id,
+                        "raw": len(_initial_triplets),
+                        "final": len(_final_triplets),
+                        "filtered": len(_filtered_triplets) + len(_ontology_filtered_triplets),
+                        "ontology_filtered": len(_ontology_filtered_triplets),
+                        "pipeline_filtered": len(_filtered_triplets),
+                    }
+                rows.append(row)
+                table_box.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
+                st.session_state["last_run_id"] = run_id
+                selected_run_id = run_id
+            except Exception as e:
+                failed_run_id = getattr(inference_with_db, "_last_run_id", None)
+                failed_art = (
+                    get_artifact(
+                        failed_run_id,
+                        "failure_report",
+                        db_name=effective_profile.triplets_db_name,
+                    )
+                    if failed_run_id else None
+                )
+                failed_meta = (
+                    get_run(failed_run_id, db_name=effective_profile.triplets_db_name)
+                    if failed_run_id else None
+                )
+                parsed_art = (
+                    get_artifact(
+                        failed_run_id,
+                        "parsed_triplets",
+                        db_name=effective_profile.triplets_db_name,
+                    )
+                    if failed_run_id else None
+                )
+                final_art = (
+                    get_artifact(
+                        failed_run_id,
+                        "final_triplets",
+                        db_name=effective_profile.triplets_db_name,
+                    )
+                    if failed_run_id else None
+                )
+                filtered_art = (
+                    get_artifact(
+                        failed_run_id,
+                        "filtered_out",
+                        db_name=effective_profile.triplets_db_name,
+                    )
+                    if failed_run_id else None
+                )
+                failed_chunk = {
+                    "chunk_index": pos,
+                    "run_id": failed_run_id,
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                    "raw": (parsed_art or {}).get("count"),
+                    "final": (final_art or {}).get("count"),
+                    "filtered": (filtered_art or {}).get("count"),
+                    "ontology_filtered": (filtered_art or {}).get("ontology_filtered_count"),
+                    "pipeline_filtered": (filtered_art or {}).get("pipeline_exception_count"),
+                    "runtime_ms": ((failed_meta or {}).get("stats") or {}).get("total_time_ms"),
+                    "failure_report": failed_art,
+                }
+                failed_chunks.append(failed_chunk)
+                batch_status = "FAILED"
+                batch_error = f"Chunk {pos} failed: {e}"
+                rows.append(
+                    {
+                        "chunk": pos,
+                        "run_id": failed_run_id,
+                        "status": "FAILED",
+                        "error": str(e),
+                        "raw": failed_chunk["raw"],
+                        "final": failed_chunk["final"],
+                        "filtered": failed_chunk["filtered"],
+                    }
+                )
+                table_box.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
+                status_box.error(batch_error)
+                break
+
+            progress.progress(
+                run_pos / run_total,
+                text=f"Chunk {pos}/{wiki_preview['chunk_count']} tamamlandı.",
+            )
+
+        batch_report = build_batch_report(
+            batch_id=batch_id,
+            source_url=wiki_preview["url"],
+            sample_id=user_id,
+            runtime_profile=effective_profile,
+            model=selected_model,
+            prompt_type=selected_prompt_type,
+            chunk_summaries=wiki_preview["chunk_summaries"],
+            chunk_reports=chunk_reports,
+            failed_chunks=failed_chunks,
+            status=batch_status,
+            error=batch_error,
+        )
+        st.session_state["wiki_batch_report"] = batch_report
+        st.session_state["wiki_batch_rows"] = rows
+
+        if rows and rows[-1].get("run_id"):
+            try:
+                log_artifact(
+                    rows[-1]["run_id"],
+                    "wiki_batch_report",
+                    batch_report,
+                    db_name=effective_profile.triplets_db_name,
+                    profile_id=effective_profile.profile_id,
+                    runtime_profile=effective_profile,
+                )
+            except Exception as e:
+                st.warning(f"Batch report Run Viewer'a yazılamadı: {e}")
+
+        if batch_status == "DONE":
+            status_box.success(
+                f"Batch tamamlandı: {len(chunk_reports)}/{wiki_preview['chunk_count']} chunk işlendi."
+            )
+        else:
+            status_box.error(batch_error or "Batch failed.")
+
+wiki_batch_report = st.session_state.get("wiki_batch_report")
+if wiki_batch_report:
+    st.markdown("**Son Wikipedia Batch Raporu**")
+    if st.session_state.get("wiki_batch_rows"):
+        st.dataframe(
+            pd.DataFrame(st.session_state["wiki_batch_rows"]),
+            width="stretch",
+            hide_index=True,
+        )
+    totals = wiki_batch_report.get("totals", {})
+    tc = st.columns(5)
+    tc[0].metric("Raw", totals.get("initial_raw_triple_count", 0))
+    tc[1].metric("Final", totals.get("final_triple_count", 0))
+    tc[2].metric("Ontology Filtered", totals.get("ontology_filtered_count", 0))
+    tc[3].metric("KG Inserted", totals.get("kg_inserted_count", 0))
+    tc[4].metric("KG Existing", totals.get("kg_already_existing_count", 0))
+    st.download_button(
+        "Wikipedia Batch JSON indir",
+        data=_json_download_bytes(wiki_batch_report),
+        file_name=f"{wiki_batch_report['batch_info']['batch_id']}.json",
+        mime="application/json",
+        key="download_wiki_batch_report",
+    )
+
+st.divider()
 
 btn_col_a, btn_col_b = st.columns([1, 1])
 trigger          = btn_col_a.button("Extract and Visualize", width="stretch")

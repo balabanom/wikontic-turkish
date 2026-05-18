@@ -176,6 +176,7 @@ def list_recent_runs(
     sample_id: Optional[str] = None,
     status: Optional[str] = None,
     model: Optional[str] = None,
+    batch_id: Optional[str] = None,
     date_from: Optional[datetime] = None,
     date_to: Optional[datetime] = None,
     db_name: Optional[str] = None,
@@ -196,6 +197,8 @@ def list_recent_runs(
             query["status"] = status
         if model:
             query["model"] = model
+        if batch_id:
+            query["extra_config.batch_id"] = batch_id
         if date_from or date_to:
             date_filter = {}
             if date_from:

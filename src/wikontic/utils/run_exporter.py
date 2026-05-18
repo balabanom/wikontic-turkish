@@ -14,6 +14,9 @@ _STAGE_ORDER = [
     "merge_map_entities",
     "filtered_out",
     "final_triplets",
+    "paper_report",
+    "failure_report",
+    "wiki_batch_report",
 ]
 
 

@@ -126,6 +126,10 @@ def _render_performance_card(run_meta: dict):
             st.caption(f"Cost estimate: ${cost:.6f}" if cost else "Cost: 0 / N/A")
         else:
             st.caption("Token bilgisi: N/A")
+        if "kg_inserted_count" in stats or "kg_already_existing_count" in stats:
+            kc = st.columns(2)
+            kc[0].metric("KG yeni eklenen", stats.get("kg_inserted_count", 0))
+            kc[1].metric("KG zaten vardı", stats.get("kg_already_existing_count", 0))
         if stats.get("failed_stage"):
             st.warning(f"Hata olan stage: `{stats['failed_stage']}`")
 
@@ -138,6 +142,9 @@ def _render_stage_tabs(run_id: str, db_name: str):
         "🔀 Merge Log",
         "🚫 Filtered Out",
         "🟢 Final Triplets",
+        "📄 Paper Report",
+        "💥 Failure",
+        "🌐 Wiki Batch",
     ])
 
     # ── Tab 0: Input & Config ─────────────────────────────────────────────────
@@ -249,6 +256,90 @@ def _render_stage_tabs(run_id: str, db_name: str):
                 _show_sentence_detail(triplets, key_prefix=f"rv_final_{run_id}")
             else:
                 st.info("Final triplet bulunamadı.")
+
+    # ── Tab 6: Paper Report ──────────────────────────────────────────────────
+    with tabs[6]:
+        art = get_artifact(run_id, "paper_report", db_name=db_name)
+        if art is None:
+            st.warning("Stage kaydı bulunamadı: paper_report")
+        else:
+            counts = art.get("triple_counts", {})
+            mc = st.columns(6)
+            mc[0].metric("Raw", counts.get("initial_raw_triple_count", 0))
+            mc[1].metric("Final", counts.get("final_triple_count", 0))
+            mc[2].metric("Filtered", counts.get("filtered_count", 0))
+            mc[3].metric("Ontology", counts.get("ontology_filtered_count", 0))
+            mc[4].metric("KG Inserted", counts.get("kg_inserted_count", 0))
+            mc[5].metric("KG Existing", counts.get("kg_already_existing_count", 0))
+
+            rels = art.get("relation_info", {}).get("top_relations", [])
+            if rels:
+                st.markdown("**En sık relationlar**")
+                st.dataframe(pd.DataFrame(rels), width="stretch", hide_index=True)
+            st.download_button(
+                label="⬇️ paper_report.json indir",
+                data=json.dumps(art, ensure_ascii=False, indent=2, default=str),
+                file_name=f"paper_report_{run_id[:8]}.json",
+                mime="application/json",
+                key=f"download_paper_{run_id}",
+            )
+            with st.expander("JSON göster", expanded=False):
+                st.json(art)
+
+    # ── Tab 7: Failure Report ────────────────────────────────────────────────
+    with tabs[7]:
+        art = get_artifact(run_id, "failure_report", db_name=db_name)
+        if art is None:
+            st.info("Failure report yok.")
+        else:
+            st.error(f"{art.get('error_type', 'Error')}: {art.get('error', '')}")
+            st.download_button(
+                label="⬇️ failure_report.json indir",
+                data=json.dumps(art, ensure_ascii=False, indent=2, default=str),
+                file_name=f"failure_report_{run_id[:8]}.json",
+                mime="application/json",
+                key=f"download_failure_{run_id}",
+            )
+            with st.expander("JSON göster", expanded=True):
+                st.json(art)
+
+    # ── Tab 8: Wiki Batch Report ─────────────────────────────────────────────
+    with tabs[8]:
+        art = get_artifact(run_id, "wiki_batch_report", db_name=db_name)
+        if art is None:
+            run_meta = get_run(run_id, db_name=db_name) or {}
+            batch_id = (run_meta.get("extra_config") or {}).get("batch_id")
+            if batch_id:
+                st.info(
+                    "Bu run bir Wikipedia batch chunk'ı, fakat toplu batch report "
+                    "genellikle batch'in son chunk run'ında saklanır."
+                )
+                st.code(batch_id, language=None)
+            else:
+                st.warning("Stage kaydı bulunamadı: wiki_batch_report")
+        else:
+            info = art.get("batch_info", {})
+            totals = art.get("totals", {})
+            st.caption(f"Batch ID: `{info.get('batch_id', '')}`")
+            st.caption(f"Source URL: {info.get('source_url', '')}")
+            bc = st.columns(5)
+            bc[0].metric("Raw", totals.get("initial_raw_triple_count", 0))
+            bc[1].metric("Final", totals.get("final_triple_count", 0))
+            bc[2].metric("Ontology", totals.get("ontology_filtered_count", 0))
+            bc[3].metric("KG Inserted", totals.get("kg_inserted_count", 0))
+            bc[4].metric("KG Existing", totals.get("kg_already_existing_count", 0))
+            rows = art.get("chunk_results", [])
+            if rows:
+                st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
+            st.download_button(
+                label="⬇️ wiki_batch_report.json indir",
+                data=json.dumps(art, ensure_ascii=False, indent=2, default=str),
+                file_name=f"{info.get('batch_id', run_id[:8])}.json",
+                mime="application/json",
+                key=f"download_batch_{run_id}",
+            )
+            with st.expander("JSON göster", expanded=False):
+                st.json(art)
 
 
 def _render_lineage(run_id: str, run_meta: dict, db_name: str):
@@ -469,6 +560,7 @@ with left_col:
     filter_status = None if filter_status_label == "(tümü)" else filter_status_label
 
     filter_sample_id = st.text_input("Sample ID (tam)", key="rv_filter_sample") or None
+    filter_batch_id = st.text_input("Batch ID (tam)", key="rv_filter_batch") or None
 
     st.divider()
 
@@ -478,6 +570,7 @@ with left_col:
             sample_id=filter_sample_id,
             status=filter_status,
             model=filter_model,
+            batch_id=filter_batch_id,
             db_name=_db_name,
         )
     except Exception as e:

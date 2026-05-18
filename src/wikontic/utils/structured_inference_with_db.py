@@ -12,6 +12,7 @@ from .timing_utils import StageTimer
 from .sentence_splitter import split_sentences
 from .sentence_matcher import enrich_triplets_with_sentence_ids
 from .llm_client_logger import set_llm_context
+from .paper_report import build_paper_report
 from ..profiles.runtime_profile import DEFAULT_RUNTIME_PROFILE, RuntimeProfile
 
 warnings.filterwarnings("ignore")
@@ -599,6 +600,7 @@ Turkish candidates are present. Return only valid JSON.
         filtered_triplets          = []
         ontology_filtered_triplets = []
         entity_merge_log           = []
+        self._last_entity_merge_log = entity_merge_log
 
         # ── Stage: ontology_alignment ─────────────────────────────────────────
         def _process_triplets():
@@ -853,7 +855,7 @@ Turkish candidates are present. Return only valid JSON.
         )
 
     def extract_triplets_with_ontology_filtering_and_add_to_db(
-        self, text, sample_id=None, source_text_id=None
+        self, text, sample_id=None, source_text_id=None, extra_config=None
     ):
         """
         Extract and refine knowledge graph triplets from text using LLM,
@@ -868,14 +870,23 @@ Turkish candidates are present. Return only valid JSON.
                     ontology_filtered_triplets, run_id)
         """
         model_name = self._get_model_name()
+        prompt_type = getattr(self.extractor, "prompt_type", None)
+        run_extra_config = {
+            "source_text_id": source_text_id,
+            "prompt_type": prompt_type,
+        }
+        if extra_config:
+            run_extra_config.update(extra_config)
+
         run_id = start_run(
             sample_id=str(sample_id) if sample_id is not None else "unknown",
             model=model_name,
             input_text=text,
-            extra_config={"source_text_id": source_text_id},
+            extra_config=run_extra_config,
             runtime_profile=self.runtime_profile,
             db_name=self.runtime_profile.triplets_db_name,
         )
+        self._last_run_id = run_id
 
         # Propagate profile context to LLM audit log for all stages in this run
         set_llm_context(
@@ -908,15 +919,43 @@ Turkish candidates are present. Return only valid JSON.
             )
 
             # ── Stage: db_write ───────────────────────────────────────────────
+            db_write_results = {
+                "initial_triplets": {
+                    "attempted_count": 0,
+                    "inserted_count": 0,
+                    "already_existing_count": 0,
+                },
+                "final_triplets": {
+                    "attempted_count": 0,
+                    "inserted_count": 0,
+                    "already_existing_count": 0,
+                },
+                "filtered_triplets": {
+                    "attempted_count": 0,
+                    "inserted_count": 0,
+                    "already_existing_count": 0,
+                },
+                "ontology_filtered_triplets": {
+                    "attempted_count": 0,
+                    "inserted_count": 0,
+                    "already_existing_count": 0,
+                },
+            }
             with timer.measure("db_write"):
                 if len(initial_triplets) > 0:
-                    self.aligner.add_initial_triplets(initial_triplets, sample_id=sample_id)
+                    db_write_results["initial_triplets"] = self.aligner.add_initial_triplets(
+                        initial_triplets, sample_id=sample_id
+                    )
                 if len(final_triplets) > 0:
-                    self.aligner.add_triplets(final_triplets, sample_id=sample_id)
+                    db_write_results["final_triplets"] = self.aligner.add_triplets(
+                        final_triplets, sample_id=sample_id
+                    )
                 if len(filtered_triplets) > 0:
-                    self.aligner.add_filtered_triplets(filtered_triplets, sample_id=sample_id)
+                    db_write_results["filtered_triplets"] = self.aligner.add_filtered_triplets(
+                        filtered_triplets, sample_id=sample_id
+                    )
                 if len(ontology_filtered_triplets) > 0:
-                    self.aligner.add_ontology_filtered_triplets(
+                    db_write_results["ontology_filtered_triplets"] = self.aligner.add_ontology_filtered_triplets(
                         ontology_filtered_triplets, sample_id=sample_id
                     )
 
@@ -926,7 +965,38 @@ Turkish candidates are present. Return only valid JSON.
                 "final_count":             len(final_triplets),
                 "filtered_count":          len(filtered_triplets),
                 "ontology_filtered_count": len(ontology_filtered_triplets),
+                "kg_inserted_count": db_write_results["final_triplets"].get("inserted_count", 0),
+                "kg_already_existing_count": db_write_results["final_triplets"].get("already_existing_count", 0),
+                "db_write_results": db_write_results,
             })
+
+            try:
+                paper_report = build_paper_report(
+                    run_id=run_id,
+                    sample_id=str(sample_id) if sample_id is not None else "unknown",
+                    model=model_name,
+                    prompt_type=prompt_type,
+                    runtime_profile=self.runtime_profile,
+                    input_text=text,
+                    initial_triplets=initial_triplets,
+                    final_triplets=final_triplets,
+                    filtered_triplets=filtered_triplets,
+                    ontology_filtered_triplets=ontology_filtered_triplets,
+                    entity_merges=getattr(self, "_last_entity_merge_log", []),
+                    db_write_results=db_write_results,
+                    stats=stats,
+                    extra_config=run_extra_config,
+                )
+                log_artifact(
+                    run_id,
+                    "paper_report",
+                    paper_report,
+                    db_name=self.runtime_profile.triplets_db_name,
+                    profile_id=self.runtime_profile.profile_id,
+                    runtime_profile=self.runtime_profile,
+                )
+            except Exception as log_exc:
+                logger.warning("run_logger paper_report failed: %s", log_exc)
 
             finish_run(
                 run_id=run_id,
@@ -937,6 +1007,24 @@ Turkish candidates are present. Return only valid JSON.
 
         except Exception as e:
             timer.mark_failed_at("unknown")
+            try:
+                log_artifact(
+                    run_id,
+                    "failure_report",
+                    {
+                        "error": str(e),
+                        "error_type": type(e).__name__,
+                        "sample_id": str(sample_id) if sample_id is not None else "unknown",
+                        "source_text_id": source_text_id,
+                        "extra_config": run_extra_config,
+                        "stats": timer.to_stats(),
+                    },
+                    db_name=self.runtime_profile.triplets_db_name,
+                    profile_id=self.runtime_profile.profile_id,
+                    runtime_profile=self.runtime_profile,
+                )
+            except Exception as log_exc:
+                logger.warning("run_logger failure_report failed: %s", log_exc)
             finish_run(
                 run_id=run_id,
                 status="FAILED",
