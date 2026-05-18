@@ -90,6 +90,22 @@ def set_llm_context(
         _ctx_embedding_dimension.set(embedding_dimension)
 
 
+def set_llm_stage(stage: Optional[str]) -> object:
+    """
+    Update only the stage context var; preserve all other context.
+    Returns a token usable with reset_llm_stage() to restore the prior stage.
+    """
+    return _ctx_stage.set(stage)
+
+
+def reset_llm_stage(token: object) -> None:
+    """Restore the stage context var to the value held before set_llm_stage()."""
+    try:
+        _ctx_stage.reset(token)
+    except (ValueError, LookupError):
+        pass
+
+
 def _now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
 
@@ -255,3 +271,100 @@ class LoggedOpenAIClient:
     def __getattr__(self, name: str):
         """Delegate any attribute not explicitly overridden to the raw client."""
         return getattr(self._raw, name)
+
+
+# ── litellm bridge (for DSPy / any litellm-backed caller) ─────────────────────
+
+_litellm_logger_installed = False
+
+
+def install_litellm_logger() -> None:
+    """
+    Register a litellm CustomLogger that mirrors LoggedOpenAIClient's JSONL shape.
+
+    Idempotent — calling repeatedly only installs the logger once. Safe to call
+    even when litellm is not installed (no-op with a warning).
+    """
+    global _litellm_logger_installed
+    if _litellm_logger_installed:
+        return
+
+    try:
+        import litellm
+        from litellm.integrations.custom_logger import CustomLogger
+    except ImportError:
+        logger.warning(
+            "litellm not installed; DSPy LLM calls will not be logged to %s",
+            _LOG_PATH,
+        )
+        return
+
+    class _WikonticLitellmLogger(CustomLogger):
+        def _entry(self, kwargs, response_obj, start_time, end_time, error=None):
+            try:
+                start_ts = start_time.astimezone(timezone.utc) if start_time else datetime.now(timezone.utc)
+                end_ts   = end_time.astimezone(timezone.utc)   if end_time   else datetime.now(timezone.utc)
+                latency_ms = round((end_ts - start_ts).total_seconds() * 1000, 2)
+
+                messages    = kwargs.get("messages") or []
+                model       = kwargs.get("model") or "unknown"
+                temperature = (kwargs.get("optional_params") or {}).get("temperature", 0)
+                request_payload = _build_request_payload(messages, model, temperature)
+
+                usage_dict = None
+                content    = ""
+                finish_reason = None
+                response_id   = None
+                if response_obj is not None and not error:
+                    try:
+                        choice = response_obj.choices[0]
+                        content = (choice.message.content or "") if choice and choice.message else ""
+                        finish_reason = getattr(choice, "finish_reason", None)
+                        response_id   = getattr(response_obj, "id", None)
+                    except (AttributeError, IndexError):
+                        pass
+                    usage = getattr(response_obj, "usage", None)
+                    if usage:
+                        usage_dict = {
+                            "prompt_tokens":     getattr(usage, "prompt_tokens",     None),
+                            "completion_tokens": getattr(usage, "completion_tokens", None),
+                            "total_tokens":      getattr(usage, "total_tokens",      None),
+                        }
+
+                base_url = (kwargs.get("litellm_params") or {}).get("api_base") or "litellm"
+
+                _append_log({
+                    "ts":                start_ts.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
+                    "run_id":            _ctx_run_id.get(),
+                    "stage":             _ctx_stage.get(),
+                    "provider_base_url": base_url,
+                    "model":             model,
+                    "endpoint":          "chat.completions",
+                    "request":           request_payload,
+                    "response_meta":     {
+                        "id":            response_id,
+                        "finish_reason": finish_reason,
+                        "usage":         usage_dict,
+                        "latency_ms":    latency_ms,
+                    },
+                    "response_preview":  _build_response_preview(content) if content else None,
+                    "error":             str(error) if error else None,
+                    **_current_profile_context(),
+                })
+            except Exception as e:
+                logger.warning("litellm log write failed: %s", e)
+
+        def log_success_event(self, kwargs, response_obj, start_time, end_time):
+            self._entry(kwargs, response_obj, start_time, end_time)
+
+        def log_failure_event(self, kwargs, response_obj, start_time, end_time):
+            self._entry(kwargs, response_obj, start_time, end_time, error=response_obj)
+
+        async def async_log_success_event(self, kwargs, response_obj, start_time, end_time):
+            self._entry(kwargs, response_obj, start_time, end_time)
+
+        async def async_log_failure_event(self, kwargs, response_obj, start_time, end_time):
+            self._entry(kwargs, response_obj, start_time, end_time, error=response_obj)
+
+    litellm.callbacks = list(getattr(litellm, "callbacks", []) or []) + [_WikonticLitellmLogger()]
+    _litellm_logger_installed = True

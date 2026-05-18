@@ -1,0 +1,37 @@
+{
+  "predict": {
+    "traces": [],
+    "train": [],
+    "demos": [
+      {
+        "girdi_metni": "Marie Curie (7 Kasım 1867 - 4 Temmuz 1934) radyoaktivite üzerine öncü araştırmalar yapmış bir fizikçi ve kimyagerdi. 1903'te Nobel Fizik Ödülü'nü ve 1911'de Nobel Kimya Ödülü'nü aldı.",
+        "bilgi_grafigi": "{\"triplets\":[{\"subject\":\"Marie Curie\",\"relation\":\"doğum tarihi\",\"object\":\"7 Kasım 1867\",\"qualifiers\":[],\"subject_type\":\"insan\",\"object_type\":\"tarih\",\"kaynak_cumle\":\"Marie Curie (7 Kasım 1867 - 4 Temmuz 1934) radyoaktivite üzerine öncü araştırmalar yapmış bir fizikçi ve kimyagerdi.\"},{\"subject\":\"Marie Curie\",\"relation\":\"ölüm tarihi\",\"object\":\"4 Temmuz 1934\",\"qualifiers\":[],\"subject_type\":\"insan\",\"object_type\":\"tarih\",\"kaynak_cumle\":\"Marie Curie (7 Kasım 1867 - 4 Temmuz 1934) radyoaktivite üzerine öncü araştırmalar yapmış bir fizikçi ve kimyagerdi.\"},{\"subject\":\"Marie Curie\",\"relation\":\"meslek\",\"object\":\"fizikçi\",\"qualifiers\":[],\"subject_type\":\"insan\",\"object_type\":\"meslek\",\"kaynak_cumle\":\"Marie Curie (7 Kasım 1867 - 4 Temmuz 1934) radyoaktivite üzerine öncü araştırmalar yapmış bir fizikçi ve kimyagerdi.\"},{\"subject\":\"Marie Curie\",\"relation\":\"kazandığı ödül\",\"object\":\"Nobel Fizik Ödülü\",\"qualifiers\":[{\"relation\":\"zaman noktası\",\"object\":\"1903\"}],\"subject_type\":\"insan\",\"object_type\":\"ödül\",\"kaynak_cumle\":\"1903'te Nobel Fizik Ödülü'nü ve 1911'de Nobel Kimya Ödülü'nü aldı.\"}]}"
+      }
+    ],
+    "signature": {
+      "instructions": "You are an algorithm designed to extract structured knowledge from texts to build a Wikidata-like knowledge graph consisting of triplets (subject, relation, object) and their qualifiers.\n\n- **Subject**: A named entity or a concept that describes a group of people, events, or any abstract objects that serves as the source of the relation.\n- **Relation**: A Wikidata-style predicate that connects the subject and object.\n- **Object**: A named entity or a concept that describes a group of people, events, or any abstract objects that is related to the subject.\n\nAdditionally, some triplets may have **qualifiers** that provide more context (e.g., date, place, or other attributes). Qualifiers should have relations and object like triplets do, but instead of subject their relation connects an object and the triplet qualifier belongs to. **Qualifiers must always be attached to a triplet** and never exist as standalone triplets.\n\n**IMPORTANT NOTE (TURKISH OUTPUT REQUIREMENT):** Regardless of the input text's language, all extracted entities (subject, object), relations, and type labels (subject_type, object_type) MUST BE STRICTLY IN TURKISH. The JSON keys themselves must remain in English.\n\nSTRICT RULES:\n1. The output MUST BE STRICTLY in JSON format containing a \"triplets\" list.\n2. Each triplet dictionary MUST ONLY contain:\n    - \"subject\": Subject entity.\n    - \"relation\": Relation connecting subject and object.\n    - \"object\": Object entity.\n    - \"qualifiers\": List of dictionaries, where each dictionary contains:\n        - \"relation\": Relation connecting triplet and object,\n        - \"object\": Object entity connected to the main triplet\n    - \"subject_type\": a class that describes the subject\n    - \"object_type\": a class that describes the object\n    - \"kaynak_cumle\": original sentence from the text where this relationship was found\n3. Qualifiers must always be attached to a main triplet and must follow the [{'relation': '...', 'object': '...'}] structure.\n4. **TURKISH LANGUAGE REQUIREMENT:** The JSON keys must remain in English (subject, relation, etc.), BUT all extracted values corresponding to these keys (entities, relations, types) MUST BE STRICTLY IN TURKISH. If there are no qualifiers, you MUST still include the \"qualifiers\" key with an empty list [].\n5. NEVER compress the JSON output into a single line! DO NOT use Markdown (```json) blocks. Output pure JSON.",
+      "fields": [
+        {
+          "prefix": "Girdi Metni:",
+          "description": "The raw text to be analyzed."
+        },
+        {
+          "prefix": "Reasoning:",
+          "description": "${reasoning}"
+        },
+        {
+          "prefix": "Bilgi Grafigi:",
+          "description": "Valid JSON object strictly containing the 'triplets' key."
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.13",
+      "dspy": "3.2.1",
+      "cloudpickle": "3.1"
+    }
+  }
+}

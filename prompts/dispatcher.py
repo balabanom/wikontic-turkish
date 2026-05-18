@@ -27,6 +27,13 @@ from typing import Optional
 import httpx
 import openai
 
+from src.wikontic.utils.llm_client_logger import (
+    LoggedOpenAIClient,
+    install_litellm_logger,
+    set_llm_stage,
+    reset_llm_stage,
+)
+
 logger = logging.getLogger("PromptDispatcher")
 
 CACHE_DIR = Path(__file__).parent / "optimized"
@@ -85,14 +92,19 @@ def _safe_model_name(model: str) -> str:
     return re.sub(r"[^\w\-.]", "_", model)
 
 
-def _build_openai_client(api_key: str, proxy: Optional[str] = None) -> openai.OpenAI:
+def _build_openai_client(
+    api_key: str,
+    proxy: Optional[str] = None,
+    model: str = "unknown",
+) -> LoggedOpenAIClient:
     base_url = os.getenv("OPENAI_BASE_URL") or os.getenv("OPENROUTER_BASE_URL")
     kwargs = {"api_key": api_key}
     if base_url:
         kwargs["base_url"] = base_url
     if proxy:
         kwargs["http_client"] = httpx.Client(proxy=proxy)
-    return openai.OpenAI(**kwargs)
+    raw = openai.OpenAI(**kwargs)
+    return LoggedOpenAIClient(raw, model=model)
 
 
 def _strip_codeblock(text: str) -> str:
@@ -146,7 +158,7 @@ def _ape_optimize(client: openai.OpenAI, model: str, num_candidates: int = 3) ->
     resp = client.chat.completions.create(
         model=model,
         messages=[{"role": "user", "content": proposal}],
-        temperature=0.7,
+        temperature=0,
     )
     parts = re.split(r"Candidate \d+:", resp.choices[0].message.content or "")
     candidates = [c.strip() for c in parts if c.strip()][:num_candidates]
@@ -195,8 +207,12 @@ def get_ape_prompt(model: str, api_key: str, proxy: Optional[str] = None) -> str
     cache = _ape_cache_path(model)
     if cache.exists():
         return cache.read_text(encoding="utf-8")
-    client = _build_openai_client(api_key, proxy)
-    best = _ape_optimize(client, model)
+    client = _build_openai_client(api_key, proxy, model=model)
+    token = set_llm_stage("ape_optimize")
+    try:
+        best = _ape_optimize(client, model)
+    finally:
+        reset_llm_stage(token)
     cache.write_text(best, encoding="utf-8")
     return best
 
@@ -207,11 +223,7 @@ def _textgrad_cache_path(model: str) -> Path:
     return CACHE_DIR / f"textgrad_{_safe_model_name(model)}.txt"
 
 
-def get_textgrad_prompt(model: str, api_key: str, proxy: Optional[str] = None) -> str:
-    cache = _textgrad_cache_path(model)
-    if cache.exists():
-        return cache.read_text(encoding="utf-8")
-
+def _textgrad_optimize_impl(model: str, api_key: str, proxy: Optional[str] = None) -> str:
     try:
         import textgrad as tg
         from textgrad.engine.openai import ChatOpenAI
@@ -227,6 +239,10 @@ def get_textgrad_prompt(model: str, api_key: str, proxy: Optional[str] = None) -
         os.environ["OPENAI_BASE_URL"] = base_url
 
     engine = ChatOpenAI(model_string=model, temperature=0.1, max_tokens=8192)
+    # Wrap engine's internal OpenAI client so every textgrad LLM call goes
+    # through LoggedOpenAIClient (writes to logs/llm_requests.jsonl).
+    if hasattr(engine, "client"):
+        engine.client = LoggedOpenAIClient(engine.client, model=model)
     tg.set_backward_engine(engine, override=True)
 
     train_texts = [
@@ -267,9 +283,23 @@ def get_textgrad_prompt(model: str, api_key: str, proxy: Optional[str] = None) -
         optimizer.step()
         optimizer.zero_grad()
 
-    cache.write_text(system_var.value, encoding="utf-8")
-    logger.info("TextGrad optimization complete; saved to %s", cache)
     return system_var.value
+
+
+def get_textgrad_prompt(model: str, api_key: str, proxy: Optional[str] = None) -> str:
+    cache = _textgrad_cache_path(model)
+    if cache.exists():
+        return cache.read_text(encoding="utf-8")
+
+    token = set_llm_stage("textgrad_optimize")
+    try:
+        optimized = _textgrad_optimize_impl(model, api_key, proxy)
+    finally:
+        reset_llm_stage(token)
+
+    cache.write_text(optimized, encoding="utf-8")
+    logger.info("TextGrad optimization complete; saved to %s", cache)
+    return optimized
 
 
 # ── DSPy ──────────────────────────────────────────────────────────────────────
@@ -295,6 +325,9 @@ def run_dspy_extraction(
             "dspy is required for prompt_type='dspy'. Install via: pip install dspy-ai"
         ) from e
 
+    # Route DSPy's litellm-backed LLM calls into logs/llm_requests.jsonl.
+    install_litellm_logger()
+
     lm_key = f"lm::{model}"
     if lm_key not in _dspy_runtime_cache:
         base_url = (
@@ -302,13 +335,29 @@ def run_dspy_extraction(
             or os.getenv("OPENROUTER_BASE_URL")
             or "https://openrouter.ai/api/v1"
         )
-        dspy_model = model if "/" in model else f"openrouter/{model}"
+        # litellm requires a provider prefix. The wider Wikontic codebase uses
+        # OpenRouter as the gateway for any model (openrouter passes through
+        # google/, anthropic/, openai/ models). Force the "openrouter/" prefix
+        # unless the caller has already specified a litellm provider explicitly.
+        _LITELLM_PROVIDERS = (
+            "openrouter/", "openai/", "anthropic/", "azure/", "gemini/",
+            "vertex_ai/", "bedrock/", "ollama/", "groq/", "deepseek/",
+            "mistral/", "together_ai/", "cohere/", "huggingface/",
+        )
+        if model.startswith(_LITELLM_PROVIDERS):
+            dspy_model = model
+        else:
+            dspy_model = f"openrouter/{model}"
+        # cache=False ensures every inference call hits litellm (and therefore
+        # our logger). Without this, DSPy's on-disk cache at ~/.dspy_cache
+        # short-circuits repeat extractions and zeroes out cost telemetry.
         lm = dspy.LM(
             api_base=base_url,
             api_key=api_key,
             model=dspy_model,
             max_tokens=8192,
             temperature=0.1,
+            cache=False,
         )
         dspy.settings.configure(lm=lm)
         _dspy_runtime_cache[lm_key] = lm
@@ -341,11 +390,31 @@ def run_dspy_extraction(
             ]
 
             def metric(ex, pred, trace=None):
-                out = pred.bilgi_grafigi or ""
-                required = ["triplets", "subject", "relation", "object",
-                            "qualifiers", "kaynak_cumle"]
-                return all(k in out for k in required)
+                # Structural validation: parse JSON, require non-empty triplets list
+                # where every triplet has all required keys and well-formed qualifiers.
+                parsed = extract_json(pred.bilgi_grafigi or "")
+                triplets = parsed.get("triplets") if isinstance(parsed, dict) else None
+                if not isinstance(triplets, list) or not triplets:
+                    return False
+                required_keys = {
+                    "subject", "relation", "object",
+                    "qualifiers", "subject_type", "object_type", "kaynak_cumle",
+                }
+                for t in triplets:
+                    if not isinstance(t, dict):
+                        return False
+                    if not required_keys.issubset(t.keys()):
+                        return False
+                    if not isinstance(t.get("qualifiers"), list):
+                        return False
+                    for q in t["qualifiers"]:
+                        if not isinstance(q, dict):
+                            return False
+                        if "relation" not in q or "object" not in q:
+                            return False
+                return True
 
+            compile_token = set_llm_stage("dspy_optimize")
             try:
                 optimizer = dspy.teleprompt.BootstrapFewShot(
                     metric=metric, max_bootstrapped_demos=1
@@ -355,11 +424,17 @@ def run_dspy_extraction(
                 logger.info("DSPy module compiled and cached at %s", cache)
             except Exception as e:
                 logger.warning("DSPy compile failed (%s); using uncompiled module", e)
+            finally:
+                reset_llm_stage(compile_token)
 
         _dspy_runtime_cache[mod_key] = kg_module
 
     kg_module = _dspy_runtime_cache[mod_key]
-    result = kg_module(girdi_metni=text)
+    infer_token = set_llm_stage("dspy_inference")
+    try:
+        result = kg_module(girdi_metni=text)
+    finally:
+        reset_llm_stage(infer_token)
     return extract_json(result.bilgi_grafigi or "")
 
 
