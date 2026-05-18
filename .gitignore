@@ -5,7 +5,7 @@ __pycache__/
 qa_logs/
 inference_logs/
 logs/
-scripts/
+scripts-ontology/
 docs/
 backups/
 .claude
