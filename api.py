@@ -129,6 +129,12 @@ class ExtractionRequest(BaseModel):
         validation_alias=AliasChoices("llm_model", "model"),
     )
     ontology_language: str = "en"         # "en" or "tr"
+    prompt_type: str = "temel"            # "temel" | "ape" | "dspy" | "textgrad"
+
+
+class Qualifier(BaseModel):
+    relation: str = ""
+    object: str = ""
 
 
 class Triplet(BaseModel):
@@ -137,6 +143,8 @@ class Triplet(BaseModel):
     relation: str
     object: str
     object_type: str
+    qualifiers: list[Qualifier] = []
+    kaynak_cumle: str = ""
 
 
 class ExtractionResponse(BaseModel):
@@ -160,10 +168,11 @@ def healthcheck():
 @app.post("/extract", response_model=ExtractionResponse)
 def extract(req: ExtractionRequest):
     logging.info(
-        "POST /extract  →  embedding_model=%s  llm_model=%s  ontology_language=%s  text_len=%d  text_preview=%r",
+        "POST /extract  →  embedding_model=%s  llm_model=%s  ontology_language=%s  prompt_type=%s  text_len=%d  text_preview=%r",
         req.embedding_model,
         req.llm_model,
         req.ontology_language,
+        req.prompt_type,
         len(req.text),
         req.text[:120],
     )
@@ -188,6 +197,13 @@ def extract(req: ExtractionRequest):
     if not req.text.strip():
         raise HTTPException(status_code=422, detail="text must not be empty")
 
+    from prompts.dispatcher import is_valid_prompt_type
+    if not is_valid_prompt_type(req.prompt_type):
+        raise HTTPException(
+            status_code=422,
+            detail=f"Unknown prompt_type '{req.prompt_type}'. Known: temel, ape, dspy, textgrad",
+        )
+
     _check_mongo()
 
     # Resolve profile
@@ -202,6 +218,7 @@ def extract(req: ExtractionRequest):
         model=req.llm_model,
         api_key=_API_KEY,
         proxy=_PROXY_URL,
+        prompt_type=req.prompt_type,
     )
 
     # Get cached aligner for this (embedding, language) combo
@@ -233,6 +250,18 @@ def extract(req: ExtractionRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Extraction failed: {e}")
 
+    def _normalise_qualifiers(raw) -> list[Qualifier]:
+        if not isinstance(raw, list):
+            return []
+        out: list[Qualifier] = []
+        for q in raw:
+            if isinstance(q, dict):
+                out.append(Qualifier(
+                    relation=str(q.get("relation", "")),
+                    object=str(q.get("object", "")),
+                ))
+        return out
+
     result = [
         Triplet(
             subject=str(t.get("subject", "")),
@@ -240,6 +269,8 @@ def extract(req: ExtractionRequest):
             relation=str(t.get("relation", "")),
             object=str(t.get("object", "")),
             object_type=str(t.get("object_type", "")),
+            qualifiers=_normalise_qualifiers(t.get("qualifiers")),
+            kaynak_cumle=str(t.get("kaynak_cumle", "")),
         )
         for t in final_triplets
     ]

@@ -18,3 +18,5 @@ pydantic
 accelerate
 langchain_openai
 langchain
+dspy-ai
+textgrad

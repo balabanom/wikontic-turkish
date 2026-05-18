@@ -45,7 +45,11 @@ class LLMTripletExtractor:
         model: str = "gpt-4o",
         max_attempts=MAX_ATTEMPTS,
         proxy: str = None,
+        prompt_type: str = "temel",
     ):
+        self.api_key = api_key
+        self.proxy = proxy
+        self.prompt_type = prompt_type if prompt_type else "temel"
         base_url = os.getenv("OPENAI_BASE_URL") or os.getenv("OPENROUTER_BASE_URL")
 
         client_kwargs = {"api_key": api_key}
@@ -164,6 +168,25 @@ class LLMTripletExtractor:
         self.messages = messages + [{"role": "assistant", "content": output}]
         return output
 
+    def _resolve_triplet_extraction_prompt(self) -> str:
+        """Return the system prompt for triplet extraction based on prompt_type.
+
+        For 'temel' returns the default file-loaded prompt.
+        For 'ape' / 'textgrad' returns the optimized cached prompt (generates
+        and caches on first call). For 'dspy' returns None — the caller takes
+        a different path via run_dspy_extraction.
+        """
+        if self.prompt_type in (None, "temel"):
+            return self.prompts["triplet_extraction"]
+        if self.prompt_type in ("ape", "textgrad"):
+            from prompts.dispatcher import get_optimized_system_prompt
+            optimized = get_optimized_system_prompt(
+                self.prompt_type, self.model, self.api_key, self.proxy
+            )
+            return optimized or self.prompts["triplet_extraction"]
+        # dspy is handled separately in extract_triplets_from_text
+        return self.prompts["triplet_extraction"]
+
     @tenacity.retry(stop=tenacity.stop_after_attempt(MAX_ATTEMPTS), reraise=True)
     def extract_triplets_from_text(self, text: str, sentences: list | None = None) -> dict:
         """Extract knowledge graph triplets from text."""
@@ -171,10 +194,17 @@ class LLMTripletExtractor:
         attempt = self._refine_attempt
         logger.log(
             logging.DEBUG,
-            "Attempt of a function call extract_triplets_from_text: %s",
+            "Attempt of a function call extract_triplets_from_text: %s (prompt_type=%s)",
             attempt,
+            self.prompt_type,
         )
-        system_prompt = self.prompts["triplet_extraction"]
+
+        # DSPy path: bypass standard get_completion since the module wraps its own LM.
+        if self.prompt_type == "dspy":
+            from prompts.dispatcher import run_dspy_extraction
+            return run_dspy_extraction(text, self.model, self.api_key, self.proxy)
+
+        system_prompt = self._resolve_triplet_extraction_prompt()
         if attempt > 1:
             prev_error = self._prev_error
             system_prompt += (

@@ -653,6 +653,23 @@ def render_ontology_neighborhood_panel(selected_run_id: str):
 model_options  = ["google/gemini-2.5-flash-lite", "gpt-4o-mini", "gpt-4.1-mini", "gpt-4.1"]
 selected_model = st.selectbox("Choose a model for KG extraction:", model_options, index=0)
 
+# ── Prompt technique selection ────────────────────────────────────────────────
+prompt_type_options = ["temel", "ape", "dspy", "textgrad"]
+prompt_type_labels  = {
+    "temel":    "Temel (default Wikontic prompt)",
+    "ape":      "APE (Automatic Prompt Engineer)",
+    "dspy":     "DSPy (compiled module)",
+    "textgrad": "TextGrad (textual gradient)",
+}
+selected_prompt_type = st.selectbox(
+    "Prompt technique:",
+    prompt_type_options,
+    index=0,
+    format_func=lambda k: prompt_type_labels.get(k, k),
+    help="Temel = default. Diğer seçenekler yalnızca prompt aşamasını değiştirir; "
+         "ontology/merge pipeline aynı kalır. İlk kullanımda optimize edilip cache'lenir.",
+)
+
 # ── Profile not ready guard ───────────────────────────────────────────────────
 if not _profile_ready:
     st.error(
@@ -748,6 +765,7 @@ if trigger_no_db:
             "text":            input_text,
             "embedding_model": effective_profile.embedding_model_name.split("/")[-1].lower().replace("-", "_").replace(".", "_"),
             "llm_model":       selected_model,
+            "prompt_type":     selected_prompt_type,
         }
         # Map full model name to embedding_key via profile
         _payload["embedding_model"] = next(
@@ -766,10 +784,20 @@ if trigger_no_db:
                 st.success(f"✅ {_data.get('count', len(_triplets))} triplets extracted (not saved to DB).")
                 if _triplets:
                     import pandas as _pd
+                    _df = _pd.DataFrame(_triplets)
+                    _cols = ["subject", "subject_type", "relation", "object", "object_type"]
+                    if "qualifiers" in _df.columns:
+                        _df["qualifiers"] = _df["qualifiers"].apply(
+                            lambda qs: "; ".join(
+                                f"{q.get('relation','')}={q.get('object','')}"
+                                for q in (qs or []) if isinstance(q, dict)
+                            )
+                        )
+                        _cols.append("qualifiers")
+                    if "kaynak_cumle" in _df.columns:
+                        _cols.append("kaynak_cumle")
                     st.dataframe(
-                        _pd.DataFrame(_triplets)[
-                            ["subject", "subject_type", "relation", "object", "object_type"]
-                        ],
+                        _df[_cols],
                         width="stretch",
                         hide_index=True,
                     )
@@ -787,7 +815,12 @@ if trigger:
     elif not selected_model:
         st.warning("Please select a model for KG extraction.")
     else:
-        extractor = LLMTripletExtractor(model=selected_model, api_key=api_key, proxy=proxy_url)
+        extractor = LLMTripletExtractor(
+            model=selected_model,
+            api_key=api_key,
+            proxy=proxy_url,
+            prompt_type=selected_prompt_type,
+        )
         inference_with_db = StructuredInferenceWithDB(
             extractor=extractor,
             aligner=aligner,
