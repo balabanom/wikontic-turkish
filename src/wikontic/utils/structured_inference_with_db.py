@@ -579,10 +579,14 @@ Turkish candidates are present. Return only valid JSON.
                     {
                         "triplets": [
                             {
-                                "subject":     t.get("subject"),
-                                "relation":    t.get("relation"),
-                                "object":      t.get("object"),
-                                "sentence_id": t.get("sentence_id"),
+                                "subject":      t.get("subject"),
+                                "relation":     t.get("relation"),
+                                "object":       t.get("object"),
+                                "subject_type": t.get("subject_type"),
+                                "object_type":  t.get("object_type"),
+                                "qualifiers":   t.get("qualifiers", []),
+                                "kaynak_cumle": t.get("kaynak_cumle"),
+                                "sentence_id":  t.get("sentence_id"),
                             }
                             for t in initial_triplets
                         ],

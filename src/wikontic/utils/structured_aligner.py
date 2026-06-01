@@ -7,12 +7,34 @@ import torch
 import logging
 from dotenv import load_dotenv, find_dotenv
 import os
+import re
 from pathlib import Path
 from ..profiles.runtime_profile import DEFAULT_RUNTIME_PROFILE, RuntimeProfile
 
 _ = load_dotenv(find_dotenv())
 
 logger = logging.getLogger(__name__)
+
+TR_ENTITY_TYPE_CANONICAL_IDS = {
+    "futbolcu": ["Q5"],
+    "sporcu": ["Q5"],
+    "oyuncu": ["Q5"],
+    "kişi": ["Q215627", "Q5"],
+    "kisi": ["Q215627", "Q5"],
+    "insan": ["Q5"],
+    "tarih": ["Q186408"],
+    "doğum tarihi": ["Q186408"],
+    "dogum tarihi": ["Q186408"],
+    "futbol kulübü": ["Q476028"],
+    "futbol kulubu": ["Q476028"],
+    "futbol takımı": ["Q476028"],
+    "futbol takimi": ["Q476028"],
+    "kulüp": ["Q476028"],
+    "kulup": ["Q476028"],
+    "ödül": ["Q618779"],
+    "odul": ["Q618779"],
+    "kupa": ["Q618779"],
+}
 
 
 @dataclass
@@ -104,13 +126,43 @@ class Aligner:
     def _get_unique_similar_entity_types(
         self, target_entity_type: str, k: int = 5, max_attempts: int = 10
     ) -> List[str]:
+        def _add_unique(items: List[str], values: List[str]) -> None:
+            for value in values:
+                if value and value not in items:
+                    items.append(value)
+
         query_k = k * 2
         attempt = 0
         unique_ranked_entities: List[str] = []
+        normalized_target = target_entity_type.strip().lower()
+        _add_unique(
+            unique_ranked_entities,
+            TR_ENTITY_TYPE_CANONICAL_IDS.get(normalized_target, []),
+        )
         query_embedding = self.get_embedding(target_entity_type)
         collection = self.ontology_db.get_collection(
             self.entity_type_aliases_collection_name
         )
+
+        entity_types = self.ontology_db.get_collection(self.entity_type_collection_name)
+        exact_pattern = f"^{re.escape(normalized_target)}$"
+        exact_label = entity_types.find_one(
+            {"label": {"$regex": exact_pattern, "$options": "i"}},
+            {"_id": 0, "entity_type_id": 1},
+        )
+        if exact_label:
+            _add_unique(unique_ranked_entities, [exact_label.get("entity_type_id")])
+
+        exact_aliases = collection.find(
+            {"alias_label": {"$regex": exact_pattern, "$options": "i"}},
+            {"_id": 0, "entity_type_id": 1},
+        )
+        _add_unique(
+            unique_ranked_entities,
+            [item.get("entity_type_id") for item in exact_aliases],
+        )
+        if query_embedding is None:
+            return unique_ranked_entities[:k]
 
         while len(unique_ranked_entities) < k and attempt < max_attempts:
             search_pipeline = [

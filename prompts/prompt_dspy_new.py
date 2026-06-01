@@ -16,7 +16,7 @@ lm = dspy.LM(
     api_base="https://openrouter.ai/api/v1",
     api_key=OPENROUTER_API_KEY,
     model=MODEL_NAME,
-    max_tokens=8192,
+    max_tokens=32768,
     temperature=0.1
 )
 dspy.settings.configure(lm=lm)

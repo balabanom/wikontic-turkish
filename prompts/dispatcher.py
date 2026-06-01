@@ -41,6 +41,8 @@ CACHE_DIR.mkdir(exist_ok=True)
 
 VALID_PROMPT_TYPES = {"temel", "ape", "dspy", "textgrad"}
 
+DEFAULT_DSPY_MAX_TOKENS = 32768
+
 
 _BASE_PROMPT = """You are an algorithm designed to extract structured knowledge from texts to build a Wikidata-like knowledge graph consisting of triplets (subject, relation, object) and their qualifiers.
 
@@ -311,6 +313,29 @@ def _dspy_cache_path(model: str) -> Path:
 _dspy_runtime_cache: dict = {}
 
 
+def _get_dspy_max_tokens() -> int:
+    raw = os.getenv("WIKONTIC_DSPY_MAX_TOKENS")
+    if not raw:
+        return DEFAULT_DSPY_MAX_TOKENS
+    try:
+        value = int(raw)
+    except ValueError:
+        logger.warning(
+            "Invalid WIKONTIC_DSPY_MAX_TOKENS=%r; using default %s",
+            raw,
+            DEFAULT_DSPY_MAX_TOKENS,
+        )
+        return DEFAULT_DSPY_MAX_TOKENS
+    if value <= 0:
+        logger.warning(
+            "Invalid WIKONTIC_DSPY_MAX_TOKENS=%r; using default %s",
+            raw,
+            DEFAULT_DSPY_MAX_TOKENS,
+        )
+        return DEFAULT_DSPY_MAX_TOKENS
+    return value
+
+
 def run_dspy_extraction(
     text: str,
     model: str,
@@ -328,7 +353,8 @@ def run_dspy_extraction(
     # Route DSPy's litellm-backed LLM calls into logs/llm_requests.jsonl.
     install_litellm_logger()
 
-    lm_key = f"lm::{model}"
+    dspy_max_tokens = _get_dspy_max_tokens()
+    lm_key = f"lm::{model}::max_tokens={dspy_max_tokens}"
     if lm_key not in _dspy_runtime_cache:
         base_url = (
             os.getenv("OPENAI_BASE_URL")
@@ -355,7 +381,7 @@ def run_dspy_extraction(
             api_base=base_url,
             api_key=api_key,
             model=dspy_model,
-            max_tokens=8192,
+            max_tokens=dspy_max_tokens,
             temperature=0.1,
             cache=False,
         )
