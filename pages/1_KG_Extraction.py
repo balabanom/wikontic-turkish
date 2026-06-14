@@ -12,6 +12,7 @@ from src.wikontic.utils.structured_aligner import Aligner
 from src.wikontic.utils.run_reader import get_run, get_artifact, list_recent_runs
 from src.wikontic.utils.run_logger import log_artifact
 from src.wikontic.utils.paper_report import build_batch_report
+from src.wikontic.llm_models import LLM_MODEL_OPTIONS
 from src.wikontic.utils.wiki_extractor import (
     DEFAULT_MAX_CHARS,
     DEFAULT_MIN_CHARS,
@@ -666,7 +667,7 @@ def render_ontology_neighborhood_panel(selected_run_id: str):
 
 
 # ── Model selection ───────────────────────────────────────────────────────────
-model_options  = ["google/gemini-2.5-flash-lite", "gpt-4o-mini", "gpt-4.1-mini", "gpt-4.1"]
+model_options  = LLM_MODEL_OPTIONS
 selected_model = st.selectbox("Choose a model for KG extraction:", model_options, index=0)
 
 # ── Prompt technique selection ────────────────────────────────────────────────

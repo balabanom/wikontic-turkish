@@ -8,7 +8,7 @@ Usage:
     uvicorn api:app --host 0.0.0.0 --port 8000
 
 POST /extract
-    Body: { "text": "...", "embedding_model": "contriever", "llm_model": "gpt-4o-mini" }
+    Body: { "text": "...", "embedding_model": "contriever", "llm_model": "google/gemini-2.5-flash-lite" }
     Returns: { "triplets": [...], "count": N }
 """
 
@@ -22,6 +22,8 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 from pymongo import MongoClient
+
+from src.wikontic.llm_models import DEFAULT_LLM_MODEL
 
 load_dotenv(find_dotenv())
 
@@ -125,7 +127,7 @@ class ExtractionRequest(BaseModel):
     text: str
     embedding_model: str = "contriever"   # embedding_key
     llm_model: str = Field(
-        default="gpt-4o-mini",
+        default=DEFAULT_LLM_MODEL,
         validation_alias=AliasChoices("llm_model", "model"),
     )
     ontology_language: str = "en"         # "en" or "tr"
@@ -186,7 +188,7 @@ def extract(req: ExtractionRequest):
     text            : Input paragraph to extract from.
     embedding_model : Embedding model key (e.g. "contriever", "bge_m3",
                       "turkish_e5_large", "mft_random").
-    llm_model       : LLM model name (e.g. "gpt-4o-mini",
+    llm_model       : LLM model name (e.g. "openai/gpt-4o-mini",
                       "google/gemini-2.5-flash-lite").
 
     Returns

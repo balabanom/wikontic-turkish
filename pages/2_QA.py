@@ -7,6 +7,7 @@ from dataclasses import replace
 from dotenv import load_dotenv, find_dotenv
 
 from pymongo import MongoClient
+from src.wikontic.llm_models import LLM_MODEL_OPTIONS
 from src.wikontic.utils.structured_aligner import Aligner
 from src.wikontic.utils.openai_utils import LLMTripletExtractor
 from src.wikontic.utils.structured_inference_with_db import StructuredInferenceWithDB
@@ -140,7 +141,7 @@ st.markdown(
 )
 
 
-model_options = ["google/gemini-2.5-flash-lite", "gpt-4o-mini", "gpt-4.1-mini", "gpt-4.1"]
+model_options = LLM_MODEL_OPTIONS
 selected_model = st.selectbox("Choose a model for QA:", model_options, index=0)
 question = st.text_input("Ask a question about the Knowledge Graph")
 trigger = st.button("Answer question")

@@ -17,6 +17,7 @@ from src.wikontic.utils.run_reader import (
 )
 from src.wikontic.utils.run_exporter import export_run
 from src.wikontic.utils.run_compare import compare_runs, compare_telemetry
+from src.wikontic.llm_models import LLM_MODEL_OPTIONS
 from src.wikontic.profiles import DEFAULT_RUNTIME_PROFILE
 
 st.set_page_config(
@@ -642,10 +643,7 @@ with right_col:
                     st.error(f"Export hazırlanamadı: {e}")
 
             with btn_col3:
-                available_models = [
-                    "google/gemini-2.5-flash-lite", "gpt-4o-mini",
-                    "gpt-4.1-mini", "gpt-4.1",
-                ]
+                available_models = LLM_MODEL_OPTIONS
                 original_model = (run_meta or {}).get("model", available_models[0])
                 with st.expander("🔄 Replay", expanded=False):
                     replay_model = st.selectbox(

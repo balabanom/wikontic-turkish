@@ -16,6 +16,7 @@ import tenacity
 import os
 import httpx
 
+from src.wikontic.llm_models import DEFAULT_LLM_MODEL
 from .llm_client_logger import LoggedOpenAIClient
 
 logger = logging.getLogger("OpenAIUtils")
@@ -31,6 +32,7 @@ class LLMTripletExtractor:
     MODEL_PRICES = {
         "gpt-4o":                            {"input": 2.5,  "output": 10},
         "gpt-4o-mini":                       {"input": 0.15, "output": 0.6},
+        "openai/gpt-4o-mini":                {"input": 0.15, "output": 0.6},
         "gpt-4.1-mini":                      {"input": 0.4,  "output": 1.6},
         "gpt-4.1":                           {"input": 2.0,  "output": 8.0},
         "Meta-llama/Llama-3.3-70B-Instruct": {"input": 0.04, "output": 0.12},
@@ -42,7 +44,7 @@ class LLMTripletExtractor:
         api_key: str,
         prompt_folder_path: str = str(Path(__file__).parent / "prompts"),
         system_prompt_paths: Optional[Dict[str, str]] = None,
-        model: str = "gpt-4o",
+        model: str = DEFAULT_LLM_MODEL,
         max_attempts=MAX_ATTEMPTS,
         proxy: str = None,
         prompt_type: str = "temel",
