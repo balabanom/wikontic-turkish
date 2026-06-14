@@ -33,7 +33,7 @@ ONTOLOGY_PROFILES: dict[str, OntologyProfile] = {
         ontology_db_name_override="wikidata_ontology",
         triplets_db_name_override="demo",
         requires_system_profile_metadata=False,
-        available=True,
+        available=False,
         notes=(
             "Uses existing legacy ontology DB `wikidata_ontology` and keeps triplets "
             "workspace in a separate legacy DB (`demo` by default)."

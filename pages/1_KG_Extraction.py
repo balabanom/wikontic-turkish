@@ -21,7 +21,6 @@ from src.wikontic.utils.wiki_extractor import (
 from src.wikontic.profiles import (
     resolve_runtime_profile,
     DEFAULT_RUNTIME_PROFILE,
-    ONTOLOGY_PROFILES,
     get_available_ontology_profiles,
     get_compatible_embedding_profiles,
     get_unavailable_embedding_profiles,
@@ -130,13 +129,6 @@ with st.sidebar:
     available_ont_profiles = get_available_ontology_profiles()
     ont_display_names = [p.display_name for p in available_ont_profiles]
 
-    # Show unavailable profiles as informational note
-    unavailable = [p for p in ONTOLOGY_PROFILES.values() if not p.available]
-    if unavailable:
-        st.caption(
-            "🔒 Unavailable: " + ", ".join(p.display_name for p in unavailable)
-        )
-
     current_profile = _get_active_profile()
     current_ont_display = next(
         (p.display_name for p in available_ont_profiles
@@ -183,7 +175,7 @@ with st.sidebar:
             index=emb_display_names.index(current_emb_display) if current_emb_display in emb_display_names else 0,
             key="sidebar_embedding_selector",
             help="Changing the embedding model changes the vector workspace. "
-                 "Runs from different embedding models are stored in separate databases.",
+                 "Embedding-specific vectors are stored in model-specific collections.",
         )
     else:
         st.warning(
@@ -213,54 +205,46 @@ with st.sidebar:
         current_profile = new_profile
         st.session_state["active_runtime_profile"] = current_profile
 
-    try:
-        available_db_names = sorted(mongo_client.list_database_names())
-    except Exception:
-        available_db_names = []
-
-    # Optional ontology DB override (keeps runtime profile default unless explicitly changed)
+    # DBs are resolved from the selected runtime profile. Old per-profile DBs
+    # may still exist in MongoDB, but they are intentionally hidden from the UI.
     ontology_db_options = [current_profile.ontology_db_name]
-    if "wikidata_ontology" not in ontology_db_options:
-        ontology_db_options.append("wikidata_ontology")
-    ontology_db_options.extend(
-        db for db in available_db_names
-        if db.startswith("ontology__") and db not in ontology_db_options
-    )
-
     stored_override_db = st.session_state.get("ontology_db_override_name")
-    default_selected_db = stored_override_db or current_profile.ontology_db_name
-    if default_selected_db not in ontology_db_options:
-        ontology_db_options.append(default_selected_db)
+    default_selected_db = (
+        stored_override_db
+        if stored_override_db in ontology_db_options
+        else current_profile.ontology_db_name
+    )
+    if stored_override_db not in (None, current_profile.ontology_db_name):
+        st.session_state["ontology_db_override_name"] = None
 
     selected_ontology_db = st.selectbox(
         "Ontology DB:",
         ontology_db_options,
         index=ontology_db_options.index(default_selected_db),
         key="sidebar_ontology_db_selector",
-        help="Use profile default DB, or override with 'wikidata_ontology'.",
+        help="Resolved from the selected runtime profile.",
     )
     st.session_state["ontology_db_override_name"] = (
         None if selected_ontology_db == current_profile.ontology_db_name else selected_ontology_db
     )
     is_external_ontology_override = st.session_state["ontology_db_override_name"] is not None
 
-    # Optional triplets DB override
     triplets_db_options = [current_profile.triplets_db_name]
-    triplets_db_options.extend(
-        db for db in available_db_names
-        if (db == "triplets" or db.startswith("triplets__") or db == "demo") and db not in triplets_db_options
-    )
     stored_triplets_override = st.session_state.get("triplets_db_override_name")
-    default_triplets_db = stored_triplets_override or current_profile.triplets_db_name
-    if default_triplets_db not in triplets_db_options:
-        triplets_db_options.append(default_triplets_db)
+    default_triplets_db = (
+        stored_triplets_override
+        if stored_triplets_override in triplets_db_options
+        else current_profile.triplets_db_name
+    )
+    if stored_triplets_override not in (None, current_profile.triplets_db_name):
+        st.session_state["triplets_db_override_name"] = None
 
     selected_triplets_db = st.selectbox(
         "Triplets DB:",
         triplets_db_options,
         index=triplets_db_options.index(default_triplets_db),
         key="sidebar_triplets_db_selector",
-        help="Use profile default triplets DB, or manually pick another workspace DB.",
+        help="Resolved from the selected runtime profile.",
     )
     st.session_state["triplets_db_override_name"] = (
         None if selected_triplets_db == current_profile.triplets_db_name else selected_triplets_db
