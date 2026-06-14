@@ -1,8 +1,11 @@
 import streamlit as st
 from pyvis.network import Network
+import io
 import tempfile
 import os
 import json
+import re
+import zipfile
 from dataclasses import replace
 from datetime import datetime, timezone
 from dotenv import load_dotenv, find_dotenv
@@ -11,6 +14,7 @@ from src.wikontic.utils.openai_utils import LLMTripletExtractor
 from src.wikontic.utils.structured_aligner import Aligner
 from src.wikontic.utils.run_reader import get_run, get_artifact, list_recent_runs
 from src.wikontic.utils.run_logger import log_artifact
+from src.wikontic.utils.run_exporter import export_run
 from src.wikontic.utils.paper_report import build_batch_report
 from src.wikontic.llm_models import LLM_MODEL_OPTIONS
 from src.wikontic.utils.wiki_extractor import (
@@ -28,6 +32,7 @@ from src.wikontic.profiles import (
 )
 from src.wikontic.profile_readiness import check_profile_readiness
 from pymongo import MongoClient
+from urllib.parse import unquote, urlparse
 import uuid
 import logging
 import sys
@@ -460,6 +465,489 @@ def _paper_report_summary(report: dict) -> dict:
     }
 
 
+def _json_text(payload: dict | list) -> str:
+    return json.dumps(payload, ensure_ascii=False, indent=2, default=str)
+
+
+def _build_wiki_preview(url: str, target_chars: int, max_chars: int, min_chars: int) -> dict:
+    wiki_result = extract_wikipedia_chunks(
+        url,
+        target_chars=target_chars,
+        max_chars=max_chars,
+        min_chars=min_chars,
+    )
+    return {
+        "url": wiki_result.url,
+        "paragraph_count": wiki_result.paragraph_count,
+        "chunk_count": wiki_result.chunk_count,
+        "chunk_summaries": wiki_result.chunk_summaries(),
+        "chunks": [chunk.to_dict() for chunk in wiki_result.chunks],
+    }
+
+
+def _parse_wikipedia_url_list(raw_text: str) -> list[str]:
+    urls: list[str] = []
+    for part in re.split(r"[\s,]+", raw_text or ""):
+        url = part.strip()
+        if url:
+            urls.append(url)
+    return urls
+
+
+def _wiki_title_from_url(url: str) -> str:
+    parsed = urlparse(url)
+    title = unquote(parsed.path.rstrip("/").split("/")[-1] or parsed.netloc)
+    return title.replace("_", " ") or url
+
+
+def _safe_filename_part(text: str, fallback: str = "wikipedia") -> str:
+    safe = re.sub(r"[^A-Za-z0-9._-]+", "_", (text or "").strip())
+    safe = safe.strip("._-")
+    return (safe or fallback)[:80]
+
+
+def _wiki_multi_sample_id(owner_user_id: str, multi_batch_id: str, article_index: int) -> str:
+    return f"{owner_user_id}:wiki:{multi_batch_id}:article:{article_index:02d}"
+
+
+def _progress_value(offset: float, span: float, fraction: float) -> float:
+    return max(0.0, min(1.0, offset + span * fraction))
+
+
+def _run_wiki_batch_from_preview(
+    *,
+    wiki_preview: dict,
+    batch_id: str,
+    sample_id: str,
+    owner_user_id: str,
+    selected_model: str,
+    selected_prompt_type: str,
+    inference_with_db: StructuredInferenceWithDB,
+    start_chunk: int = 1,
+    end_chunk_input: int = 0,
+    batch_type: str = "wikipedia_url",
+    status_box=None,
+    table_box=None,
+    progress=None,
+    progress_label_prefix: str = "",
+    progress_offset: float = 0.0,
+    progress_span: float = 1.0,
+    extra_batch_config: dict | None = None,
+) -> dict:
+    total_chunks = int(wiki_preview["chunk_count"])
+    start_chunk = max(1, min(int(start_chunk), total_chunks))
+    end_chunk = (
+        total_chunks
+        if int(end_chunk_input) <= 0
+        else max(start_chunk, min(int(end_chunk_input), total_chunks))
+    )
+    chunks_to_run = [
+        chunk for chunk in wiki_preview["chunks"]
+        if start_chunk <= int(chunk["index"]) <= end_chunk
+    ]
+
+    chunk_reports = []
+    failed_chunks = []
+    rows = []
+    batch_status = "DONE"
+    batch_error = None
+    last_run_id = None
+    extra_batch_config = extra_batch_config or {}
+
+    run_total = max(1, len(chunks_to_run))
+    for run_pos, chunk in enumerate(chunks_to_run, start=1):
+        pos = int(chunk["index"])
+        prefix = f"{progress_label_prefix} " if progress_label_prefix else ""
+        if status_box is not None:
+            status_box.info(
+                f"{prefix}Chunk {pos}/{wiki_preview['chunk_count']} çalışıyor "
+                f"({chunk['char_count']} chars, {chunk['paragraph_count']} paragraphs)."
+            )
+        if progress is not None:
+            progress.progress(
+                _progress_value(progress_offset, progress_span, (run_pos - 1) / run_total),
+                text=f"{prefix}Chunk {pos}/{wiki_preview['chunk_count']} çalışıyor...",
+            )
+
+        try:
+            chunk_extra_config = {
+                "batch_id": batch_id,
+                "batch_type": batch_type,
+                "owner_user_id": owner_user_id,
+                "source_url": wiki_preview["url"],
+                "chunk_index": pos,
+                "chunk_count": wiki_preview["chunk_count"],
+                "resume_start_chunk": start_chunk,
+                "resume_end_chunk": end_chunk,
+                "resume_run_position": run_pos,
+                "resume_run_total": run_total,
+                "chunk_char_count": chunk["char_count"],
+                "chunk_paragraph_count": chunk["paragraph_count"],
+            }
+            chunk_extra_config.update(extra_batch_config)
+
+            (
+                _initial_triplets,
+                _final_triplets,
+                _filtered_triplets,
+                _ontology_filtered_triplets,
+                run_id,
+            ) = inference_with_db.extract_triplets_with_ontology_filtering_and_add_to_db(
+                text=chunk["text"],
+                sample_id=sample_id,
+                source_text_id=f"{batch_id}:chunk:{pos}",
+                extra_config=chunk_extra_config,
+            )
+            last_run_id = run_id
+            paper_report = get_artifact(
+                run_id,
+                "paper_report",
+                db_name=effective_profile.triplets_db_name,
+            )
+            if paper_report:
+                chunk_reports.append(paper_report)
+                row = _paper_report_summary(paper_report)
+            else:
+                row = {
+                    "chunk": pos,
+                    "run_id": run_id,
+                    "raw": len(_initial_triplets),
+                    "final": len(_final_triplets),
+                    "filtered": len(_filtered_triplets) + len(_ontology_filtered_triplets),
+                    "ontology_filtered": len(_ontology_filtered_triplets),
+                    "pipeline_filtered": len(_filtered_triplets),
+                }
+            row["status"] = "DONE"
+            rows.append(row)
+            if table_box is not None:
+                table_box.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
+        except Exception as e:
+            failed_run_id = getattr(inference_with_db, "_last_run_id", None)
+            failed_art = (
+                get_artifact(
+                    failed_run_id,
+                    "failure_report",
+                    db_name=effective_profile.triplets_db_name,
+                )
+                if failed_run_id else None
+            )
+            failed_meta = (
+                get_run(failed_run_id, db_name=effective_profile.triplets_db_name)
+                if failed_run_id else None
+            )
+            parsed_art = (
+                get_artifact(
+                    failed_run_id,
+                    "parsed_triplets",
+                    db_name=effective_profile.triplets_db_name,
+                )
+                if failed_run_id else None
+            )
+            final_art = (
+                get_artifact(
+                    failed_run_id,
+                    "final_triplets",
+                    db_name=effective_profile.triplets_db_name,
+                )
+                if failed_run_id else None
+            )
+            filtered_art = (
+                get_artifact(
+                    failed_run_id,
+                    "filtered_out",
+                    db_name=effective_profile.triplets_db_name,
+                )
+                if failed_run_id else None
+            )
+            failed_chunk = {
+                "chunk_index": pos,
+                "run_id": failed_run_id,
+                "error": str(e),
+                "error_type": type(e).__name__,
+                "raw": (parsed_art or {}).get("count"),
+                "final": (final_art or {}).get("count"),
+                "filtered": (filtered_art or {}).get("count"),
+                "ontology_filtered": (filtered_art or {}).get("ontology_filtered_count"),
+                "pipeline_filtered": (filtered_art or {}).get("pipeline_exception_count"),
+                "runtime_ms": ((failed_meta or {}).get("stats") or {}).get("total_time_ms"),
+                "failure_report": failed_art,
+            }
+            failed_chunks.append(failed_chunk)
+            batch_status = "FAILED"
+            batch_error = f"Chunk {pos} failed: {e}"
+            rows.append(
+                {
+                    "chunk": pos,
+                    "run_id": failed_run_id,
+                    "status": "FAILED",
+                    "error": str(e),
+                    "raw": failed_chunk["raw"],
+                    "final": failed_chunk["final"],
+                    "filtered": failed_chunk["filtered"],
+                }
+            )
+            if table_box is not None:
+                table_box.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
+            if status_box is not None:
+                status_box.error(batch_error)
+            last_run_id = failed_run_id
+            break
+
+        if progress is not None:
+            progress.progress(
+                _progress_value(progress_offset, progress_span, run_pos / run_total),
+                text=f"{prefix}Chunk {pos}/{wiki_preview['chunk_count']} tamamlandı.",
+            )
+
+    batch_report = build_batch_report(
+        batch_id=batch_id,
+        source_url=wiki_preview["url"],
+        sample_id=sample_id,
+        runtime_profile=effective_profile,
+        model=selected_model,
+        prompt_type=selected_prompt_type,
+        chunk_summaries=wiki_preview["chunk_summaries"],
+        chunk_reports=chunk_reports,
+        failed_chunks=failed_chunks,
+        status=batch_status,
+        error=batch_error,
+    )
+    batch_report["batch_info"].update(
+        {
+            "owner_user_id": owner_user_id,
+            "article_sample_id": sample_id,
+            **extra_batch_config,
+        }
+    )
+    return {
+        "batch_report": batch_report,
+        "rows": rows,
+        "status": batch_status,
+        "error": batch_error,
+        "last_run_id": last_run_id,
+        "chunk_reports": chunk_reports,
+        "failed_chunks": failed_chunks,
+    }
+
+
+def _build_wiki_multi_report(
+    *,
+    multi_batch_id: str,
+    owner_user_id: str,
+    requested_urls: list[str],
+    article_reports: list[dict],
+    model: str,
+    prompt_type: str,
+) -> dict:
+    totals: dict[str, int] = {}
+    articles = []
+    for report in article_reports:
+        info = report.get("batch_info", {})
+        report_totals = report.get("totals", {})
+        for key, value in report_totals.items():
+            if isinstance(value, (int, float)):
+                totals[key] = totals.get(key, 0) + int(value)
+        run_ids = [
+            row.get("run_id")
+            for row in report.get("chunk_results", [])
+            if row.get("run_id")
+        ]
+        articles.append(
+            {
+                "article_index": info.get("article_index"),
+                "title": info.get("article_title") or _wiki_title_from_url(info.get("source_url", "")),
+                "source_url": info.get("source_url"),
+                "batch_id": info.get("batch_id"),
+                "sample_id": info.get("article_sample_id") or info.get("sample_id"),
+                "status": report.get("status"),
+                "error": report.get("error"),
+                "chunk_count": len(report.get("chunk_plan", [])),
+                "run_ids": run_ids,
+                "totals": report_totals,
+            }
+        )
+
+    done_count = sum(1 for article in articles if article["status"] == "DONE")
+    failed_count = sum(1 for article in articles if article["status"] != "DONE")
+    status = "DONE" if failed_count == 0 else ("FAILED" if done_count == 0 else "PARTIAL")
+
+    return {
+        "schema_version": "wiki-multi-batch-report-v1",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "status": status,
+        "multi_batch_info": {
+            "multi_batch_id": multi_batch_id,
+            "owner_user_id": owner_user_id,
+            "requested_url_count": len(requested_urls),
+            "completed_url_count": done_count,
+            "failed_url_count": failed_count,
+            "llm_model": model,
+            "prompt_type": prompt_type,
+            "profile_id": effective_profile.profile_id,
+            "triplets_db_name": effective_profile.triplets_db_name,
+        },
+        "requested_urls": requested_urls,
+        "articles": articles,
+        "totals": totals,
+        "article_reports": article_reports,
+    }
+
+
+def _build_wiki_multi_zip(multi_report: dict, db_name: str) -> bytes:
+    zip_buffer = io.BytesIO()
+    exported_at = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M")
+    with zipfile.ZipFile(zip_buffer, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr("multi_batch_report.json", _json_text(multi_report))
+        zf.writestr(
+            "README.txt",
+            "Each articles/<index>_<title>/ folder is isolated with its own sample_id.\n"
+            "wiki_batch_report.json contains the per-link aggregate report.\n"
+            "runs/ contains one ZIP export per chunk run.\n",
+        )
+        for fallback_index, report in enumerate(multi_report.get("article_reports", []), start=1):
+            info = report.get("batch_info", {})
+            article_index = int(info.get("article_index") or fallback_index)
+            title = info.get("article_title") or _wiki_title_from_url(info.get("source_url", ""))
+            prefix = f"articles/{article_index:02d}_{_safe_filename_part(title, f'article_{article_index:02d}')}"
+            zf.writestr(f"{prefix}/wiki_batch_report.json", _json_text(report))
+            zf.writestr(f"{prefix}/chunk_plan.json", _json_text(report.get("chunk_plan", [])))
+            zf.writestr(f"{prefix}/chunk_results.json", _json_text(report.get("chunk_results", [])))
+            zf.writestr(f"{prefix}/final_triples.json", _json_text(report.get("final_triples", [])))
+            zf.writestr(
+                f"{prefix}/ontology_filtered_triples.json",
+                _json_text(report.get("ontology_filtered_triples", [])),
+            )
+            for row in report.get("chunk_results", []):
+                run_id = row.get("run_id")
+                if not run_id:
+                    continue
+                chunk_index = int(row.get("chunk_index") or row.get("chunk") or 0)
+                try:
+                    run_zip, run_filename, _ = export_run(run_id, db_name=db_name)
+                    zf.writestr(
+                        f"{prefix}/runs/chunk_{chunk_index:03d}_{run_filename}",
+                        run_zip,
+                    )
+                except Exception as e:
+                    zf.writestr(
+                        f"{prefix}/runs/chunk_{chunk_index:03d}_{run_id[:8]}_export_error.json",
+                        _json_text({"run_id": run_id, "error": str(e)}),
+                    )
+        zf.writestr("export_info.json", _json_text({"exported_at": exported_at}))
+    return zip_buffer.getvalue()
+
+
+def _render_wiki_multi_report(multi_report: dict) -> None:
+    info = multi_report.get("multi_batch_info", {})
+    st.markdown("**Son Çoklu Wikipedia Batch Raporu**")
+    mc = st.columns(5)
+    mc[0].metric("Status", multi_report.get("status", "—"))
+    mc[1].metric("URL", info.get("requested_url_count", 0))
+    mc[2].metric("Done", info.get("completed_url_count", 0))
+    mc[3].metric("Failed", info.get("failed_url_count", 0))
+    mc[4].metric("Final", multi_report.get("totals", {}).get("final_triple_count", 0))
+
+    articles = multi_report.get("articles", [])
+    if articles:
+        article_rows = []
+        for article in articles:
+            totals = article.get("totals", {})
+            article_rows.append(
+                {
+                    "article": article.get("article_index"),
+                    "title": article.get("title"),
+                    "status": article.get("status"),
+                    "chunks": article.get("chunk_count"),
+                    "final": totals.get("final_triple_count", 0),
+                    "inserted": totals.get("kg_inserted_count", 0),
+                    "existing": totals.get("kg_already_existing_count", 0),
+                    "sample_id": article.get("sample_id"),
+                    "batch_id": article.get("batch_id"),
+                }
+            )
+        st.dataframe(pd.DataFrame(article_rows), width="stretch", hide_index=True)
+
+    for fallback_index, report in enumerate(multi_report.get("article_reports", []), start=1):
+        batch_info = report.get("batch_info", {})
+        article_index = int(batch_info.get("article_index") or fallback_index)
+        title = batch_info.get("article_title") or _wiki_title_from_url(batch_info.get("source_url", ""))
+        label = f"{article_index:02d}. {title} — {report.get('status', 'UNKNOWN')}"
+        with st.expander(label, expanded=article_index == 1):
+            st.caption(
+                f"URL: `{batch_info.get('source_url', '')}`  |  "
+                f"sample_id: `{batch_info.get('article_sample_id') or batch_info.get('sample_id', '')}`  |  "
+                f"batch_id: `{batch_info.get('batch_id', '')}`"
+            )
+            if report.get("error"):
+                st.error(report["error"])
+
+            totals = report.get("totals", {})
+            cols = st.columns(5)
+            cols[0].metric("Raw", totals.get("initial_raw_triple_count", 0))
+            cols[1].metric("Final", totals.get("final_triple_count", 0))
+            cols[2].metric("Ontology Filtered", totals.get("ontology_filtered_count", 0))
+            cols[3].metric("KG Inserted", totals.get("kg_inserted_count", 0))
+            cols[4].metric("KG Existing", totals.get("kg_already_existing_count", 0))
+
+            chunk_results = report.get("chunk_results", [])
+            if chunk_results:
+                st.markdown("**Chunk sonuçları**")
+                st.dataframe(pd.DataFrame(chunk_results), width="stretch", hide_index=True)
+
+            final_triples = report.get("final_triples", [])
+            if final_triples:
+                st.markdown("**Makale KG Tripletleri**")
+                final_df = pd.DataFrame(final_triples)
+                display_cols = [
+                    col for col in [
+                        "subject", "subject_type", "relation", "object",
+                        "object_type", "sentence_id", "sample_id",
+                    ]
+                    if col in final_df.columns
+                ]
+                st.dataframe(final_df[display_cols], width="stretch", hide_index=True)
+                if st.checkbox(
+                    "Makale KG grafını göster",
+                    key=f"multi_article_graph_{batch_info.get('batch_id', article_index)}",
+                ):
+                    visualize_initial_knowledge_graph(final_triples)
+            else:
+                st.info("Bu link için final triplet yok.")
+
+            if st.checkbox(
+                "Chunk KG'lerini göster",
+                key=f"multi_article_chunks_{batch_info.get('batch_id', article_index)}",
+            ):
+                chunk_reports = report.get("chunk_reports", [])
+                if not chunk_reports:
+                    st.info("Gösterilecek chunk raporu yok.")
+                for chunk_report in chunk_reports:
+                    extra = chunk_report.get("run_info", {}).get("extra_config", {})
+                    chunk_index = extra.get("chunk_index", "?")
+                    chunk_triples = chunk_report.get("final_triples", [])
+                    st.markdown(f"**Chunk {chunk_index}**")
+                    if chunk_triples:
+                        chunk_df = pd.DataFrame(chunk_triples)
+                        chunk_cols = [
+                            col for col in [
+                                "subject", "subject_type", "relation", "object",
+                                "object_type", "sentence_id",
+                            ]
+                            if col in chunk_df.columns
+                        ]
+                        st.dataframe(chunk_df[chunk_cols], width="stretch", hide_index=True)
+                        if st.checkbox(
+                            f"Chunk {chunk_index} grafını göster",
+                            key=(
+                                f"multi_chunk_graph_"
+                                f"{batch_info.get('batch_id', article_index)}_{chunk_index}"
+                            ),
+                        ):
+                            visualize_initial_knowledge_graph(chunk_triples)
+                    else:
+                        st.info(f"Chunk {chunk_index} için final triplet yok.")
+
+
 # ── Transparency Panel ────────────────────────────────────────────────────────
 
 def render_transparency_panel(selected_run_id: str):
@@ -776,6 +1264,10 @@ for _k, _default in {
     "wiki_preview": None,
     "wiki_batch_report": None,
     "wiki_batch_rows": [],
+    "wiki_multi_urls": "",
+    "wiki_multi_report": None,
+    "wiki_multi_zip_bytes": None,
+    "wiki_multi_zip_filename": "",
 }.items():
     if _k not in st.session_state:
         st.session_state[_k] = _default
@@ -1147,6 +1639,257 @@ if wiki_batch_report:
         mime="application/json",
         key="download_wiki_batch_report",
     )
+
+st.divider()
+st.subheader("Wikipedia Link Listesi ile Toplu Çek")
+previous_wiki_multi_urls = st.session_state.get("wiki_multi_urls", "")
+wiki_multi_urls_text = st.text_area(
+    "Wikipedia URL listesi",
+    value=previous_wiki_multi_urls,
+    placeholder=(
+        "Her satıra bir Wikipedia linki gir:\n"
+        "https://tr.wikipedia.org/wiki/Cristiano_Ronaldo\n"
+        "https://tr.wikipedia.org/wiki/Lionel_Messi"
+    ),
+    height=150,
+    key="wiki_multi_urls_input",
+)
+if wiki_multi_urls_text != previous_wiki_multi_urls:
+    st.session_state["wiki_multi_report"] = None
+    st.session_state["wiki_multi_zip_bytes"] = None
+    st.session_state["wiki_multi_zip_filename"] = ""
+st.session_state["wiki_multi_urls"] = wiki_multi_urls_text
+wiki_multi_urls = _parse_wikipedia_url_list(wiki_multi_urls_text)
+
+if wiki_multi_urls:
+    st.caption(
+        f"{len(wiki_multi_urls)} link sırayla işlenecek. "
+        "Her link kendi `sample_id` değeriyle izole çalışır; önceki linkin tripletleri sonraki linkte kullanılmaz."
+    )
+    with st.expander("Algılanan linkleri göster", expanded=False):
+        st.dataframe(
+            pd.DataFrame(
+                [
+                    {
+                        "index": i,
+                        "title": _wiki_title_from_url(url),
+                        "url": url,
+                    }
+                    for i, url in enumerate(wiki_multi_urls, start=1)
+                ]
+            ),
+            width="stretch",
+            hide_index=True,
+        )
+
+run_wiki_multi_batch = st.button(
+    "Listedeki Linkleri Sırayla KG'ye Ekle",
+    width="stretch",
+    disabled=not wiki_multi_urls,
+)
+
+if run_wiki_multi_batch:
+    if not selected_model:
+        st.warning("Please select a model for KG extraction.")
+    else:
+        multi_batch_id = (
+            f"wiki_multi_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_"
+            f"{uuid.uuid4().hex[:8]}"
+        )
+        st.session_state["wiki_multi_report"] = None
+        st.session_state["wiki_multi_zip_bytes"] = None
+        st.session_state["wiki_multi_zip_filename"] = ""
+
+        progress = st.progress(0, text="Çoklu Wikipedia batch başlıyor...")
+        status_box = st.empty()
+        table_box = st.empty()
+        article_reports: list[dict] = []
+        article_rows: list[dict] = []
+        last_multi_run_id = None
+
+        extractor = LLMTripletExtractor(
+            model=selected_model,
+            api_key=api_key,
+            proxy=proxy_url,
+            prompt_type=selected_prompt_type,
+        )
+        inference_with_db = StructuredInferenceWithDB(
+            extractor=extractor,
+            aligner=aligner,
+            triplets_db=triplets_db,
+            runtime_profile=effective_profile,
+        )
+
+        article_total = len(wiki_multi_urls)
+        for article_pos, article_url in enumerate(wiki_multi_urls, start=1):
+            article_title = _wiki_title_from_url(article_url)
+            article_batch_id = f"{multi_batch_id}_article_{article_pos:02d}"
+            article_sample_id = _wiki_multi_sample_id(
+                user_id, multi_batch_id, article_pos
+            )
+            article_prefix = f"URL {article_pos}/{article_total}: {article_title}"
+            status_box.info(f"{article_prefix} çekiliyor ve chunklara ayrılıyor...")
+
+            try:
+                article_preview = _build_wiki_preview(
+                    article_url,
+                    target_chars=int(wiki_target_chars),
+                    max_chars=int(wiki_max_chars),
+                    min_chars=int(wiki_min_chars),
+                )
+            except Exception as e:
+                failed_report = build_batch_report(
+                    batch_id=article_batch_id,
+                    source_url=article_url,
+                    sample_id=article_sample_id,
+                    runtime_profile=effective_profile,
+                    model=selected_model,
+                    prompt_type=selected_prompt_type,
+                    chunk_summaries=[],
+                    chunk_reports=[],
+                    failed_chunks=[],
+                    status="FAILED",
+                    error=f"Wikipedia çekimi/chunklama başarısız: {e}",
+                )
+                failed_report["batch_info"].update(
+                    {
+                        "owner_user_id": user_id,
+                        "article_sample_id": article_sample_id,
+                        "multi_batch_id": multi_batch_id,
+                        "article_index": article_pos,
+                        "article_count": article_total,
+                        "article_title": article_title,
+                        "batch_type": "wikipedia_multi_url",
+                    }
+                )
+                article_reports.append(failed_report)
+                article_rows.append(
+                    {
+                        "article": article_pos,
+                        "title": article_title,
+                        "status": "FAILED",
+                        "chunks": 0,
+                        "final": 0,
+                        "sample_id": article_sample_id,
+                        "error": str(e),
+                    }
+                )
+                table_box.dataframe(pd.DataFrame(article_rows), width="stretch", hide_index=True)
+                progress.progress(
+                    article_pos / article_total,
+                    text=f"{article_prefix} başarısız, sonraki linke geçiliyor.",
+                )
+                continue
+
+            result = _run_wiki_batch_from_preview(
+                wiki_preview=article_preview,
+                batch_id=article_batch_id,
+                sample_id=article_sample_id,
+                owner_user_id=user_id,
+                selected_model=selected_model,
+                selected_prompt_type=selected_prompt_type,
+                inference_with_db=inference_with_db,
+                start_chunk=1,
+                end_chunk_input=0,
+                batch_type="wikipedia_multi_url",
+                status_box=status_box,
+                table_box=None,
+                progress=progress,
+                progress_label_prefix=article_prefix,
+                progress_offset=(article_pos - 1) / article_total,
+                progress_span=1 / article_total,
+                extra_batch_config={
+                    "multi_batch_id": multi_batch_id,
+                    "article_index": article_pos,
+                    "article_count": article_total,
+                    "article_title": article_title,
+                },
+            )
+            article_report = result["batch_report"]
+            article_reports.append(article_report)
+            if result.get("last_run_id"):
+                last_multi_run_id = result["last_run_id"]
+                st.session_state["last_run_id"] = last_multi_run_id
+                selected_run_id = last_multi_run_id
+                try:
+                    log_artifact(
+                        last_multi_run_id,
+                        "wiki_batch_report",
+                        article_report,
+                        db_name=effective_profile.triplets_db_name,
+                        profile_id=effective_profile.profile_id,
+                        runtime_profile=effective_profile,
+                    )
+                except Exception as e:
+                    st.warning(f"{article_title} batch report Run Viewer'a yazılamadı: {e}")
+
+            totals = article_report.get("totals", {})
+            article_rows.append(
+                {
+                    "article": article_pos,
+                    "title": article_title,
+                    "status": article_report.get("status"),
+                    "chunks": article_preview.get("chunk_count"),
+                    "final": totals.get("final_triple_count", 0),
+                    "inserted": totals.get("kg_inserted_count", 0),
+                    "existing": totals.get("kg_already_existing_count", 0),
+                    "sample_id": article_sample_id,
+                    "batch_id": article_batch_id,
+                    "error": article_report.get("error"),
+                }
+            )
+            table_box.dataframe(pd.DataFrame(article_rows), width="stretch", hide_index=True)
+
+        multi_report = _build_wiki_multi_report(
+            multi_batch_id=multi_batch_id,
+            owner_user_id=user_id,
+            requested_urls=wiki_multi_urls,
+            article_reports=article_reports,
+            model=selected_model,
+            prompt_type=selected_prompt_type,
+        )
+        zip_bytes = _build_wiki_multi_zip(
+            multi_report,
+            db_name=effective_profile.triplets_db_name,
+        )
+        zip_filename = f"{multi_batch_id}.zip"
+        st.session_state["wiki_multi_report"] = multi_report
+        st.session_state["wiki_multi_zip_bytes"] = zip_bytes
+        st.session_state["wiki_multi_zip_filename"] = zip_filename
+
+        if last_multi_run_id:
+            try:
+                log_artifact(
+                    last_multi_run_id,
+                    "wiki_multi_batch_report",
+                    multi_report,
+                    db_name=effective_profile.triplets_db_name,
+                    profile_id=effective_profile.profile_id,
+                    runtime_profile=effective_profile,
+                )
+            except Exception as e:
+                st.warning(f"Çoklu batch report Run Viewer'a yazılamadı: {e}")
+
+        progress.progress(1.0, text="Çoklu Wikipedia batch tamamlandı.")
+        if multi_report["status"] == "DONE":
+            status_box.success(f"Çoklu batch tamamlandı: {len(article_reports)}/{article_total} link işlendi.")
+        elif multi_report["status"] == "PARTIAL":
+            status_box.warning("Çoklu batch kısmen tamamlandı; başarısız linkler rapora yazıldı.")
+        else:
+            status_box.error("Çoklu batch başarısız oldu.")
+
+wiki_multi_report = st.session_state.get("wiki_multi_report")
+if wiki_multi_report:
+    _render_wiki_multi_report(wiki_multi_report)
+    wiki_multi_zip_bytes = st.session_state.get("wiki_multi_zip_bytes")
+    if wiki_multi_zip_bytes:
+        st.download_button(
+            "Tüm Wikipedia Link Sonuçlarını ZIP İndir",
+            data=wiki_multi_zip_bytes,
+            file_name=st.session_state.get("wiki_multi_zip_filename") or "wiki_multi_batch.zip",
+            mime="application/zip",
+            key="download_wiki_multi_batch_zip",
+        )
 
 st.divider()
 
