@@ -216,11 +216,6 @@ Turkish candidates are present. Return only valid JSON.
             candidate_subj_type_ids + candidate_obj_type_ids
         )
 
-        candidate_entity_type_label_2_id = {
-            entity_label: entity_id
-            for entity_id, entity_label in candidate_entity_type_id_2_label.items()
-        }
-
         candidate_subject_types = [
             candidate_entity_type_id_2_label[t] for t in candidate_subj_type_ids
         ]
@@ -228,43 +223,61 @@ Turkish candidates are present. Return only valid JSON.
             candidate_entity_type_id_2_label[t] for t in candidate_obj_type_ids
         ]
 
-        if (
-            triplet["subject_type"] in candidate_subject_types
-            and triplet["object_type"] in candidate_object_types
-        ):
-            refined_subject_type = triplet["subject_type"]
-            refined_object_type  = triplet["object_type"]
-            refined_subject_type_id = candidate_entity_type_label_2_id[
-                triplet["subject_type"]
-            ]
-            refined_object_type_id = candidate_entity_type_label_2_id[
-                triplet["object_type"]
-            ]
+        resolved_subject_type, resolved_subject_type_id = (
+            self.aligner.resolve_entity_type_candidate(
+                triplet["subject_type"],
+                candidate_subj_type_ids,
+                candidate_entity_type_id_2_label,
+            )
+        )
+        resolved_object_type, resolved_object_type_id = (
+            self.aligner.resolve_entity_type_candidate(
+                triplet["object_type"],
+                candidate_obj_type_ids,
+                candidate_entity_type_id_2_label,
+            )
+        )
+
+        if resolved_subject_type_id and resolved_object_type_id:
+            refined_subject_type = resolved_subject_type
+            refined_object_type  = resolved_object_type
+            refined_subject_type_id = resolved_subject_type_id
+            refined_object_type_id  = resolved_object_type_id
         else:
-            if triplet["subject_type"] in candidate_subject_types:
+            prompt_triplet = triplet.copy()
+            if resolved_subject_type_id:
+                candidate_subject_types = [resolved_subject_type]
+                prompt_triplet["subject_type"] = resolved_subject_type
+            elif triplet["subject_type"] in candidate_subject_types:
                 candidate_subject_types = [triplet["subject_type"]]
-            if triplet["object_type"] in candidate_object_types:
+
+            if resolved_object_type_id:
+                candidate_object_types = [resolved_object_type]
+                prompt_triplet["object_type"] = resolved_object_type
+            elif triplet["object_type"] in candidate_object_types:
                 candidate_object_types = [triplet["object_type"]]
 
             self.extractor.reset_error_state()
             refined_entity_types = self.extractor.refine_entity_types(
                 text=text,
-                triplet=triplet,
+                triplet=prompt_triplet,
                 candidate_subject_types=candidate_subject_types,
                 candidate_object_types=candidate_object_types,
             )
-            refined_subject_type = refined_entity_types["subject_type"]
-            refined_object_type  = refined_entity_types["object_type"]
 
-            refined_subject_type_id = (
-                candidate_entity_type_label_2_id[refined_subject_type]
-                if refined_subject_type in candidate_subject_types
-                else None
+            refined_subject_type, refined_subject_type_id = (
+                self.aligner.resolve_entity_type_candidate(
+                    refined_entity_types["subject_type"],
+                    candidate_subj_type_ids,
+                    candidate_entity_type_id_2_label,
+                )
             )
-            refined_object_type_id = (
-                candidate_entity_type_label_2_id[refined_object_type]
-                if refined_object_type in candidate_object_types
-                else None
+            refined_object_type, refined_object_type_id = (
+                self.aligner.resolve_entity_type_candidate(
+                    refined_entity_types["object_type"],
+                    candidate_obj_type_ids,
+                    candidate_entity_type_id_2_label,
+                )
             )
 
         return (

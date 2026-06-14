@@ -101,6 +101,108 @@ class Aligner:
         ).to(self.device)
         self.model.eval()
 
+    @staticmethod
+    def _normalize_lookup_text(text: str | None) -> str:
+        if text is None:
+            return ""
+        return re.sub(r"\s+", " ", str(text).strip()).casefold()
+
+    @staticmethod
+    def _add_unique(items: List[str], values: List[str]) -> None:
+        for value in values:
+            if value and value not in items:
+                items.append(value)
+
+    def _get_exact_entity_type_ids(self, entity_type_label: str) -> List[str]:
+        normalized_label = self._normalize_lookup_text(entity_type_label)
+        if not normalized_label:
+            return []
+
+        entity_type_ids: List[str] = []
+        self._add_unique(
+            entity_type_ids,
+            TR_ENTITY_TYPE_CANONICAL_IDS.get(normalized_label, []),
+        )
+
+        exact_pattern = f"^{re.escape(str(entity_type_label).strip())}$"
+        entity_types = self.ontology_db.get_collection(self.entity_type_collection_name)
+        exact_label = entity_types.find_one(
+            {"label": {"$regex": exact_pattern, "$options": "i"}},
+            {"_id": 0, "entity_type_id": 1},
+        )
+        if exact_label:
+            self._add_unique(entity_type_ids, [exact_label.get("entity_type_id")])
+
+        alias_collection = self.ontology_db.get_collection(
+            self.entity_type_aliases_collection_name
+        )
+        exact_aliases = alias_collection.find(
+            {"alias_label": {"$regex": exact_pattern, "$options": "i"}},
+            {"_id": 0, "entity_type_id": 1},
+        )
+        self._add_unique(
+            entity_type_ids,
+            [item.get("entity_type_id") for item in exact_aliases],
+        )
+        return entity_type_ids
+
+    def resolve_entity_type_candidate(
+        self,
+        entity_type_label: str,
+        candidate_type_ids: List[str],
+        candidate_type_id_2_label: Optional[Dict[str, str]] = None,
+    ) -> Tuple[str, Optional[str]]:
+        """
+        Resolve an LLM-provided type label to one of the candidate ontology IDs.
+
+        The LLM often emits domain labels or aliases ("futbolcu", "kupa") while
+        the ontology validator expects canonical candidate labels ("insan",
+        "odul"). This resolver accepts only labels that can be tied back to the
+        provided candidate ID set through exact label, exact alias, known
+        canonical fallback, or a parent in the type hierarchy.
+        """
+        if not entity_type_label or not candidate_type_ids:
+            return entity_type_label, None
+
+        candidate_type_id_2_label = candidate_type_id_2_label or {}
+        missing_labels = [
+            type_id
+            for type_id in candidate_type_ids
+            if type_id not in candidate_type_id_2_label
+        ]
+        if missing_labels:
+            candidate_type_id_2_label = {
+                **candidate_type_id_2_label,
+                **self.retrieve_entity_type_labels(missing_labels),
+            }
+
+        normalized_label = self._normalize_lookup_text(entity_type_label)
+        for candidate_id in candidate_type_ids:
+            candidate_label = candidate_type_id_2_label.get(candidate_id)
+            if (
+                candidate_label
+                and self._normalize_lookup_text(candidate_label) == normalized_label
+            ):
+                return candidate_label, candidate_id
+
+        candidate_set = set(candidate_type_ids)
+        exact_type_ids = self._get_exact_entity_type_ids(entity_type_label)
+
+        for type_id in exact_type_ids:
+            if type_id in candidate_set:
+                return candidate_type_id_2_label.get(type_id, entity_type_label), type_id
+
+        for type_id in exact_type_ids:
+            hierarchy = self.retrieve_entity_type_hierarchy_by_id(type_id)
+            for parent_id in hierarchy:
+                if parent_id in candidate_set:
+                    return (
+                        candidate_type_id_2_label.get(parent_id, entity_type_label),
+                        parent_id,
+                    )
+
+        return entity_type_label, None
+
     def get_embedding(self, text):
 
         def mean_pooling(token_embeddings, mask):
@@ -126,16 +228,11 @@ class Aligner:
     def _get_unique_similar_entity_types(
         self, target_entity_type: str, k: int = 5, max_attempts: int = 10
     ) -> List[str]:
-        def _add_unique(items: List[str], values: List[str]) -> None:
-            for value in values:
-                if value and value not in items:
-                    items.append(value)
-
         query_k = k * 2
         attempt = 0
         unique_ranked_entities: List[str] = []
-        normalized_target = target_entity_type.strip().lower()
-        _add_unique(
+        normalized_target = self._normalize_lookup_text(target_entity_type)
+        self._add_unique(
             unique_ranked_entities,
             TR_ENTITY_TYPE_CANONICAL_IDS.get(normalized_target, []),
         )
@@ -151,13 +248,13 @@ class Aligner:
             {"_id": 0, "entity_type_id": 1},
         )
         if exact_label:
-            _add_unique(unique_ranked_entities, [exact_label.get("entity_type_id")])
+            self._add_unique(unique_ranked_entities, [exact_label.get("entity_type_id")])
 
         exact_aliases = collection.find(
             {"alias_label": {"$regex": exact_pattern, "$options": "i"}},
             {"_id": 0, "entity_type_id": 1},
         )
-        _add_unique(
+        self._add_unique(
             unique_ranked_entities,
             [item.get("entity_type_id") for item in exact_aliases],
         )
