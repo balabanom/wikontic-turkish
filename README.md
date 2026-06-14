@@ -49,7 +49,41 @@ Clone and install dependencies:
 ```bash
 git clone <repo-url>
 cd Wikontic
+```
 
+Run the first-time setup script:
+
+```bash
+./scripts/first_setup.sh
+```
+
+This script creates `.env` if needed, creates `.venv`, installs dependencies, starts MongoDB Atlas Local, and initializes all current UI profiles:
+
+```text
+en__contriever
+en__bge_m3
+en__turkish_e5_large
+en__mft_random
+tr__bge_m3
+tr__turkish_e5_large
+tr__mft_random
+```
+
+Start the app later with:
+
+```bash
+./scripts/start_wikontic.sh
+```
+
+The start script checks Docker, starts or creates the `wikontic_mongo` container if needed, waits for MongoDB, and launches Streamlit at `http://localhost:8501`.
+
+## Manual Setup
+
+Use this section only if you do not want to use the setup scripts.
+
+Install dependencies:
+
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -299,6 +333,9 @@ Wikontic/
 ├── init_dbs.py
 ├── init_triplets_only.py
 ├── requirements.txt
+├── scripts/
+│   ├── first_setup.sh
+│   └── start_wikontic.sh
 ├── configs/
 │   └── embedding_profiles.json
 ├── src/wikontic/

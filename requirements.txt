@@ -4,16 +4,20 @@ uvicorn[standard]
 requests
 beautifulsoup4
 numpy
+pandas
+networkx
 pyvis
 python-dotenv
 pymongo
 openai
+httpx
 tenacity
 pathlib
 typing
 unidecode
 torch>=2.6.0
 transformers
+tqdm
 dataclasses
 pydantic
 accelerate
@@ -21,3 +25,5 @@ langchain_openai
 langchain
 dspy-ai
 textgrad
+jsonlines
+datasets
