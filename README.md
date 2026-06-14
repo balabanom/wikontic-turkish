@@ -75,7 +75,7 @@ Start the app later with:
 ./scripts/start_wikontic.sh
 ```
 
-The start script checks Docker, starts or creates the `wikontic_mongo` container if needed, waits for MongoDB, and launches Streamlit at `http://localhost:8501`.
+The start script checks Docker, starts or creates the `wikontic` MongoDB container if needed, waits for MongoDB, and launches Streamlit at `http://localhost:8501`.
 
 ## Manual Setup
 
@@ -116,8 +116,8 @@ WIKONTIC_API_URL=http://localhost:8000
 Start MongoDB Atlas Local:
 
 ```bash
-docker pull mongodb-atlas-local
-docker run --name wikontic_mongo -d -p 27018:27018 mongodb-atlas-local:latest
+docker pull mongodb/mongodb-atlas-local:latest
+docker run --name wikontic -d -p 27018:27017 mongodb/mongodb-atlas-local:latest
 ```
 
 Initialize the default English profile:

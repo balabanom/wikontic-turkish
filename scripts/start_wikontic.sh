@@ -4,9 +4,11 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
-MONGO_CONTAINER="${MONGO_CONTAINER:-wikontic_mongo}"
-MONGO_IMAGE="${MONGO_IMAGE:-mongodb-atlas-local:latest}"
-MONGO_PORT="${MONGO_PORT:-27018}"
+MONGO_CONTAINER="${MONGO_CONTAINER:-wikontic}"
+LEGACY_MONGO_CONTAINER="${LEGACY_MONGO_CONTAINER:-wikontic_mongo}"
+MONGO_IMAGE="${MONGO_IMAGE:-mongodb/mongodb-atlas-local:latest}"
+MONGO_HOST_PORT="${MONGO_HOST_PORT:-27018}"
+MONGO_CONTAINER_PORT="${MONGO_CONTAINER_PORT:-27017}"
 STREAMLIT_PORT="${STREAMLIT_PORT:-8501}"
 
 log() {
@@ -60,9 +62,22 @@ ensure_mongo_container() {
     return 0
   fi
 
+  if docker ps --format '{{.Names}}' | grep -qx "$LEGACY_MONGO_CONTAINER"; then
+    log "Legacy Mongo container '$LEGACY_MONGO_CONTAINER' is already running"
+    ok "Mongo container running"
+    return 0
+  fi
+
   if docker ps -a --format '{{.Names}}' | grep -qx "$MONGO_CONTAINER"; then
     log "Starting existing Mongo container '$MONGO_CONTAINER'"
     docker start "$MONGO_CONTAINER" >/dev/null
+    ok "Mongo container started"
+    return 0
+  fi
+
+  if docker ps -a --format '{{.Names}}' | grep -qx "$LEGACY_MONGO_CONTAINER"; then
+    log "Starting existing legacy Mongo container '$LEGACY_MONGO_CONTAINER'"
+    docker start "$LEGACY_MONGO_CONTAINER" >/dev/null
     ok "Mongo container started"
     return 0
   fi
@@ -73,7 +88,7 @@ ensure_mongo_container() {
   docker run \
     --name "$MONGO_CONTAINER" \
     -d \
-    -p "${MONGO_PORT}:${MONGO_PORT}" \
+    -p "${MONGO_HOST_PORT}:${MONGO_CONTAINER_PORT}" \
     "$MONGO_IMAGE" >/dev/null
   ok "Mongo container created and started"
 }
@@ -84,7 +99,7 @@ wait_for_mongo() {
     exit 1
   fi
 
-  log "Waiting for MongoDB on localhost:${MONGO_PORT}"
+  log "Waiting for MongoDB on localhost:${MONGO_HOST_PORT}"
   for attempt in $(seq 1 60); do
     if .venv/bin/python - <<'PY' >/dev/null 2>&1
 import os

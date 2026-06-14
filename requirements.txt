@@ -16,6 +16,7 @@ pathlib
 typing
 unidecode
 torch>=2.6.0
+torchvision
 transformers
 tqdm
 dataclasses
