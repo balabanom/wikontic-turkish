@@ -329,7 +329,7 @@ def _network() -> Network:
         width="100%",
         bgcolor="#ffffff",
         font_color="#172033",
-        directed=True,
+        directed=False,
         cdn_resources="in_line",
     )
     net.set_options(
@@ -349,7 +349,11 @@ def _network() -> Network:
             "stabilization": {"iterations": 220}
           },
           "edges": {
-            "arrows": {"to": {"enabled": true, "scaleFactor": 0.65}},
+            "arrows": {
+              "to": {"enabled": false},
+              "middle": {"enabled": false},
+              "from": {"enabled": false}
+            },
             "color": {"inherit": false},
             "font": {"size": 11, "align": "middle"},
             "smooth": {"enabled": true, "type": "dynamic"}
@@ -361,13 +365,94 @@ def _network() -> Network:
           },
           "interaction": {
             "hover": true,
-            "navigationButtons": true,
+            "navigationButtons": false,
             "keyboard": true
           }
         }
         """
     )
     return net
+
+
+def _with_png_export_button(graph_html: str) -> str:
+    export_controls = """
+        <style>
+          .wikontic-export-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px 10px;
+            border-top: 1px solid rgba(148, 163, 184, 0.35);
+            background: #ffffff;
+            box-sizing: border-box;
+            font-family: Inter, Arial, sans-serif;
+          }
+          .wikontic-export-button {
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #172033;
+            cursor: pointer;
+            font-size: 13px;
+            line-height: 1.2;
+            padding: 7px 11px;
+          }
+          .wikontic-export-button:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+          }
+        </style>
+        <div class="wikontic-export-bar">
+          <button
+            id="wikontic-download-visible-png"
+            class="wikontic-export-button"
+            type="button"
+            aria-label="Download visible graph area as PNG"
+          >
+            Download visible PNG
+          </button>
+        </div>
+        <script>
+          (function () {
+            function downloadVisibleGraphPng() {
+              var container = document.getElementById("mynetwork");
+              if (!container) {
+                return;
+              }
+
+              var canvas = container.querySelector("canvas");
+              if (!canvas) {
+                return;
+              }
+
+              var exportCanvas = document.createElement("canvas");
+              exportCanvas.width = canvas.width;
+              exportCanvas.height = canvas.height;
+
+              var context = exportCanvas.getContext("2d");
+              context.fillStyle = "#ffffff";
+              context.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+              context.drawImage(canvas, 0, 0);
+
+              var link = document.createElement("a");
+              var timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+              link.download = "ontology-graph-" + timestamp + ".png";
+              link.href = exportCanvas.toDataURL("image/png");
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }
+
+            var button = document.getElementById("wikontic-download-visible-png");
+            if (button) {
+              button.addEventListener("click", downloadVisibleGraphPng);
+            }
+          })();
+        </script>
+    """
+    if "</body>" in graph_html:
+        return graph_html.replace("</body>", f"{export_controls}\n    </body>", 1)
+    return graph_html + export_controls
 
 
 def _node_title(label: str, item_id: str, detail: str = "") -> str:
@@ -431,7 +516,8 @@ def _render_network(net: Network, height: int = 650) -> None:
         path = Path(tmp_file.name)
     try:
         net.save_graph(str(path))
-        st.iframe(path.read_text(encoding="utf-8"), height=height, width="stretch")
+        graph_html = _with_png_export_button(path.read_text(encoding="utf-8"))
+        st.iframe(graph_html, height=height + 52, width="stretch")
     finally:
         path.unlink(missing_ok=True)
 
