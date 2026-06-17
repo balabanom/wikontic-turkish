@@ -1902,11 +1902,12 @@ if trigger_no_db:
         st.warning("Please enter a text to extract KG.")
     else:
         import requests as _requests
-        _api_url = os.getenv("WIKONTIC_API_URL", "http://localhost:8000") + "/extract"
+        _api_url = os.getenv("WIKONTIC_API_URL", "http://localhost:8001") + "/extract"
         _payload = {
             "text":            input_text,
             "embedding_model": effective_profile.embedding_model_name.split("/")[-1].lower().replace("-", "_").replace(".", "_"),
             "llm_model":       selected_model,
+            "ontology_language": effective_profile.ontology_language,
             "prompt_type":     selected_prompt_type,
         }
         # Map full model name to embedding_key via profile
@@ -1946,7 +1947,7 @@ if trigger_no_db:
             except _requests.exceptions.ConnectionError:
                 st.error(
                     "Cannot reach Wikontic API. Start it with:\n"
-                    "```\nuvicorn api:app --host 0.0.0.0 --port 8000\n```"
+                    "```\nuvicorn api:app --host 0.0.0.0 --port 8001\n```"
                 )
             except Exception as _e:
                 st.error(f"API call failed: {_e}")

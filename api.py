@@ -5,10 +5,10 @@ Extracts knowledge graph triplets from text using the full ontology pipeline
 but WITHOUT writing anything to the database.
 
 Usage:
-    uvicorn api:app --host 0.0.0.0 --port 8000
+    uvicorn api:app --host 0.0.0.0 --port 8001
 
 POST /extract
-    Body: { "text": "...", "embedding_model": "turkish_sbert_mean_nli_stsb", "ontology_language": "tr", "llm_model": "google/gemini-2.5-flash-lite" }
+    Body: { "text": "...", "embedding_model": "turkish_sbert_mean_nli_stsb", "ontology_language": "tr", "llm_model": "google/gemini-2.5-flash-lite", "prompt_type": "ape" }
     Returns: { "triplets": [...], "count": N }
 """
 
@@ -32,6 +32,7 @@ logging.basicConfig(
     format="%(asctime)s  %(levelname)s  %(message)s",
     datefmt="%H:%M:%S",
 )
+api_logger = logging.getLogger("uvicorn.error")
 
 app = FastAPI(title="Wikontic Extraction API", version="1.0.0")
 
@@ -49,6 +50,18 @@ _PROXY_URL = os.getenv("PROXY_URL")
 _mongo_client: Optional[MongoClient] = None
 
 
+def _prompt_execution_mode(prompt_type: str) -> str:
+    if prompt_type == "temel":
+        return "default_wikontic_prompt"
+    if prompt_type == "ape":
+        return "ape_optimized_system_prompt"
+    if prompt_type == "textgrad":
+        return "textgrad_optimized_system_prompt"
+    if prompt_type == "dspy":
+        return "dspy_extraction_runtime"
+    return "unknown"
+
+
 def _get_mongo() -> MongoClient:
     global _mongo_client
     if _mongo_client is None:
@@ -61,7 +74,7 @@ def _check_mongo():
     try:
         _get_mongo().admin.command("ping")
     except Exception as e:
-        logging.error("MongoDB unreachable: %s", e)
+        api_logger.error("MongoDB unreachable: %s", e)
         raise HTTPException(
             status_code=503,
             detail="MongoDB is not running. Start it (e.g. docker-compose up -d) and retry.",
@@ -158,7 +171,7 @@ class ExtractionResponse(BaseModel):
 
 @app.get("/")
 def healthcheck():
-    logging.info("GET /  →  healthcheck")
+    api_logger.info("GET /  ->  healthcheck")
     try:
         _get_mongo().admin.command("ping")
         db_status = "ok"
@@ -169,8 +182,8 @@ def healthcheck():
 
 @app.post("/extract", response_model=ExtractionResponse)
 def extract(req: ExtractionRequest):
-    logging.info(
-        "POST /extract  →  embedding_model=%s  llm_model=%s  ontology_language=%s  prompt_type=%s  text_len=%d  text_preview=%r",
+    api_logger.info(
+        "[WIKONTIC_API] POST /extract received embedding_model=%s llm_model=%s ontology_language=%s prompt_type=%s text_len=%d text_preview=%r",
         req.embedding_model,
         req.llm_model,
         req.ontology_language,
@@ -202,10 +215,19 @@ def extract(req: ExtractionRequest):
 
     from prompts.dispatcher import is_valid_prompt_type
     if not is_valid_prompt_type(req.prompt_type):
+        api_logger.warning(
+            "[WIKONTIC_PROMPT_TECH] rejected invalid prompt_type=%r known=temel,ape,dspy,textgrad",
+            req.prompt_type,
+        )
         raise HTTPException(
             status_code=422,
             detail=f"Unknown prompt_type '{req.prompt_type}'. Known: temel, ape, dspy, textgrad",
         )
+    api_logger.info(
+        "[WIKONTIC_PROMPT_TECH] accepted request prompt_type=%s execution_mode=%s",
+        req.prompt_type,
+        _prompt_execution_mode(req.prompt_type),
+    )
 
     _check_mongo()
 
@@ -214,6 +236,14 @@ def extract(req: ExtractionRequest):
         profile = _resolve_profile(req.embedding_model, req.ontology_language)
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
+    api_logger.info(
+        "[WIKONTIC_API] resolved profile_id=%s ontology_db=%s triplets_db=%s ontology_language=%s prompt_type=%s",
+        profile.profile_id,
+        profile.ontology_db_name,
+        profile.triplets_db_name,
+        profile.ontology_language,
+        req.prompt_type,
+    )
 
     # Build extractor
     from src.wikontic.utils.openai_utils import LLMTripletExtractor
@@ -222,6 +252,27 @@ def extract(req: ExtractionRequest):
         api_key=_API_KEY,
         proxy=_PROXY_URL,
         prompt_type=req.prompt_type,
+    )
+    effective_prompt_type = getattr(extractor, "prompt_type", None)
+    if effective_prompt_type != req.prompt_type:
+        api_logger.error(
+            "[WIKONTIC_PROMPT_TECH] extractor prompt_type mismatch requested=%s effective=%s",
+            req.prompt_type,
+            effective_prompt_type,
+        )
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                "Internal prompt_type mismatch: "
+                f"requested={req.prompt_type}, effective={effective_prompt_type}"
+            ),
+        )
+    api_logger.info(
+        "[WIKONTIC_PROMPT_TECH] extractor configured requested_prompt_type=%s effective_prompt_type=%s execution_mode=%s llm_model=%s",
+        req.prompt_type,
+        effective_prompt_type,
+        _prompt_execution_mode(effective_prompt_type),
+        req.llm_model,
     )
 
     # Get cached aligner for this (embedding, language) combo
@@ -243,6 +294,11 @@ def extract(req: ExtractionRequest):
     )
 
     try:
+        api_logger.info(
+            "[WIKONTIC_PROMPT_TECH] starting no-write extraction prompt_type=%s execution_mode=%s",
+            req.prompt_type,
+            _prompt_execution_mode(req.prompt_type),
+        )
         _, final_triplets, _, _ = pipeline.extract_triplets_with_ontology_filtering(
             text=req.text,
             sample_id="api_preview",
@@ -251,6 +307,11 @@ def extract(req: ExtractionRequest):
             timer=None,
         )
     except Exception as e:
+        api_logger.exception(
+            "[WIKONTIC_PROMPT_TECH] extraction failed prompt_type=%s execution_mode=%s",
+            req.prompt_type,
+            _prompt_execution_mode(req.prompt_type),
+        )
         raise HTTPException(status_code=500, detail=f"Extraction failed: {e}")
 
     def _normalise_qualifiers(raw) -> list[Qualifier]:
@@ -278,5 +339,10 @@ def extract(req: ExtractionRequest):
         for t in final_triplets
     ]
 
-    logging.info("POST /extract  ←  returned %d triplets", len(result))
+    api_logger.info(
+        "[WIKONTIC_PROMPT_TECH] completed no-write extraction prompt_type=%s execution_mode=%s returned_triplets=%d",
+        req.prompt_type,
+        _prompt_execution_mode(req.prompt_type),
+        len(result),
+    )
     return ExtractionResponse(triplets=result, count=len(result))

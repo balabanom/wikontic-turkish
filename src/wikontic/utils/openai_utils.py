@@ -21,9 +21,11 @@ from .llm_client_logger import LoggedOpenAIClient
 
 logger = logging.getLogger("OpenAIUtils")
 logger.setLevel(logging.ERROR)
+prompt_audit_logger = logging.getLogger("uvicorn.error")
 logging.getLogger("httpx").setLevel(logging.ERROR)
 
 MAX_ATTEMPTS = 1
+VALID_TRIPLET_PROMPT_TYPES = {"temel", "ape", "dspy", "textgrad"}
 
 
 class LLMTripletExtractor:
@@ -52,6 +54,11 @@ class LLMTripletExtractor:
         self.api_key = api_key
         self.proxy = proxy
         self.prompt_type = prompt_type if prompt_type else "temel"
+        if self.prompt_type not in VALID_TRIPLET_PROMPT_TYPES:
+            raise ValueError(
+                f"Unknown prompt_type {self.prompt_type!r}. "
+                "Known: temel, ape, dspy, textgrad"
+            )
         base_url = os.getenv("OPENAI_BASE_URL") or os.getenv("OPENROUTER_BASE_URL")
 
         client_kwargs = {"api_key": api_key}
@@ -179,15 +186,34 @@ class LLMTripletExtractor:
         a different path via run_dspy_extraction.
         """
         if self.prompt_type in (None, "temel"):
+            prompt_audit_logger.info(
+                "[WIKONTIC_PROMPT_TECH] resolved triplet extraction prompt_type=temel mode=default_wikontic_prompt model=%s",
+                self.model,
+            )
             return self.prompts["triplet_extraction"]
         if self.prompt_type in ("ape", "textgrad"):
             from prompts.dispatcher import get_optimized_system_prompt
             optimized = get_optimized_system_prompt(
                 self.prompt_type, self.model, self.api_key, self.proxy
             )
-            return optimized or self.prompts["triplet_extraction"]
-        # dspy is handled separately in extract_triplets_from_text
-        return self.prompts["triplet_extraction"]
+            if not isinstance(optimized, str) or not optimized.strip():
+                raise RuntimeError(
+                    f"prompt_type={self.prompt_type!r} did not produce a usable "
+                    "optimized prompt; refusing to fall back to the default prompt."
+                )
+            prompt_audit_logger.info(
+                "[WIKONTIC_PROMPT_TECH] resolved triplet extraction prompt_type=%s mode=optimized_system_prompt model=%s prompt_chars=%d",
+                self.prompt_type,
+                self.model,
+                len(optimized),
+            )
+            return optimized
+        # dspy is handled separately in extract_triplets_from_text. Reaching this
+        # branch means the extractor state was mutated after construction.
+        raise RuntimeError(
+            f"Unsupported prompt_type {self.prompt_type!r} reached prompt resolution; "
+            "refusing to use the default prompt implicitly."
+        )
 
     @tenacity.retry(stop=tenacity.stop_after_attempt(MAX_ATTEMPTS), reraise=True)
     def extract_triplets_from_text(self, text: str, sentences: list | None = None) -> dict:
@@ -200,13 +226,29 @@ class LLMTripletExtractor:
             attempt,
             self.prompt_type,
         )
+        prompt_audit_logger.info(
+            "[WIKONTIC_PROMPT_TECH] triplet_extraction started prompt_type=%s model=%s attempt=%s",
+            self.prompt_type,
+            self.model,
+            attempt,
+        )
 
         # DSPy path: bypass standard get_completion since the module wraps its own LM.
         if self.prompt_type == "dspy":
             from prompts.dispatcher import run_dspy_extraction
+            prompt_audit_logger.info(
+                "[WIKONTIC_PROMPT_TECH] triplet_extraction using prompt_type=dspy mode=dspy_extraction_runtime model=%s",
+                self.model,
+            )
             return run_dspy_extraction(text, self.model, self.api_key, self.proxy)
 
         system_prompt = self._resolve_triplet_extraction_prompt()
+        prompt_audit_logger.info(
+            "[WIKONTIC_PROMPT_TECH] triplet_extraction using prompt_type=%s system_prompt_chars=%d model=%s",
+            self.prompt_type,
+            len(system_prompt),
+            self.model,
+        )
         if attempt > 1:
             prev_error = self._prev_error
             system_prompt += (

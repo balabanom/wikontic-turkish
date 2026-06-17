@@ -111,7 +111,7 @@ Optional values:
 
 ```bash
 PROXY_URL=
-WIKONTIC_API_URL=http://localhost:8000
+WIKONTIC_API_URL=http://localhost:8001
 ```
 
 Start MongoDB Atlas Local:
@@ -290,19 +290,19 @@ demo
 Run the API:
 
 ```bash
-uvicorn api:app --host 0.0.0.0 --port 8000
+uvicorn api:app --host 0.0.0.0 --port 8001
 ```
 
 Health check:
 
 ```bash
-curl http://localhost:8000/
+curl http://localhost:8001/
 ```
 
 No-write extraction:
 
 ```bash
-curl -X POST http://localhost:8000/extract \
+curl -X POST http://localhost:8001/extract \
   -H "Content-Type: application/json" \
   -d '{
     "text": "Ada Lovelace worked on Charles Babbage's Analytical Engine.",
@@ -316,7 +316,7 @@ curl -X POST http://localhost:8000/extract \
 Turkish SBERT Mean NLI STS-B no-write extraction:
 
 ```bash
-curl -X POST http://localhost:8000/extract \
+curl -X POST http://localhost:8001/extract \
   -H "Content-Type: application/json" \
   -d '{
     "text": "Mustafa Kemal Atatürk Türkiye Cumhuriyeti'nin kurucusudur.",
