@@ -83,6 +83,13 @@ def resolve_runtime_profile(
         raise ValueError(f"Unknown embedding profile: {embedding_profile_id!r}")
 
     lang = ontology.language
+    if lang not in embedding.compatible_languages:
+        raise ValueError(
+            f"Embedding profile {embedding.profile_id!r} is not compatible with "
+            f"ontology language {lang!r}. Compatible languages: "
+            f"{', '.join(embedding.compatible_languages)}"
+        )
+
     runtime_key = ontology.runtime_key
     emb_key = embedding.embedding_key
     profile_id = f"{runtime_key}__{emb_key}"

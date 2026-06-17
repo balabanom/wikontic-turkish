@@ -66,6 +66,7 @@ en__turkish_e5_large
 en__mft_random
 tr__bge_m3
 tr__turkish_e5_large
+tr__turkish_sbert_mean_nli_stsb
 tr__mft_random
 ```
 
@@ -132,6 +133,12 @@ Initialize the recommended Turkish profile:
 python init_dbs.py --profile tr__turkish_e5_large
 ```
 
+Initialize the Turkish SBERT Mean NLI STS-B profile:
+
+```bash
+python init_dbs.py --profile tr__turkish_sbert_mean_nli_stsb
+```
+
 Launch the Streamlit app:
 
 ```bash
@@ -158,6 +165,7 @@ python init_dbs.py --profile en__bge_m3
 
 # Explicit Turkish profiles
 python init_dbs.py --profile tr__turkish_e5_large
+python init_dbs.py --profile tr__turkish_sbert_mean_nli_stsb
 python init_dbs.py --profile tr__mft_random
 python init_dbs.py --profile tr__bge_m3
 
@@ -181,7 +189,7 @@ python init_dbs.py --profile en__contriever --drop_triplets
 A runtime profile is the combination of:
 
 - an ontology profile, such as English or Turkish
-- an embedding profile, such as Contriever, Turkish E5 Large, BGE-M3, or MFT-Random
+- an embedding profile, such as Contriever, Turkish E5 Large, Turkish SBERT Mean NLI STS-B, BGE-M3, or MFT-Random
 
 Profile IDs use this format:
 
@@ -195,6 +203,7 @@ Examples:
 en__contriever
 en__mft_random
 tr__turkish_e5_large
+tr__turkish_sbert_mean_nli_stsb
 tr__bge_m3
 ```
 
@@ -219,6 +228,7 @@ Defined in `configs/embedding_profiles.json`:
 | `contriever_v1` | `contriever` | `facebook/contriever` | 768 | en | Available |
 | `bge_m3_v1` | `bge_m3` | `BAAI/bge-m3` | 1024 | en, tr | Available |
 | `turkish_e5_large_v1` | `turkish_e5_large` | `ytu-ce-cosmos/turkish-e5-large` | 1024 | en, tr | Available |
+| `turkish_sbert_mean_nli_stsb_v1` | `turkish_sbert_mean_nli_stsb` | `emrecan/bert-base-turkish-cased-mean-nli-stsb-tr` | 768 | tr | Available |
 | `mft_random_v1` | `mft_random` | `alibayram/mft-random` | 768 | en, tr | Available |
 
 `tr__contriever` is not valid because Contriever is registered as English-only.
@@ -243,9 +253,12 @@ ontology__en.property_aliases__contriever
 
 ontology__tr.entity_type_aliases__turkish_e5_large
 ontology__tr.property_aliases__turkish_e5_large
+ontology__tr.entity_type_aliases__turkish_sbert_mean_nli_stsb
+ontology__tr.property_aliases__turkish_sbert_mean_nli_stsb
 
 triplets.entity_aliases__contriever
 triplets.entity_aliases__turkish_e5_large
+triplets.entity_aliases__turkish_sbert_mean_nli_stsb
 triplets.triplets
 triplets.initial_triplets
 triplets.filtered_triplets
@@ -300,11 +313,25 @@ curl -X POST http://localhost:8000/extract \
   }'
 ```
 
+Turkish SBERT Mean NLI STS-B no-write extraction:
+
+```bash
+curl -X POST http://localhost:8000/extract \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Mustafa Kemal Atatürk Türkiye Cumhuriyeti'nin kurucusudur.",
+    "embedding_model": "turkish_sbert_mean_nli_stsb",
+    "ontology_language": "tr",
+    "llm_model": "gpt-4o-mini",
+    "prompt_type": "temel"
+  }'
+```
+
 API fields:
 
 | Field | Values |
 |---|---|
-| `embedding_model` | `contriever`, `bge_m3`, `turkish_e5_large`, `mft_random` |
+| `embedding_model` | `contriever`, `bge_m3`, `turkish_e5_large`, `turkish_sbert_mean_nli_stsb`, `mft_random` |
 | `ontology_language` | `en`, `tr` |
 | `prompt_type` | `temel`, `ape`, `dspy`, `textgrad` |
 | `llm_model` | Any configured OpenAI/OpenRouter-compatible model |

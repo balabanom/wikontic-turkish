@@ -36,6 +36,18 @@
     "notes": "Set available=true after model installation."
   },
   {
+    "embedding_profile_id": "turkish_sbert_mean_nli_stsb_v1",
+    "embedding_model_name": "emrecan/bert-base-turkish-cased-mean-nli-stsb-tr",
+    "embedding_dimension": 768,
+    "display_name": "Turkish SBERT Mean NLI STS-B",
+    "embedding_key": "turkish_sbert_mean_nli_stsb",
+    "compatible_languages": ["tr"],
+    "family": "hf_local",
+    "supports_turkish": "strong",
+    "available": true,
+    "notes": "Sentence-transformers Turkish BERT model trained on Turkish NLI and STS-B translations; 768-dim mean-pooled embeddings."
+  },
+  {
     "embedding_profile_id": "mft_random_v1",
     "embedding_model_name": "alibayram/mft-random",
     "embedding_dimension": 768,

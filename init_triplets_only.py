@@ -19,11 +19,18 @@ def resolve_profile_from_runtime_id(profile_id: str):
     # profile_id format: "{runtime_key}__{embedding_key}"  e.g. en__mft_random
     for op_id, op in ONTOLOGY_PROFILES.items():
         for ep_id, ep in EMBEDDING_PROFILES.items():
+            if op.language not in ep.compatible_languages:
+                continue
             candidate_id = f"{op.runtime_key}__{ep.embedding_key}"
             if candidate_id == profile_id:
                 return resolve_runtime_profile(op_id, ep_id)
 
-    known = [f"{op.runtime_key}__{ep.embedding_key}" for op in ONTOLOGY_PROFILES.values() for ep in EMBEDDING_PROFILES.values()]
+    known = [
+        f"{op.runtime_key}__{ep.embedding_key}"
+        for op in ONTOLOGY_PROFILES.values()
+        for ep in EMBEDDING_PROFILES.values()
+        if op.language in ep.compatible_languages
+    ]
     print(f"ERROR: Unknown profile_id '{profile_id}'.")
     print("Known profiles:", ", ".join(sorted(known)))
     sys.exit(1)

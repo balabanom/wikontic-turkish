@@ -12,6 +12,7 @@ Usage:
 
     # When Turkish data is ready
     python init_dbs.py --profile tr__turkish_e5_large
+    python init_dbs.py --profile tr__turkish_sbert_mean_nli_stsb
 
 The --profile argument must match a profile_id resolvable from the registry.
 No silent fallback: if the profile is unknown, the script exits with an error.
@@ -42,6 +43,8 @@ def _resolve_profile(profile_id: str):
     # profile_id is "{runtime_key}__{embedding_key}" — derive profile IDs from registry
     for op_id, op in ONTOLOGY_PROFILES.items():
         for ep_id, ep in EMBEDDING_PROFILES.items():
+            if op.language not in ep.compatible_languages:
+                continue
             candidate_id = f"{op.runtime_key}__{ep.embedding_key}"
             if candidate_id == profile_id:
                 return resolve_runtime_profile(op_id, ep_id)
@@ -49,10 +52,12 @@ def _resolve_profile(profile_id: str):
     known = []
     for op in ONTOLOGY_PROFILES.values():
         for ep in EMBEDDING_PROFILES.values():
+            if op.language not in ep.compatible_languages:
+                continue
             known.append(f"{op.runtime_key}__{ep.embedding_key}")
 
     print(f"ERROR: Unknown profile_id '{profile_id}'.")
-    print(f"Known profiles: {', '.join(known)}")
+    print(f"Known profiles: {', '.join(sorted(known))}")
     sys.exit(1)
 
 

@@ -186,6 +186,10 @@ def _shorten(text: str, length: int = 32) -> str:
     return text if len(text) <= length else f"{text[: length - 3]}..."
 
 
+def _graph_node_label(label: str, item_id: str) -> str:
+    return f"{_shorten(label)}\n{item_id}"
+
+
 def _dedupe(values: list[str]) -> list[str]:
     seen: set[str] = set()
     out: list[str] = []
@@ -329,7 +333,7 @@ def _network() -> Network:
         width="100%",
         bgcolor="#ffffff",
         font_color="#172033",
-        directed=False,
+        directed=True,
         cdn_resources="in_line",
     )
     net.set_options(
@@ -350,12 +354,18 @@ def _network() -> Network:
           },
           "edges": {
             "arrows": {
-              "to": {"enabled": false},
+              "to": {"enabled": true, "scaleFactor": 0.75},
               "middle": {"enabled": false},
               "from": {"enabled": false}
             },
             "color": {"inherit": false},
-            "font": {"size": 11, "align": "middle"},
+            "font": {
+              "size": 11,
+              "align": "middle",
+              "background": "#ffffff",
+              "strokeWidth": 3,
+              "strokeColor": "#ffffff"
+            },
             "smooth": {"enabled": true, "type": "dynamic"}
           },
           "nodes": {
@@ -478,7 +488,7 @@ def _add_entity_node(
     label = _label_entity(bundle, entity_id)
     net.add_node(
         entity_id,
-        label=_shorten(label),
+        label=_graph_node_label(label, entity_id),
         title=_node_title(label, entity_id, "entity type"),
         color=colors.get(role, colors["object"]),
         shape="box",
@@ -503,7 +513,7 @@ def _add_property_node(
     data_type = bundle["prop_data_type"].get(property_id, "unknown data type")
     net.add_node(
         property_id,
-        label=_shorten(label),
+        label=_graph_node_label(label, property_id),
         title=_node_title(label, property_id, f"property, {data_type}"),
         color=colors.get(role, colors["property"]),
         shape="ellipse",

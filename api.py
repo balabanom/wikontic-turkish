@@ -8,7 +8,7 @@ Usage:
     uvicorn api:app --host 0.0.0.0 --port 8000
 
 POST /extract
-    Body: { "text": "...", "embedding_model": "contriever", "llm_model": "google/gemini-2.5-flash-lite" }
+    Body: { "text": "...", "embedding_model": "turkish_sbert_mean_nli_stsb", "ontology_language": "tr", "llm_model": "google/gemini-2.5-flash-lite" }
     Returns: { "triplets": [...], "count": N }
 """
 
@@ -187,7 +187,8 @@ def extract(req: ExtractionRequest):
     ----------
     text            : Input paragraph to extract from.
     embedding_model : Embedding model key (e.g. "contriever", "bge_m3",
-                      "turkish_e5_large", "mft_random").
+                      "turkish_e5_large", "turkish_sbert_mean_nli_stsb",
+                      "mft_random").
     llm_model       : LLM model name (e.g. "openai/gpt-4o-mini",
                       "google/gemini-2.5-flash-lite").
 

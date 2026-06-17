@@ -17,6 +17,7 @@ PROFILES=(
   "en__mft_random"
   "tr__bge_m3"
   "tr__turkish_e5_large"
+  "tr__turkish_sbert_mean_nli_stsb"
   "tr__mft_random"
 )
 
